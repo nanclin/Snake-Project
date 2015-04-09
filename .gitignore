@@ -20,6 +20,10 @@ ExportedObj/
 *.user
 *.unityproj
 *.booproj
+*.sublime-project
+*.sublime-project.meta
+*.sublime-workspace
+*.sublime-workspace.meta
 
 # ============ #
 # OS generated #
