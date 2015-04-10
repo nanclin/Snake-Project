@@ -6,18 +6,8 @@ public class FollowTarget : MonoBehaviour {
 	// public GameObject target;
 	// public float smoothTime = 0.1f;
 
-	private Transform target;
+	public Transform target;
 
-	// Use this for initialization
-	void Start () {
-		target = GetComponentInChildren<Chain>().head.prefab.transform;
-		// print( GetComponent<Chain>().head.prefab.transform );
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
 	void LateUpdate () {
 

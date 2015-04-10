@@ -17,12 +17,12 @@ public class Chain : MonoBehaviour {
 	public Node tail;
 
 
-	void Awake()
+	void Start()
 	{
 		for( int i = 0; i < 5; i++ ) {
 			addLast( new Node( -i, buffer, bondStrength, Instantiate( prefab, Vector3.zero, Quaternion.identity) as Transform ) );
 		}
-		printNodes( head );
+		// printNodes( head );
 	}
 
 	void Update()
@@ -74,6 +74,9 @@ public class Chain : MonoBehaviour {
 
 public class Node
 {
+	// Components
+	public Transform prefab;
+
 	// Handling
 	public float buffer;
 	public float bondStrength;
@@ -82,7 +85,6 @@ public class Node
 	public float value;
 	public Node next;
 	public Node previous;
-	public Transform prefab;
 
 	public Node( float value, float buffer, float bondStrength, Transform prefab )
 	{

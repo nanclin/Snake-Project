@@ -26,7 +26,7 @@ public class MyDraw : MonoBehaviour {
 		STEP++;
 	}
 
-	public static void DrawLineThroughPoint( Vector3 point, Color color, float length = 0.01f )
+	public static void DrawLineThroughPoint( Vector3 point, Color color, float length = 0.1f )
 	{
 		Vector3 a = point - Vector3.right * length / 2;
 		Vector3 b = point + Vector3.right * length / 2;
