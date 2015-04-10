@@ -12,7 +12,7 @@ public class SnakeSkeleton {
 	public List<Vector3> joints = new List<Vector3>();
 
 
-	// CONSTRUCTOR ////////////////////////////////////////////////////////
+// CONSTRUCTOR ////////////////////////////////////////////////////////
 
 	// Use this for initialization
 	public SnakeSkeleton ()
@@ -57,25 +57,24 @@ public class SnakeSkeleton {
 		// PrependJoint( new Vector3(0.0f, 0.0f, 2.0f) );
 		// joints.RemoveRange(2,-1);
 
-		// Spiral
-		// for( float i=0; i<=360; i+=(360/10) ) {
-		// 	PrependJoint( new Vector3( Mathf.Sin(i/180*Mathf.PI), (i/360)*5.0f, Mathf.Cos(i/180*Mathf.PI) ) );
+		// // 3D Spiral
+		// for( float i = 0; i <= 360; i += (360/100) ) {
+		// 	PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), ( i / 360) * 5.0f, Mathf.Cos( i / 180 * Mathf.PI ) ) );
 		// }
 
+		// Wave
+		int intervals = 2;
+		for( float i = 0; i <= 360 * intervals; i += (360 * intervals/100) ) {
+			PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), 0, ( i / 360 / intervals ) * 3 ) );
+		}
 
-		// Loop
-		// for( float i=0; Math.Round(i,4)<=1f; i+=0.1f ) {
-		// 	PrependJoint( new Vector3( 0, 0, i ) );
-		// }
+
 	}
-
-
-	// EO CONSTRUCTOR ////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////// EO CONSTRUCTOR //
 
 
 
-	// JOINTS LIST MANIPULATION ////////////////////////////////////////////////////////
-
+// JOINTS LIST MANIPULATION ////////////////////////////////////////////////////////
 
 	// Add joint to the top of the skeleton, closer to the head
 	public void PrependJoint ( Vector3 point )
@@ -123,21 +122,52 @@ public class SnakeSkeleton {
 			_length = 0;
 		}
 	}
+//////////////////////////////////////////////////////// EO JOINTS LIST MANIPULATION //
 
 
 
-	// EO JOINTS LIST MANIPULATION ////////////////////////////////////////////////////////
+// GET DATA ALONG SKELETON ////////////////////////////////////////////////////////
+
+	public SkeletonPointData GetPointOnSkeleton( float input )
+	{
+		SkeletonPointData data = new SkeletonPointData();
+
+		if( input > length ) {
+			throw new System.ArgumentException("Input is larger than skeleton length! Last point returned.");
+		}
+		else if( input < 0 ) {
+			throw new System.ArgumentException("Input is negative! First point returned.");
+		}
+
+		float traversed = 0;
+
+		for( int i = 0; i < joints.Count - 1; i++ )
+		{
+			// Get current bone
+			Vector3 a = joints[ i ];
+			Vector3 b = joints[ i + 1 ];
+			Vector3 bone = b - a;
+
+			traversed += bone.magnitude;
+
+			if( traversed >= input ) {
+
+				float remaining = bone.magnitude - (traversed - input);
+
+				data.point = a + bone.normalized * remaining;
+				data.angle = Quaternion.LookRotation( b - a );
+
+				return data;
+			}
+		}
+
+		return data;
+	}
+//////////////////////////////////////////////////////// EO GET DATA ALONG SKELETON //
 
 
 
-	// GET DATA ALONG SKELETON ////////////////////////////////////////////////////////
-
-
-	// EO GET DATA ALONG SKELETON ////////////////////////////////////////////////////////
-
-
-
-	// DEBUG METHODS ////////////////////////////////////////////////////////
+// DEBUG METHODS ////////////////////////////////////////////////////////
 
 	// Draw joints and bones of skeleton data for debugging pursposes
 	public void Draw( bool drawBones=true, bool drawJoints=true)
@@ -182,7 +212,6 @@ public class SnakeSkeleton {
 		// }
 	}
 
-
 	// Returns data about skeleton in readeable form
 	override public string ToString ()
 	{
@@ -212,12 +241,11 @@ public class SnakeSkeleton {
 
 		return str;
 	}
-
-	// EO DEBUG METHODS ////////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////// EO DEBUG METHODS //
 
 
-	// BASIC SETTERS, GETTTERS ////////////////////////////////////////////////////////
+
+// BASIC SETTERS, GETTTERS ////////////////////////////////////////////////////////
 
 	[SerializeField]
 	public Vector3 firstJoint {
@@ -249,7 +277,6 @@ public class SnakeSkeleton {
 	        	throw new System.Exception("Skeleton has no bone. Can't return \"length\"!");
 		}
 	}
-
-	// EO BASIC SETTERS, GETTTERS ////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////// EO BASIC SETTERS, GETTTERS //
 
 }
