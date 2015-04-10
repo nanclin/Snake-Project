@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour {
 	// System
 	SnakeSkeleton skeleton = new SnakeSkeleton();
 	private float dt;
-	private float angle = 0;
 	private float speed = 0;
 	private Vector3 direction = Vector3.forward;
 	private Vector3 currentPosition = Vector3.zero;
@@ -39,7 +38,7 @@ public class GameManager : MonoBehaviour {
 		speed = Mathf.Min( speed, maxSpeed * dt );
 
 		// Update position
-		direction = Quaternion.Euler( 0, Input.GetAxis( "Horizontal" ) * rotationSpeed * dt, 0 ) * direction;		// Rotate direction vector
+		direction = Quaternion.Euler( 0, Input.GetAxisRaw( "Horizontal" ) * rotationSpeed * dt, 0 ) * direction;		// Rotate direction vector
 		currentPosition += direction * speed;
 		
 		// Update skeleton
