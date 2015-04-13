@@ -24,7 +24,7 @@ public class SnakeController : MonoBehaviour {
 	}
 	private State _state;
 
-	SnakeSkeleton skeleton = new SnakeSkeleton();
+	public SnakeSkeleton skeleton = new SnakeSkeleton();
 	private float dt;
 	private float speed = 0;
 	private Vector3 direction = Vector3.forward;

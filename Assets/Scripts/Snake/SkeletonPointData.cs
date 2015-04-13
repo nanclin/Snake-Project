@@ -4,15 +4,15 @@ using System.Collections;
 
 public struct SkeletonPointData {
 
-	public Vector3 point;
-	public Quaternion angle;
+	public Vector3 position;
+	public Quaternion rotation;
 
 	override public string ToString ()
 	{
 		string s = "";
 		
-		s += " point:\t"         + point        + "\n";
-		s += " angle:\t"         + angle        + "\n";
+		s += " position:\t"         + position        + "\n";
+		s += " rotation:\t"         + rotation        + "\n";
 		
 		return s;
 	}

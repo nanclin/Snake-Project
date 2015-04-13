@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class GameManager : MonoBehaviour {
@@ -7,48 +8,44 @@ public class GameManager : MonoBehaviour {
 	// Global
 	public static int ROUND_DECIMALS = 5;
 	
-
-	public Transform prefab;
+	// Components
+	public SnakeController snake;
+	public Transform cellPrefab;
 	private SnakeSkeleton skeleton;
+	private Chain chain;
+
+	// Debug
+	public Transform marker;
 
 	// Use this for initialization
 	void Start ()
 	{
-		skeleton = new SnakeSkeleton();
+		// Initialize skeleton and chain
+		skeleton = snake.skeleton;
+		chain = GetComponent<Chain>();
 
+		// Create initial skeleton
+		// skeleton.AppendJoint( transform.up * 0 );
+		// skeleton.AppendJoint( transform.up * -5 );
+
+		// Grow cells
+		for( int i = 0; i < 10; i++ )
+		{
+			// Add chain node for current cell
+			chain.addLast( new ChainNode( i, chain.buffer, chain.bondStrength ) );
+			
+			// Instantiate cell and put it on the skeleton
+			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
+			SkeletonPointData point = snake.skeleton.GetPointOnSkeleton( chain.tail.value );
+			cell.position = point.position;
+			cell.rotation = point.rotation;
+		}
 	}
-	
-	private float a = 0;
-	public float speed = 1;
 
 	// Update is called once per frame
 	void Update ()
 	{
-		
-		// Move point
-		a += speed * Time.deltaTime;
-		// a += 0.1f;
-
-		// Handle positions off of skeleton
-		int n = 1;
-		while( a > skeleton.length ){
-			a -= skeleton.length;
-			print( "jump " + n++ );
-		}
-		while( a < 0 ){
-			a += skeleton.length;
-			print( "jump " + n++ );
-		}
-
-		// Get and apply data
-		SkeletonPointData data = skeleton.GetPointOnSkeleton( a );
-		// print( data );
-		prefab.position = data.point;
-		prefab.rotation = data.angle;
-
-
-
 		skeleton.Draw();
-		
+		// print( skeleton.ToString() );	
 	}
 }

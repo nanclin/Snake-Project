@@ -32,7 +32,7 @@ public class SnakeSkeleton {
 		// PrependJoint( new Vector3(2.0f, 0.0f, 1.0f) );
 		// AppendJoint( new Vector3(2.0f, 0.0f, 1.0f) );
 
-		// Simple straight line
+		// // Simple straight line
 		// PrependJoint( new Vector3(0.0f, 0.0f, 0.0f) );
 		// PrependJoint( new Vector3(0.0f, 0.0f, 1.0f) );
 		// PrependJoint( new Vector3(0.0f, 0.0f, 2.0f) );
@@ -63,9 +63,9 @@ public class SnakeSkeleton {
 		// }
 
 		// Wave
-		int intervals = 2;
+		int intervals = 1;
 		for( float i = 0; i <= 360 * intervals; i += (360 * intervals/100) ) {
-			PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), 0, ( i / 360 / intervals ) * 3 ) );
+			PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), 0, ( i / 360 / intervals ) * 10 ) );
 		}
 
 
@@ -130,14 +130,15 @@ public class SnakeSkeleton {
 
 	public SkeletonPointData GetPointOnSkeleton( float input )
 	{
-		SkeletonPointData data = new SkeletonPointData();
 
-		if( input > length ) {
-			throw new System.ArgumentException("Input is larger than skeleton length! Last point returned.");
+		if( input > Math.Round( length, GameManager.ROUND_DECIMALS ) ) {
+			throw new System.ArgumentException("Input is larger than skeleton length!");
 		}
 		else if( input < 0 ) {
-			throw new System.ArgumentException("Input is negative! First point returned.");
+			throw new System.ArgumentException("Input is negative!");
 		}
+
+		SkeletonPointData data = new SkeletonPointData();
 
 		float traversed = 0;
 
@@ -154,12 +155,12 @@ public class SnakeSkeleton {
 
 				float remaining = bone.magnitude - (traversed - input);
 
-				data.point = a + bone.normalized * remaining;
-				data.angle = Quaternion.LookRotation( b - a );
+				data.position = a + bone.normalized * remaining;
+				data.rotation = Quaternion.LookRotation( b - a );
 
 				return data;
 			}
-		}
+	 	}
 
 		return data;
 	}
@@ -222,22 +223,22 @@ public class SnakeSkeleton {
 		// str += "First:\t"+joints.First()+"\n";
 		// str += "Last:\t"+joints.Last()+"\n";
 
-		// str += "Joints: \n";
+		str += "Joints: \n";
 
-		// // Loop through joints FIRST 5
-		// for( int i = 0; i < Mathf.Clamp( 5, 0, joints.Count ); i++ ) {
-		// 	Vector3 point = joints[i];
-		// 	str += "   "+i+": ("+point.x+", "+point.y+", "+point.z+")\n";
-		// }
-		// if(joints.Count > 5) {
-		// 	str += "   ...\n";
-		// 	// Loop through joints LAST 5
-		// 	int num = Mathf.Clamp( joints.Count-1-5, 5, joints.Count );
-		// 	for( int i = num; i < joints.Count; i++ ) {
-		// 		Vector3 point = joints[i];
-		// 		str += "   "+i+": ("+point.x+", "+point.y+", "+point.z+")\n";
-		// 	}
-		// }
+		// Loop through joints FIRST 5
+		for( int i = 0; i < Mathf.Clamp( 5, 0, joints.Count ); i++ ) {
+			Vector3 point = joints[i];
+			str += "   "+i+": ("+point.x+", "+point.y+", "+point.z+")\n";
+		}
+		if(joints.Count > 5) {
+			str += "   ...\n";
+			// Loop through joints LAST 5
+			int num = Mathf.Clamp( joints.Count-1-5, 5, joints.Count );
+			for( int i = num; i < joints.Count; i++ ) {
+				Vector3 point = joints[i];
+				str += "   "+i+": ("+point.x+", "+point.y+", "+point.z+")\n";
+			}
+		}
 
 		return str;
 	}

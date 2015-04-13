@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,28 +10,25 @@ public class Chain : MonoBehaviour {
 	public Transform prefab;
 
 	[Range(0.0f, 1.0f)]
-	public float bondStrength;
+	public float bondStrength = 0.5f;
 	[Range(0.0f, 2.0f)]
-	public float buffer;
+	public float buffer = 0.3f;
 
-	public Node head;
-	public Node tail;
+	public ChainNode head;
+	public ChainNode tail;
 
 
 	void Start()
 	{
-		for( int i = 0; i < 5; i++ ) {
-			addLast( new Node( -i, buffer, bondStrength, Instantiate( prefab, Vector3.zero, Quaternion.identity) as Transform ) );
-		}
 		// printNodes( head );
 	}
 
 	void Update()
 	{
-		changeValue( head, 0.15f * Input.GetAxis("Vertical") );
+		// moveChain( head, 0.15f * Input.GetAxis("Vertical") );
 	}
 
-	public void addLast( Node newNode )
+	public void addLast( ChainNode newNode )
 	{
 		if( head == null ) {
 			head = newNode;
@@ -42,37 +40,38 @@ public class Chain : MonoBehaviour {
 		tail = newNode;
 	}
 
-	// Print all nodes, starting with currentNode
-	// (example of recursion)
-	public void printNodes( Node currentNode )
-	{
-		print( currentNode.value );
+	// // Print all nodes, starting with currentNode
+	// // (example of recursion)
+	// public void printNodes( ChainNode currentNode )
+	// {
+	// 	print( currentNode.value );
 		
-		// Continoue with the next Node
-		if( currentNode.next != null ) {
-			printNodes( currentNode.next );
-		}
-	}
+	// 	// Continoue with the next ChainNode
+	// 	if( currentNode.next != null ) {
+	// 		printNodes( currentNode.next );
+	// 	}
+	// }
 
-	public void changeValue( Node currentNode, float valueChange )
+	public void moveChain( ChainNode currentNode, float moveBy )
 	{
-		currentNode.value += valueChange;
-		currentNode.prefab.position = new Vector3( 0, 0, currentNode.value );
+		currentNode.value += moveBy;
 
-		// Continoue with the next Node
+		// // Debug purposes
+		// currentNode.prefab.position = new Vector3( 0, 0, currentNode.value );
+
+		// Continoue with the next ChainNode
 		if( currentNode.next != null ) {
-
 			float dif = currentNode.value - currentNode.next.value - currentNode.buffer - currentNode.next.buffer;
 
 			// Make nodes move only forward
-			// if( dif > 0 )
-				changeValue( currentNode.next, dif * currentNode.next.bondStrength );
+			if( dif > 0 )
+				moveChain( currentNode.next, dif * currentNode.next.bondStrength );
 		}
 
 	}
 }
 
-public class Node
+public class ChainNode
 {
 	// Components
 	public Transform prefab;
@@ -83,14 +82,18 @@ public class Node
 
 	// System
 	public float value;
-	public Node next;
-	public Node previous;
+	public ChainNode next;
+	public ChainNode previous;
 
-	public Node( float value, float buffer, float bondStrength, Transform prefab )
+	public ChainNode( float value, float buffer, float bondStrength )
 	{
 		this.value = value;
-		this.prefab = prefab;
 		this.buffer = buffer;
 		this.bondStrength = bondStrength;
+
+		// // Debug purposes
+		// this.prefab.position = new Vector3( 0, 0, this.value );
+
+		// Debug.Log("New node created. Initial value is " + this.value );
 	}
 }
