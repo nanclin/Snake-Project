@@ -8,11 +8,7 @@ public class GameManager : MonoBehaviour {
 	// Global
 	public static int ROUND_DECIMALS = 5;
 	
-	// Components
-	public SnakeController snake;
-	public Transform cellPrefab;
-	private SnakeSkeleton skeleton;
-	private Chain chain;
+	private Chain chain = new Chain();
 
 	// Debug
 	public Transform marker;
@@ -20,32 +16,30 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		// Initialize skeleton and chain
-		skeleton = snake.skeleton;
-		chain = GetComponent<Chain>();
+		// Head ChainNode
+		chain.AddLast( new ChainNode( 0, 0.5f ) );
 
-		// Create initial skeleton
-		// skeleton.AppendJoint( transform.up * 0 );
-		// skeleton.AppendJoint( transform.up * -5 );
-
-		// Grow cells
-		for( int i = 0; i < 10; i++ )
-		{
-			// Add chain node for current cell
-			chain.addLast( new ChainNode( i, chain.buffer, chain.bondStrength ) );
-			
-			// Instantiate cell and put it on the skeleton
-			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
-			SkeletonPointData point = snake.skeleton.GetPointOnSkeleton( chain.tail.value );
-			cell.position = point.position;
-			cell.rotation = point.rotation;
+		// Initial ChainNodes
+		for( int i = 1; i < 3; i++ ) {
+			chain.AddLast( new ChainNode( -2f * i, 0.5f, 0.2f ) );
 		}
 	}
 
 	// Update is called once per frame
 	void Update ()
 	{
-		skeleton.Draw();
-		// print( skeleton.ToString() );	
+		// Grow new ChainNodes
+		if( Time.frameCount%50 == 0 && chain.Count < 7 )
+			chain.AddLast( new ChainNode( chain.tail.value, UnityEngine.Random.Range( 0.3f, 0.7f ), 0.2f ) );
+
+
+		// Move chain
+		// if( Time.frameCount > 1 )
+			// chain.MoveChain( chain.head, 0.1f );
+			chain.MoveChain( chain.head, 0.1f * Input.GetAxis("Horizontal") );
+
+		// Draw Chain
+		chain.DrawChain( chain.head );
 	}
+
 }

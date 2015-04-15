@@ -33,18 +33,37 @@ public class MyDraw : MonoBehaviour {
 		Debug.DrawLine ( a, b, color);
 	}
 
-
-	public static void DrawCircle(Vector3 center, Color color, float radius = 1, float duration = 0)
+	public static void DrawSquare(Vector3 center, float radius, Color color )
 	{
-		float prevX = 0 + center.x;
-		float prevY = radius + center.y;
+		Vector3 prevPoint = Quaternion.Euler(0, 45, 0) * Vector3.forward;
+		prevPoint = prevPoint.normalized * radius;
+		prevPoint = prevPoint * Mathf.Sqrt( 2 );
 
-		for(int i = 0; i <= 360; i += 360/36){
-			float x = Mathf.Cos(Mathf.Deg2Rad * (i+90)) * radius;
-			float y = Mathf.Sin(Mathf.Deg2Rad * (i+90)) * radius;
-			Debug.DrawLine(new Vector2(prevX, prevY), new Vector2(x,y), color, duration);
-			prevX = x + center.x;
-			prevY = y + center.y;
+		for( int i = 0; i <= 360; i += 360/4 )
+		{
+			Vector3 currentPoint = Quaternion.Euler(0, i + 45, 0) * Vector3.forward;
+			currentPoint = currentPoint.normalized * radius;
+			currentPoint = currentPoint * Mathf.Sqrt( 2 );
+			
+			Debug.DrawLine( center + prevPoint, center + currentPoint, color );
+
+			prevPoint = currentPoint;
+		}
+	}
+
+	public static void DrawCircle(Vector3 center, float radius, Color color )
+	{
+		Vector3 prevPoint = Quaternion.Euler(0, 45, 0) * Vector3.forward;
+		prevPoint = prevPoint.normalized * radius;
+
+		for( int i = 0; i <= 360; i += 360/18 )
+		{
+			Vector3 currentPoint = Quaternion.Euler(0, i + 45, 0) * Vector3.forward;
+			currentPoint = currentPoint.normalized * radius;
+			
+			Debug.DrawLine( center + prevPoint, center + currentPoint, color );
+
+			prevPoint = currentPoint;
 		}
 	}
 

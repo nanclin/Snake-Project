@@ -3,32 +3,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+public class Chain {
 
+	// Handling
 
-public class Chain : MonoBehaviour {
-
-	public Transform prefab;
-
-	[Range(0.0f, 1.0f)]
-	public float bondStrength = 0.5f;
-	[Range(0.0f, 2.0f)]
-	public float buffer = 0.3f;
-
+	// System
+	private int _count = 0;
 	public ChainNode head;
 	public ChainNode tail;
 
 
-	void Start()
-	{
-		// printNodes( head );
-	}
+// CONSTRUCTOR ////////////////////////////////////////////////////////
 
-	void Update()
+	public Chain()
 	{
-		// moveChain( head, 0.15f * Input.GetAxis("Vertical") );
-	}
 
-	public void addLast( ChainNode newNode )
+	}
+//////////////////////////////////////////////////////// EO CONSTRUCTOR //
+
+
+// NODES MANIPULATION ////////////////////////////////////////////////////////
+
+	public void AddLast( ChainNode newNode )
 	{
 		if( head == null ) {
 			head = newNode;
@@ -38,44 +34,73 @@ public class Chain : MonoBehaviour {
 			tail.next = newNode;
 		}
 		tail = newNode;
+
+		_count++;
 	}
+//////////////////////////////////////////////////////// EO NODES MANIPULATION //
 
-	// // Print all nodes, starting with currentNode
-	// // (example of recursion)
-	// public void printNodes( ChainNode currentNode )
-	// {
-	// 	print( currentNode.value );
-		
-	// 	// Continoue with the next ChainNode
-	// 	if( currentNode.next != null ) {
-	// 		printNodes( currentNode.next );
-	// 	}
-	// }
 
-	public void moveChain( ChainNode currentNode, float moveBy )
+
+
+
+	public void MoveChain( ChainNode currentNode, float moveBy )
 	{
-		currentNode.value += moveBy;
-
-		// // Debug purposes
-		// currentNode.prefab.position = new Vector3( 0, 0, currentNode.value );
+		currentNode.value += moveBy * currentNode.bondStrength;
 
 		// Continoue with the next ChainNode
-		if( currentNode.next != null ) {
-			float dif = currentNode.value - currentNode.next.value - currentNode.buffer - currentNode.next.buffer;
+		if( currentNode.next != null )
+		{
+			float gap = currentNode.Gap;
 
-			// Make nodes move only forward
-			if( dif > 0 )
-				moveChain( currentNode.next, dif * currentNode.next.bondStrength );
+			if( gap > 0 )
+				MoveChain( currentNode.next, gap );
+			else
+				MoveChain( currentNode.next, 0 );
+
+			// string trace = "";
+			// trace += "CURRENT NODE:\n";
+			// trace += "value: " + (float) Math.Round( currentNode.value, GameManager.ROUND_DECIMALS ) + "\n";
+			// trace += "\n NEXT NODE:\n";
+			// trace += "value: " + (float) Math.Round( currentNode.next.value, GameManager.ROUND_DECIMALS ) + "\n";
+			// trace += "\n RELATIONS:\n";
+			// trace += "dis: " + (float) Math.Round( dis, GameManager.ROUND_DECIMALS ) + "\n";
+			// trace += "gap: " + (float) Math.Round( gap, GameManager.ROUND_DECIMALS ) + "\n";
+			// Debug.Log( trace );
 		}
-
 	}
+
+
+
+
+// BASIC SETTERS, GETTTERS ////////////////////////////////////////////////////////
+	[SerializeField]
+	public int Count {
+		get {
+			return _count;
+		}
+	}
+
+//////////////////////////////////////////////////////// EO BASIC SETTERS, GETTTERS //
+
+
+// DEBUG METHODS ////////////////////////////////////////////////////////
+
+	public void DrawChain ( ChainNode currentNode, float colorModifier = 1 )
+	{
+		Debug.DrawLine( Vector3.right * currentNode.value + Vector3.forward * -0.1f, Vector3.right * currentNode.value + Vector3.forward * 0.1f, Color.red * colorModifier );
+		MyDraw.DrawCircle( Vector3.right * currentNode.value, currentNode.buffer, Color.red * colorModifier );
+		
+		if( currentNode.next != null) {
+			colorModifier = Mathf.Max( colorModifier - 0.2f, 0.2f );
+			DrawChain( currentNode.next, colorModifier );
+		}
+	}
+//////////////////////////////////////////////////////// EO DEBUG METHODS //
+	
 }
 
 public class ChainNode
 {
-	// Components
-	public Transform prefab;
-
 	// Handling
 	public float buffer;
 	public float bondStrength;
@@ -85,15 +110,36 @@ public class ChainNode
 	public ChainNode next;
 	public ChainNode previous;
 
-	public ChainNode( float value, float buffer, float bondStrength )
+	public ChainNode( float value, float buffer, float bondStrength = 1 )
 	{
 		this.value = value;
 		this.buffer = buffer;
 		this.bondStrength = bondStrength;
+	}
 
-		// // Debug purposes
-		// this.prefab.position = new Vector3( 0, 0, this.value );
+	// Return distance to the next ChainNode
+	[SerializeField]
+	public float Distance {
+		get {
+			if( next != null ) {
+				return value - next.value;
+			}
+			else {
+				throw new System.ArgumentException("Can't get distance to the next ChainNode, because it doesn't exist!");
+			}
+		}
+	}
 
-		// Debug.Log("New node created. Initial value is " + this.value );
+	// Return gap to the next ChainNode
+	[SerializeField]
+	public float Gap {
+		get {
+			if( next != null ) {
+				return Distance - buffer - next.buffer;
+			}
+			else {
+				throw new System.ArgumentException("Can't get gap to the next ChainNode, because it doesn't exist!");
+			}
+		}
 	}
 }

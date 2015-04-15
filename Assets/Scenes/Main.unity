@@ -310,10 +310,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55732e7384e46428ab021edba5309b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buffer: .5
+  bondStrength: .5
 --- !u!4 &700878576
 Transform:
   m_PrefabParentObject: {fileID: 453852, guid: 222cd8125ca4845c8bd95b53164a6031, type: 2}
   m_PrefabInternal: {fileID: 637208803}
+--- !u!114 &700878577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 700878571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a4eff5549494e48b901c172c21599e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
 --- !u!1 &873116075
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,7 +401,6 @@ GameObject:
   - 124: {fileID: 996483053}
   - 81: {fileID: 996483052}
   - 114: {fileID: 996483057}
-  - 114: {fileID: 996483058}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -471,23 +484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2256955c4cd21452a8586f4aeade18df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snake: {fileID: 700878572}
-  cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
   marker: {fileID: 148295161}
---- !u!114 &996483058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 996483051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f49ffa66de52407db634542e10f1a40, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
-  bondStrength: .479999989
-  buffer: .300000012
 --- !u!1 &1794453013
 GameObject:
   m_ObjectHideFlags: 0
