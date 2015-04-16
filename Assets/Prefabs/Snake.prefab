@@ -47,6 +47,8 @@ GameObject:
   - 33: {fileID: 3375998}
   - 65: {fileID: 6553108}
   - 23: {fileID: 2341952}
+  - 114: {fileID: 11439882}
+  - 114: {fileID: 11499584}
   m_Layer: 0
   m_Name: Snake
   m_TagString: Untagged
@@ -61,7 +63,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 111544}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -.5, y: .370000005, z: -.100000001}
+  m_LocalPosition: {x: -.5, y: .370000005, z: -.219999999}
   m_LocalScale: {x: .516108394, y: .516108394, z: .516108394}
   m_Children: []
   m_Father: {fileID: 453852}
@@ -72,8 +74,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 151626}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: .5, z: 0}
+  m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 410552}
@@ -87,7 +89,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 104454}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .5, y: .370000005, z: -.100000001}
+  m_LocalPosition: {x: .5, y: .370000005, z: -.219999999}
   m_LocalScale: {x: .516108394, y: .516108394, z: .516108394}
   m_Children: []
   m_Father: {fileID: 453852}
@@ -197,6 +199,33 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11439882
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 151626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55732e7384e46428ab021edba5309b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buffer: .550000012
+  bondStrength: .400000006
+  controlType: 0
+--- !u!114 &11499584
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 151626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a4eff5549494e48b901c172c21599e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  marker: {fileID: 0}
+  cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
 --- !u!135 &13545252
 SphereCollider:
   m_ObjectHideFlags: 1
