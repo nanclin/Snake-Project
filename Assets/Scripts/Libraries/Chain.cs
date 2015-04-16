@@ -36,6 +36,10 @@ public class Chain {
 		tail = newNode;
 
 		_count++;
+
+		// Reposition newly added ChainNode
+		if( tail.previous != null )
+			MoveChain( tail.previous, 0 );
 	}
 //////////////////////////////////////////////////////// EO NODES MANIPULATION //
 
@@ -87,8 +91,12 @@ public class Chain {
 
 	public void DrawChain ( ChainNode currentNode, float colorModifier = 1 )
 	{
-		Debug.DrawLine( Vector3.right * currentNode.value + Vector3.forward * -0.1f, Vector3.right * currentNode.value + Vector3.forward * 0.1f, Color.red * colorModifier );
-		MyDraw.DrawCircle( Vector3.right * currentNode.value, currentNode.buffer, Color.red * colorModifier );
+		Debug.DrawLine(
+			Vector3.right * currentNode.value + Vector3.forward * -0.1f,
+			Vector3.right * currentNode.value + Vector3.forward * 0.1f, Color.red * colorModifier );
+		MyDraw.DrawCircle(
+			Vector3.right * currentNode.value,
+			currentNode.buffer, Color.red * colorModifier );
 		
 		if( currentNode.next != null) {
 			colorModifier = Mathf.Max( colorModifier - 0.2f, 0.2f );

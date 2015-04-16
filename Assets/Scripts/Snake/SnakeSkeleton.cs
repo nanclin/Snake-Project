@@ -62,11 +62,11 @@ public class SnakeSkeleton {
 		// 	PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), ( i / 360) * 5.0f, Mathf.Cos( i / 180 * Mathf.PI ) ) );
 		// }
 
-		// Wave
-		int intervals = 1;
-		for( float i = 0; i <= 360 * intervals; i += (360 * intervals/100) ) {
-			PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), 0, ( i / 360 / intervals ) * 10 ) );
-		}
+		// // Wave
+		// int intervals = 1;
+		// for( float i = 0; i <= 360 * intervals; i += (360 * intervals/100) ) {
+		// 	PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), 0, ( i / 360 / intervals ) * 10 ) );
+		// }
 
 
 	}
@@ -280,4 +280,22 @@ public class SnakeSkeleton {
 	}
 //////////////////////////////////////////////////////// EO BASIC SETTERS, GETTTERS //
 
+}
+
+
+
+public struct SkeletonPointData {
+
+	public Vector3 position;
+	public Quaternion rotation;
+
+	override public string ToString ()
+	{
+		string s = "";
+		
+		s += " position:\t"         + position        + "\n";
+		s += " rotation:\t"         + rotation        + "\n";
+		
+		return s;
+	}
 }

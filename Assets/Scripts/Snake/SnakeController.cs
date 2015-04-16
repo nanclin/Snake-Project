@@ -7,9 +7,15 @@ public class SnakeController : MonoBehaviour {
 	private static bool FSM_DEBUG = false;
 
 	// Handling
-	private float maxSpeed = 5f;
-	private float acceleration = 0.3f;
-	private float rotationSpeed = 60;
+	private float maxSpeed = 2f;
+	private float acceleration = 2f;
+	private float rotationSpeed = 40;
+	// [Range(0.0f, 2.0f)]
+	[SerializeField]
+	public float buffer = 0.5f;
+	// [Range(0.0f, 1.0f)]
+	[SerializeField]
+	public float bondStrength = 1f;
 
 	// Components
 
@@ -24,7 +30,7 @@ public class SnakeController : MonoBehaviour {
 	}
 	private State _state;
 
-	public SnakeSkeleton skeleton = new SnakeSkeleton();
+	private SnakeBody body;
 	private float dt;
 	private float speed = 0;
 	private Vector3 direction = Vector3.forward;
@@ -34,13 +40,16 @@ public class SnakeController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		skeleton.AppendJoint( currentPosition );
+		body = GetComponent<SnakeBody>();
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate ()
 	{
 		ExecuteState();
+
+		if( Input.GetKeyDown("space") )
+			body.Grow();
 	}
 
 
@@ -117,7 +126,7 @@ public class SnakeController : MonoBehaviour {
 	private void IdleState()
 	{
 		if( FSM_DEBUG ) print("FSM -> Idle");
-		if( Time.frameCount > 60 )
+		if( Time.frameCount > 30 )
 			currentState = State.Move;
 	}
 
@@ -138,20 +147,29 @@ public class SnakeController : MonoBehaviour {
 	{
 		if( FSM_DEBUG ) print("FSM -> Move");
 
-		dt = Time.deltaTime;
+		// dt = Time.deltaTime;
+		dt = 0.025f;
+		// dt = 1f;
+
+		float turbo = Input.GetAxis("Vertical") * 5;
+		float turboRotation = Mathf.Max( 0, Input.GetAxis("Vertical") * 80 );
 
 		// Translate snake
+		float positionChange = speed * dt;
+		transform.Translate( Vector3.forward * positionChange );
 		speed += acceleration;
-		speed = Mathf.Min( speed, maxSpeed );
-		transform.Translate( Vector3.forward * speed * dt );
+		speed = Mathf.Min( speed, maxSpeed + turbo );
+		speed = Mathf.Max( speed, 0 );
+
+		// Store current positon point
+		body.skeleton.PrependJoint( transform.position );
 
 		// // Rotate and translate snakes head
-		transform.Rotate( Vector3.up * Input.GetAxis("Horizontal") * rotationSpeed * dt );
+		transform.Rotate( Vector3.up * Input.GetAxis("Horizontal") * ( rotationSpeed + turboRotation ) * dt );
 
-		// Store current positon point,
-		// and draw skeleton
-		skeleton.PrependJoint( transform.position );
-		skeleton.Draw();
+
+		//
+		body.UpdateBody( positionChange );
 	}
 
 	private void MoveExitState()
