@@ -79,42 +79,55 @@ public class SnakeSkeleton {
 	// Add joint to the top of the skeleton, closer to the head
 	public void PrependJoint ( Vector3 point )
 	{
-		// Insert new joint to the beginning of list
-		joints.Insert( 0, point );
+		// Before adding, check if the given point doesn't sit on top of the previous joint
+		if( joints.Count == 0 || joints.Count > 0 && !Mathf.Approximately( (joints.First() - point).magnitude, 0 ) ){
 
-		// If joint(s) already existed before
-		if( joints.Count > 1 ){
+			// Insert new joint to the beginning of list
+			joints.Insert( 0, point );
 
-			// Take currently added point,
-			// figure out how much _length it added,
-			float dis = Vector3.Distance( joints[0], joints[1] );
+			// If joint(s) already existed before
+			if( joints.Count > 1 ){
 
-			// add that value to skeleton _length
-			_length += dis;
-			// _length = (float) Math.Round( _length, GameManager.ROUND_DECIMALS );	// round length to 4 decimal precision
-		}
+				// Take currently added point,
+				// figure out how much _length it added,
+				float dis = Vector3.Distance( joints[0], joints[1] );
 
-		// If first joint, set length to 0 instead of -1
-		else {
-			_length = 0;
+				// add that value to skeleton _length
+				_length += dis;
+				// _length = (float) Math.Round( _length, GameManager.ROUND_DECIMALS );	// round length to 4 decimal precision
+			}
+
+			// If first joint, set length to 0 instead of -1
+			else {
+				_length = 0;
+			}
 		}
 	}
 
 	// Add joint to the bottom of the skeleton, closer to the tail
 	public void AppendJoint ( Vector3 point )
 	{
-		// Insert new joint to the beginning of list
-		joints.Add(point);
+		// Before adding, check if the given point doesn't sit on top of the previous joint
+		if( joints.Count == 0 || joints.Count > 0 && !Mathf.Approximately( (joints.Last() - point).magnitude, 0 ) ){
 
-		// If joint(s) already existed before
-		if(joints.Count > 1){
-			// Take currently added point,
-			// figure out how much _length it added,
-			float dis = Vector3.Distance( joints[ joints.Count-1 ], joints[ joints.Count-2 ] );
+			// Insert new joint to the beginning of list
+			joints.Add(point);
 
-			// add that value to skeleton _length
-			_length += dis;
-			// _length = (float)Math.Round(_length, GameManager.ROUND_DECIMALS);	// round length to 4 decimal precision
+			// If joint(s) already existed before
+			if(joints.Count > 1){
+				// Take currently added point,
+				// figure out how much _length it added,
+				float dis = Vector3.Distance( joints[ joints.Count-1 ], joints[ joints.Count-2 ] );
+
+				// add that value to skeleton _length
+				_length += dis;
+				// _length = (float)Math.Round(_length, GameManager.ROUND_DECIMALS);	// round length to 4 decimal precision
+			}
+
+			// If first joint, set length to 0 instead of -1
+			else {
+				_length = 0;
+			}
 		}
 
 		// If first joint, set length to 0 instead of -1
