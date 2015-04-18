@@ -26,10 +26,10 @@ public class MyDraw : MonoBehaviour {
 		STEP++;
 	}
 
-	public static void DrawLineThroughPoint( Vector3 point, Color color, float length = 0.1f )
+	public static void DrawLineThroughPoint( Vector3 point, Vector3 direction, Color color, float length = 0.2f )
 	{
-		Vector3 a = point - Vector3.right * length / 2;
-		Vector3 b = point + Vector3.right * length / 2;
+		Vector3 a = point - direction * length / 2;
+		Vector3 b = point + direction * length / 2;
 		Debug.DrawLine ( a, b, color);
 	}
 

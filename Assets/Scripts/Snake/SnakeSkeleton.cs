@@ -109,7 +109,7 @@ public class SnakeSkeleton {
 	{
 		// Before adding, check if the given point doesn't sit on top of the previous joint
 		if( joints.Count == 0 || joints.Count > 0 && !Mathf.Approximately( (joints.Last() - point).magnitude, 0 ) ){
-
+			// Debug.Log( "appdeing joint ");
 			// Insert new joint to the beginning of list
 			joints.Add(point);
 
@@ -129,13 +129,240 @@ public class SnakeSkeleton {
 				_length = 0;
 			}
 		}
-
-		// If first joint, set length to 0 instead of -1
-		else {
-			_length = 0;
-		}
 	}
 //////////////////////////////////////////////////////// EO JOINTS LIST MANIPULATION //
+
+// TRIM & SHAVE METHODS ////////////////////////////////////////////////////////
+	
+	/**
+	 * Shortens skeleton from the beginning, for given length.
+	 * @param input 	Given value of how much skeleton should be shortened.
+	 * 
+	 * \code
+	 * 
+	 * --input-->
+	 * 
+	 * X~~~~~X~~/--O-----O-----O-----O
+	 * 0     1     2     3     4     5
+	 *
+	 * RESULT:
+	 *          O--O-----O-----O-----O
+	 *          0  1     2     3     4
+	 * 
+	 * \endcode
+	 */
+	public void ShaveStart( float input )
+	{
+		// Handle exception
+		if( input > length ) {
+			throw new System.ArgumentException("Input is larger than skeleton length!");
+		}
+		else if( input < 0 ) {
+			throw new System.ArgumentException("Input is negative!");
+		}
+
+		// Start algorithm
+		float traversed = 0;
+
+		for( int i = 0; i < joints.Count-1; i++ )
+		{
+			// Get current bone
+			Vector3 a = joints[ i ];
+			Vector3 b = joints[ i + 1 ];
+			Vector3 bone = b - a;
+
+			// Move step forward along skeleton
+			traversed += bone.magnitude;
+
+			if( traversed >= input )
+			{
+				// Add joint at trim point
+				joints.RemoveRange( 0, i+1 );
+				_length = Mathf.Max( _length - traversed, 0 );
+
+				// Remove joints and adjust length
+				float remaining = bone.magnitude - ( traversed - input );
+				PrependJoint( a + bone.normalized * remaining );
+
+				break;
+			}
+		}
+	}
+
+
+	/**
+	 * Shortens skeleton from the end, for given length.
+	 * @param input 	Given value of how much skeleton should be shortened.
+	 * 
+	 * \code
+	 * 
+	 *                      <--input--
+	 * 
+	 * O-----O-----O-----O--/~~O~~~~~O
+	 * 0     1     2     3     4     5
+	 *
+	 * RESULT:
+	 * O-----O-----O-----O--O
+	 * 0     1     2     3  4
+	 * 
+	 * \endcode
+	 */
+	public void ShaveEnd( float input )
+	{
+		// Handle exception
+		if( input > length ) {
+			throw new System.ArgumentException("Input is larger than skeleton length!");
+		}
+		else if( input < 0 ) {
+			throw new System.ArgumentException("Input is negative!");
+		}
+
+		// Start algorithm
+		float traversed = 0;
+
+		for( int i = joints.Count-1; i > 0; i-- )
+		{
+			// Get current bone
+			Vector3 a = joints[ i ];
+			Vector3 b = joints[ i - 1 ];
+			Vector3 bone = b - a;
+
+			// Move step forward along skeleton
+			traversed += bone.magnitude;
+
+
+			if( traversed >= input )
+			{
+				// Remove joints and adjust length
+				joints.RemoveRange( i, joints.Count-i );
+				_length = Mathf.Max( _length - traversed, 0 );
+
+				// Remove joints and adjust length
+				float remaining = bone.magnitude - ( traversed - input );
+				AppendJoint( a + bone.normalized * remaining );
+
+				break;
+			}
+		}
+	}
+
+
+	/**
+	 * Shortens skeleton at the beginning, to the given length.
+	 * @param input 	Given value of how long new skeleton will be.
+	 * 
+	 * \code
+	 * 
+	 *          <-------input---------
+	 * 
+	 * O~~~~~O~~/--O-----O-----O-----O
+	 * 0     1     2     3     4     5
+	 *
+	 * RESULT:
+	 * 			O--O-----O-----O-----O
+	 * 			0  1     2     3     4
+	 * 
+	 * \endcode
+	 */
+	public void TrimStart( float input )
+	{
+		// Handle exception
+		if( input > length ) {
+			throw new System.ArgumentException("Input is larger than skeleton length!");
+		}
+		else if( input < 0 ) {
+			throw new System.ArgumentException("Input is negative!");
+		}
+
+		// Start algorithm
+		float traversed = 0;
+
+		for( int i = joints.Count-1; i > 0; i-- )
+		{
+			// Debug.Log( "i: " + i );
+			// Get current bone
+			Vector3 a = joints[ i ];
+			Vector3 b = joints[ i - 1 ];
+			Vector3 bone = b - a;
+
+			// Move step forward along skeleton
+			traversed += bone.magnitude;
+
+			if( traversed > input )
+			{
+				// Add joint at trim point
+				// Debug.Log( 0 );
+				// Debug.Log( i );
+				joints.RemoveRange( 0, i );
+				_length = traversed - bone.magnitude;
+
+				// Remove joints and adjust length
+				float remaining = bone.magnitude - ( traversed - input );
+				PrependJoint( a + bone.normalized * remaining );
+
+				break;
+			}
+		}
+	}
+
+
+	/**
+	 * Shortens skeleton at the end, to the given length
+	 * @param input 	Given value of how long new skeleton will be.
+	 * 
+	 * \code
+	 * 
+	 * --------input-------->
+	 * 
+	 * O-----O-----O-----O--/~~X~~~~~X
+	 * 0     1     2     3     4     5
+	 *
+	 * RESULT:
+	 * O-----O-----O-----O--O
+	 * 0     1     2     3  4
+	 * 
+	 * \endcode
+	 */
+	public void TrimEnd( float input )
+	{
+		// Handle exception
+		if( input > length ) {
+			throw new System.ArgumentException("Input is larger than skeleton length!");
+		}
+		else if( input < 0 ) {
+			throw new System.ArgumentException("Input is negative!");
+		}
+
+		// Start algorithm
+		float traversed = 0;
+
+		for( int i = 0; i < joints.Count-1; i++ )
+		{
+			// Get current bone
+			Vector3 a = joints[ i ];
+			Vector3 b = joints[ i + 1 ];
+			Vector3 bone = b - a;
+
+			// Move step forward along skeleton
+			traversed += bone.magnitude;
+
+			if( traversed > input  )
+			{
+				// Remove joints and adjust length
+				joints.RemoveRange( i+1, joints.Count-1 - i );
+				_length = traversed - bone.magnitude;
+
+				// Remove joints and adjust length
+				float remaining = bone.magnitude - ( traversed - input );
+				AppendJoint( a + bone.normalized * remaining );
+
+				break;
+			}
+		}
+	}
+//////////////////////////////////////////////////////// EO TRIM METHODS //
+
+
 
 
 
@@ -153,7 +380,7 @@ public class SnakeSkeleton {
 
 		SkeletonPointData data = new SkeletonPointData();
 
-		float traversed = 0;
+		float traversed = 0;	///< How far algorithem travesed until current step
 
 		for( int i = 0; i < joints.Count - 1; i++ )
 		{
@@ -169,7 +396,7 @@ public class SnakeSkeleton {
 				float remaining = bone.magnitude - (traversed - input);
 
 				data.position = a + bone.normalized * remaining;
-				data.rotation = Quaternion.LookRotation( b - a );
+				data.rotation = Quaternion.LookRotation( a - b );
 
 				return data;
 			}
@@ -194,8 +421,8 @@ public class SnakeSkeleton {
 			// Debug.Log( joints[0] );
 
 			if( drawJoints ) {
-				// MyDraw.DrawLineThroughPoint( joints[ joints.Count-1 ], Color.green );	// draw last joint
-				MyDraw.DrawLineThroughPoint( joints[ 0 ], Color.green );					// draw first joint
+				// MyDraw.DrawLineThroughPoint( joints[ joints.Count-1 ], Color.green );			// draw last joint
+				MyDraw.DrawLineThroughPoint( joints[ 0 ], Vector3.forward, Color.green );			// draw first joint
 			}
 
 			for( int i = 0; i < joints.Count-1; i++ ) {
@@ -211,7 +438,7 @@ public class SnakeSkeleton {
 
 				// Draw joints
 				if( drawJoints ) {
-					MyDraw.DrawLineThroughPoint( b, Color.blue );
+					MyDraw.DrawLineThroughPoint( b, Vector3.forward, Color.blue );
 				}
 			}
 		}

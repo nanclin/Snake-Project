@@ -7,39 +7,35 @@ public class GameManager : MonoBehaviour {
 
 	// Global
 	public static int ROUND_DECIMALS = 5;
-	
-	private Chain chain = new Chain();
 
 	// Debug
 	public Transform marker;
 
+
+
+	private SnakeSkeleton skeleton = new SnakeSkeleton();
+
 	// Use this for initialization
 	void Start ()
 	{
-		// Head ChainNode
-		chain.AddLast( new ChainNode( 0, 0.5f ) );
-
-		// Initial ChainNodes
-		for( int i = 1; i < 3; i++ ) {
-			chain.AddLast( new ChainNode( -2f * i, 0.5f, 0.2f ) );
+		for( int i = 0; i <= 5; i++ ){
+			skeleton.AppendJoint( new Vector3( i, 0, 0 ) );
 		}
+		print( skeleton.ToString() );
 	}
 
 	// Update is called once per frame
 	void Update ()
 	{
-		// Grow new ChainNodes
-		if( Time.frameCount%50 == 0 && chain.Count < 7 )
-			chain.AddLast( new ChainNode( chain.tail.value, UnityEngine.Random.Range( 0.3f, 0.7f ), 0.2f ) );
+		if( Time.frameCount > 1 ){
+			// skeleton.ShaveStart( 1f );
+			// skeleton.ShaveEnd( 5f );
+			// skeleton.TrimStart( 3f );
+			// skeleton.TrimEnd( 3f );
+			print( skeleton.ToString() );
+		}
 
-
-		// Move chain
-		// if( Time.frameCount > 1 )
-			// chain.MoveChain( chain.head, 0.1f );
-			chain.MoveChain( chain.head, 0.1f * Input.GetAxis("Horizontal") );
-
-		// Draw Chain
-		chain.DrawChain( chain.head );
+		skeleton.Draw();
 	}
 
 }
