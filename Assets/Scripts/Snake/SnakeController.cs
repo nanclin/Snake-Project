@@ -47,6 +47,7 @@ public class SnakeController : MonoBehaviour {
 			case ControlType.PC: PCInput(); break;
 			// case ControlType.Android: AndroidInput(); break;
 		}
+		// FadeObjectInFrontOfCamera();
 	}
 
 	void FixedUpdate ()
@@ -408,4 +409,45 @@ public class SnakeController : MonoBehaviour {
 		}
 	}
 //////////////////////////////////////////////////////// EO INPUTS //
+
+// RAYCASTING ///////////////////////////////////////////////////////////////
+
+	public GameObject source;
+	public LayerMask layerMask;
+
+	private GameObject lastOther;
+
+
+	private void FadeObjectInFrontOfCamera()
+	{
+		
+		// Vector3 a = transform.position;
+		Vector3 a = source.transform.position;
+		Vector3 b = transform.position - source.transform.position;
+
+		RaycastHit hit;
+		Ray ray = new Ray( a, b );
+
+		bool isHit = Physics.Raycast( ray, out hit, 100, layerMask );
+		print( "isHit: " + isHit );
+
+		if ( isHit ){
+            // print("There is something in front of the object! " + hit.collider);
+            // Debug.Break();
+
+            lastOther = hit.collider.gameObject;
+
+            Color color = lastOther.GetComponent<Renderer>().material.color;
+            lastOther.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 0.1f );
+		}
+		else{
+			if( lastOther != null ){
+	            Color color = lastOther.GetComponent<Renderer>().material.color;
+	            lastOther.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 1 );
+	        }
+		}
+
+        Debug.DrawRay( a, b * 100 );
+	}
+//////////////////////////////////////////////////////////// EO RAYCASTING //
 }

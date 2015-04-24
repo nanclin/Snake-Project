@@ -40,8 +40,8 @@ public class SnakeBody : MonoBehaviour {
 	void Update ()
 	{
 		// // Debug
-		skeleton.Draw();
-		chain.DrawChain( chain.head );
+		// skeleton.Draw();
+		// chain.DrawChain( chain.head );
 	}
 
 	void OnGUI()
@@ -61,7 +61,7 @@ public class SnakeBody : MonoBehaviour {
 		currentNode.value += moveBy * currentNode.bondStrength;
 		// Push zero
 		zero = Mathf.Max( zero, currentNode.value );
-		Debug.DrawLine( Vector3.forward * 1f + Vector3.right * zero, Vector3.forward * -1f + Vector3.right * zero, Color.green );
+		// Debug.DrawLine( Vector3.forward * 1f + Vector3.right * zero, Vector3.forward * -1f + Vector3.right * zero, Color.green );
 
 		// Continoue with the next ChainNode
 		if( currentNode.next != null )
