@@ -32,7 +32,7 @@ public class SnakeController : MonoBehaviour {
 		body = GetComponent<SnakeBody>();
 
 		// Grow cells
-		for( int i = 0; i < 2; i++ )
+		for( int i = 0; i < 3; i++ )
 		{	
 			body.Grow();
 		}
@@ -57,11 +57,16 @@ public class SnakeController : MonoBehaviour {
 
 	void OnTriggerEnter( Collider other )
 	{
+		print( "SnakeController - OnTriggerEnter" );
+
 		switch( other.tag )
 		{
 			case "Item":
 				for( int i = 0; i < other.GetComponent<Item>().nutritionValue; i++ )
 					body.Grow();
+				break;
+			case "Wall":
+				currentState = State.Shrink;
 				break;
 			default:
 				print("SnakeHeadCollider hit something not handeld by code!");
@@ -219,44 +224,36 @@ public class SnakeController : MonoBehaviour {
 
 
 	private float shrinkNumberOfCells = 2;
+	private float shrinkCurrentNumberOfCells;
 	private float shrinkPosition;
 
 	private ChainNode head;
 	private ChainNode targetNode;
 
+	private bool dying;
+
 	private void ShrinkEnterState()
 	{
 		DebugEnter( "Shrink" );
 
-
-
 		shrinkPosition = 0;
-
-
+		shrinkCurrentNumberOfCells = shrinkNumberOfCells;
 		head = body.chain.head;
-		targetNode = head.next.next;
 
+		// Get target node (node to which snake is going to be shrinked)
+		targetNode = head;
+		while( shrinkCurrentNumberOfCells-- > 0 && targetNode.next != null ){
+			targetNode = targetNode.next;
+		}
 
-		// string trace = "";
-		// ChainNode node = body.chain.tail;
-		// while( node != null ){
-
-
-		// 	node.value = ( node.value - head.value );
-		// 	trace += "node: " + node.value + "\n";
-
-		// 	node = node.previous;
-		// }
-		// // print( trace );
-
-
-
+		// If target node is the last node of the snake,
+		// this is last, dying shrink
+		dying = ( targetNode == body.chain.tail );
 	}
 
 	private void ShrinkState()
 	{
 		DebugExecute( "Shrink" );
-
 
 		// Move head along skeleton - from head to tail
 		float dis = Mathf.Abs( targetNode.value - head.value );
@@ -265,7 +262,7 @@ public class SnakeController : MonoBehaviour {
 		// body.PutOnSkeleton( transform, -head.value );
 
 		// Destroy cells on path
-		if( head.Distance < 0.1f ){
+		if( head.next != null && head.Distance < 0.1f ){
 			body.DestroyCell( head.next );
 		}
 
@@ -273,12 +270,11 @@ public class SnakeController : MonoBehaviour {
 		// trim skeleton and reset zero value to heads value
 		if( dis < 0.1f )
 		{
-			print("end of shrinking");
 			body.skeleton.ShaveStart( body.zero - head.value );
 			body.zero = head.value;
 
 			// Switch state
-			currentState = State.Move;
+			currentState = dying ? State.Die : State.Move;
 		}
 	}
 
