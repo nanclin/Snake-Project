@@ -83,16 +83,20 @@ public class SnakeController : MonoBehaviour {
 	{
 		get { return _state; }
 		set {
-			// If current state is set,
-			// run exit state code
-			if( _state != null )
-				ExitState( _state );
+			// State should not transition to itself
+			if( _state != value )
+			{
+				// If current state is set,
+				// run exit state code
+				if( _state != null )
+					ExitState( _state );
 
-			// Set new current state value
-			_state = value;
+				// Set new current state value
+				_state = value;
 
-			// Run enter state code
-			EnterState( _state );
+				// Run enter state code
+				EnterState( _state );
+			}
 		}
 	}
 
