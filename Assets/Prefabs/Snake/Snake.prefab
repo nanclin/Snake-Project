@@ -45,13 +45,13 @@ GameObject:
   m_Component:
   - 4: {fileID: 453852}
   - 33: {fileID: 3375998}
-  - 65: {fileID: 6553108}
   - 23: {fileID: 2341952}
   - 114: {fileID: 11439882}
   - 114: {fileID: 11499584}
+  - 135: {fileID: 13571150}
   m_Layer: 0
   m_Name: Snake
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -187,18 +187,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 104454}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &6553108
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 151626}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &11439882
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -210,9 +198,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55732e7384e46428ab021edba5309b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controlType: 1
   buffer: .550000012
-  bondStrength: .400000006
-  controlType: 0
+  bondStrength: .300000012
 --- !u!114 &11499584
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -226,6 +214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   marker: {fileID: 0}
   cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
+  zero: 0
 --- !u!135 &13545252
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -250,6 +239,18 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: .5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &13571150
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 151626}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: .5
+  m_Center: {x: 0, y: 0, z: .449999988}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

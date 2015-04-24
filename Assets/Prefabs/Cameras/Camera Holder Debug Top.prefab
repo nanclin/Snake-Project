@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  smoothTime: .300000012
+  smoothTime: 0
 --- !u!114 &11441938
 MonoBehaviour:
   m_ObjectHideFlags: 1
