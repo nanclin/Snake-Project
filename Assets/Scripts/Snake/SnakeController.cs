@@ -9,7 +9,7 @@ public class SnakeController : MonoBehaviour {
 	// Handling
 	private float maxSpeed = 0.08f;
 	private float acceleration = 0.01f;
-	private float rotationSpeed = 2;
+	private float rotationSpeed = 3;
 	public enum ControlType{ Debug, PC, Android }
 	public ControlType controlType = ControlType.Debug;
 	public float buffer;
@@ -67,8 +67,11 @@ public class SnakeController : MonoBehaviour {
 				break;
 			case "Wall":
 				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
-				if( currentState != State.Shrink && !otherIsNeck )
+				if( currentState != State.Shrink && !otherIsNeck ){
 					currentState = State.Shrink;
+					// Debug.Break();
+				}
+
 				break;
 			default:
 				print("SnakeHeadCollider hit something not handeld by code!");
@@ -116,6 +119,9 @@ public class SnakeController : MonoBehaviour {
 			case State.Shrink:
 				ShrinkEnterState();
 				break;
+			case State.Die:
+				DieEnterState();
+				break;
 		}
 	}
 
@@ -132,6 +138,9 @@ public class SnakeController : MonoBehaviour {
 			case State.Shrink:
 				ShrinkState();
 				break;
+			case State.Die:
+				DieState();
+				break;
 		}
 	}
 
@@ -147,6 +156,9 @@ public class SnakeController : MonoBehaviour {
 				break;
 			case State.Shrink:
 				ShrinkExitState();
+				break;
+			case State.Die:
+				DieExitState();
 				break;
 		}
 	}
@@ -237,7 +249,7 @@ public class SnakeController : MonoBehaviour {
 // SHRINK STATE //
 
 
-	private float shrinkNumberOfCells = 5;
+	private float shrinkNumberOfCells = 7;
 	private float shrinkCurrentNumberOfCells;
 	private float shrinkPosition;
 
@@ -297,6 +309,26 @@ public class SnakeController : MonoBehaviour {
 		DebugExit( "Shrink" );
 	}
 // EO SHRINK STATE //
+
+// DIE STATE //
+	private void DieEnterState()
+	{
+		DebugEnter( "Die" );
+	}
+
+	private void DieState()
+	{
+		DebugExecute( "Die" );
+
+		body.Grow(10);
+		currentState = State.Move;
+	}
+
+	private void DieExitState()
+	{
+		DebugExit( "Die" );
+	}
+// EO DIE STATE //
 
 //////////////////////////////////////////////////////// EO STATE METHODS //
 
