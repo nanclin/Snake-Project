@@ -8,27 +8,32 @@ public class Chain {
 	// Handling
 
 	// System
-	private int _count = 0;
 	public ChainNode head;
 	public ChainNode tail;
+	private int _count = 0;
+
+	// private LinkedList<ChainNode> = new LinkedList<ChainNode>();
 
 
 // CONSTRUCTOR ////////////////////////////////////////////////////////
 
-	public Chain()
-	{
-
-	}
+	// public Chain( SnakeBody body = null )
+	// {
+	// 	this.body = body;
+	// }
 //////////////////////////////////////////////////////// EO CONSTRUCTOR //
 
 
 // NODES MANIPULATION ////////////////////////////////////////////////////////
 
+
+
 	public void AddLast( ChainNode newNode )
 	{
-		if( head == null ) {
+		if( head == null )
 			head = newNode;
-		}
+		else
+			newNode.previous = tail;
 
 		if( tail != null ) {
 			tail.next = newNode;
@@ -37,9 +42,29 @@ public class Chain {
 
 		_count++;
 
-		// Reposition newly added ChainNode
-		if( tail.previous != null )
-			MoveChain( tail.previous, 0 );
+		// // Reposition newly added ChainNode
+		// if( tail.previous != null )
+		// 	MoveChain( tail.previous, 0 );
+	}
+	public void RemoveNode( ChainNode node )
+	{
+		GameObject.Destroy( node.prefab );
+
+		if( node != head && node != tail ){
+			node.previous.next = node.next;
+			node.next.previous = node.previous;
+		}
+		if( node == tail ){
+			if( node.previous != null)
+				tail = node.previous;
+			node.previous.next = null;
+		}
+		if( node == head ){
+			head = node.next;
+			node.next.previous = null;
+		}
+
+		_count--;
 	}
 //////////////////////////////////////////////////////// EO NODES MANIPULATION //
 
@@ -47,31 +72,33 @@ public class Chain {
 
 
 
-	public void MoveChain( ChainNode currentNode, float moveBy )
-	{
-		currentNode.value += moveBy * currentNode.bondStrength;
+	// public void MoveChain( ChainNode currentNode, float moveBy )
+	// {
+	// 	currentNode.value += moveBy * currentNode.bondStrength;
 
-		// Continoue with the next ChainNode
-		if( currentNode.next != null )
-		{
-			float gap = currentNode.Gap;
+	// 	// Continoue with the next ChainNode
+	// 	if( currentNode.next != null )
+	// 	{
 
-			if( gap > 0 )
-				MoveChain( currentNode.next, gap );
-			else
-				MoveChain( currentNode.next, 0 );
+	// 		float gap = currentNode.Gap;
+	// 		float dis = currentNode.Distance;
 
-			// string trace = "";
-			// trace += "CURRENT NODE:\n";
-			// trace += "value: " + (float) Math.Round( currentNode.value, GameManager.ROUND_DECIMALS ) + "\n";
-			// trace += "\n NEXT NODE:\n";
-			// trace += "value: " + (float) Math.Round( currentNode.next.value, GameManager.ROUND_DECIMALS ) + "\n";
-			// trace += "\n RELATIONS:\n";
-			// trace += "dis: " + (float) Math.Round( dis, GameManager.ROUND_DECIMALS ) + "\n";
-			// trace += "gap: " + (float) Math.Round( gap, GameManager.ROUND_DECIMALS ) + "\n";
-			// Debug.Log( trace );
-		}
-	}
+	// 		if( gap > 0 )
+	// 			MoveChain( currentNode.next, gap );
+	// 		else
+	// 			MoveChain( currentNode.next, 0 );
+
+	// 		// string trace = "";
+	// 		// trace += "CURRENT NODE:\n";
+	// 		// trace += "value: " + (float) Math.Round( currentNode.value, GameManager.ROUND_DECIMALS ) + "\n";
+	// 		// trace += "\n NEXT NODE:\n";
+	// 		// trace += "value: " + (float) Math.Round( currentNode.next.value, GameManager.ROUND_DECIMALS ) + "\n";
+	// 		// trace += "\n RELATIONS:\n";
+	// 		// trace += "dis: " + (float) Math.Round( dis, GameManager.ROUND_DECIMALS ) + "\n";
+	// 		// trace += "gap: " + (float) Math.Round( gap, GameManager.ROUND_DECIMALS ) + "\n";
+	// 		// Debug.Log( trace );
+	// 	}
+	// }
 
 
 
@@ -83,7 +110,6 @@ public class Chain {
 			return _count;
 		}
 	}
-
 //////////////////////////////////////////////////////// EO BASIC SETTERS, GETTTERS //
 
 
@@ -103,6 +129,28 @@ public class Chain {
 			DrawChain( currentNode.next, colorModifier );
 		}
 	}
+
+	override public string ToString()
+	{
+		string trace = "";
+
+		trace += "count: " + _count + "\n";
+
+		ChainNode node = head;
+		int i = 0;
+		while( node != null )
+		{
+			// trace += "Node " + i + "\n";
+			// trace += "  value: " + node.value + "\n";
+			// trace += "  buffer: " + node.buffer + "\n";
+			// trace += "  bondStrength: " + node.bondStrength + "\n";
+			// trace += "  prev: " + node.previous + "\n";
+			// trace += "  next: " + node.next + "\n";
+
+			node = node.next;
+		}
+		return trace;
+	}
 //////////////////////////////////////////////////////// EO DEBUG METHODS //
 	
 }
@@ -117,12 +165,30 @@ public class ChainNode
 	public float value;
 	public ChainNode next;
 	public ChainNode previous;
+	public GameObject prefab;
 
-	public ChainNode( float value, float buffer, float bondStrength = 1 )
+	public ChainNode( float value, float buffer, GameObject prefab, float bondStrength = 1 )
 	{
 		this.value = value;
 		this.buffer = buffer;
+		this.prefab = prefab;
 		this.bondStrength = bondStrength;
+	}
+
+	public void LinkToParentNode( ChainNode parent )
+	{
+		// Temporary store child
+		ChainNode child = parent.next;
+
+		// Set links to current node
+		next = child;
+		previous = parent;
+
+		// Relink child and parent nodes with current node
+		if( child != null )
+		child.previous = this;
+		parent.next = this;
+
 	}
 
 	// Return distance to the next ChainNode
@@ -150,4 +216,10 @@ public class ChainNode
 			}
 		}
 	}
+	// [SerializeField]
+	// public ChainNode next {
+	// 	get {
+
+	// 	}
+	// }
 }

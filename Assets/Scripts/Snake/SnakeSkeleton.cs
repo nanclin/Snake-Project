@@ -17,7 +17,6 @@ public class SnakeSkeleton {
 	// Use this for initialization
 	public SnakeSkeleton ()
 	{
-
 		// PrependJoint( new Vector3(0.0f, 0.0f, 0.0f) );
 		// PrependJoint( new Vector3(0.0f, 0.0f, 10f) );
 
@@ -67,8 +66,6 @@ public class SnakeSkeleton {
 		// for( float i = 0; i <= 360 * intervals; i += (360 * intervals/100) ) {
 		// 	PrependJoint( new Vector3( Mathf.Sin( i / 180 * Mathf.PI ), 0, ( i / 360 / intervals ) * 10 ) );
 		// }
-
-
 	}
 //////////////////////////////////////////////////////// EO CONSTRUCTOR //
 
@@ -132,6 +129,7 @@ public class SnakeSkeleton {
 	}
 //////////////////////////////////////////////////////// EO JOINTS LIST MANIPULATION //
 
+
 // TRIM & SHAVE METHODS ////////////////////////////////////////////////////////
 	
 	/**
@@ -155,10 +153,10 @@ public class SnakeSkeleton {
 	{
 		// Handle exception
 		if( input > length ) {
-			throw new System.ArgumentException("Input is larger than skeleton length!");
+			throw new System.ArgumentException("Input is larger than skeleton length! (" + input + ")");
 		}
 		else if( input < 0 ) {
-			throw new System.ArgumentException("Input is negative!");
+			throw new System.ArgumentException("Input is negative! (" + input + ")");
 		}
 
 		// Start algorithm
@@ -211,10 +209,10 @@ public class SnakeSkeleton {
 	{
 		// Handle exception
 		if( input > length ) {
-			throw new System.ArgumentException("Input is larger than skeleton length!");
+			throw new System.ArgumentException("Input is larger than skeleton length! (" + input + ")");
 		}
 		else if( input < 0 ) {
-			throw new System.ArgumentException("Input is negative!");
+			throw new System.ArgumentException("Input is negative! (" + input + ")");
 		}
 
 		// Start algorithm
@@ -268,10 +266,10 @@ public class SnakeSkeleton {
 	{
 		// Handle exception
 		if( input > length ) {
-			throw new System.ArgumentException("Input is larger than skeleton length!");
+			throw new System.ArgumentException("Input is larger than skeleton length! (" + input + ")");
 		}
 		else if( input < 0 ) {
-			throw new System.ArgumentException("Input is negative!");
+			throw new System.ArgumentException("Input is negative! (" + input + ")");
 		}
 
 		// Start algorithm
@@ -327,10 +325,10 @@ public class SnakeSkeleton {
 	{
 		// Handle exception
 		if( input > length ) {
-			throw new System.ArgumentException("Input is larger than skeleton length!");
+			throw new System.ArgumentException("Input is larger than skeleton length! (" + input + ")");
 		}
 		else if( input < 0 ) {
-			throw new System.ArgumentException("Input is negative!");
+			throw new System.ArgumentException("Input is negative! (" + input + ")");
 		}
 
 		// Start algorithm
@@ -364,18 +362,16 @@ public class SnakeSkeleton {
 
 
 
-
-
 // GET DATA ALONG SKELETON ////////////////////////////////////////////////////////
 
 	public SkeletonPointData GetPointOnSkeleton( float input )
 	{
 
 		if( input > Math.Round( length, GameManager.ROUND_DECIMALS ) ) {
-			throw new System.ArgumentException("Input is larger than skeleton length!");
+			throw new System.ArgumentException("Input is larger than skeleton length! (" + input + ")");
 		}
 		else if( input < 0 ) {
-			throw new System.ArgumentException("Input is negative!");
+			throw new System.ArgumentException("Input is negative! (" + input + ")");
 		}
 
 		SkeletonPointData data = new SkeletonPointData();

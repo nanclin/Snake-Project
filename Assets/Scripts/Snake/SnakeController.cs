@@ -7,62 +7,80 @@ public class SnakeController : MonoBehaviour {
 	private static bool FSM_DEBUG = false;
 
 	// Handling
-	private float maxSpeed = 2f;
-	private float acceleration = 2f;
-	private float rotationSpeed = 40;
-	// [Range(0.0f, 2.0f)]
-	[SerializeField]
+	private float maxSpeed = 0.08f;
+	private float acceleration = 0.01f;
+	private float rotationSpeed = 2;
+	public enum ControlType{ Debug, PC, Android }
+	public ControlType controlType = ControlType.Debug;
 	public float buffer = 0.5f;
-	// [Range(0.0f, 1.0f)]
-	[SerializeField]
-	public float bondStrength = 1f;
+	public float bondStrength = 0.2f;
 
 	// Components
+	private SnakeBody body;
 
 	// System
-	public enum State{
-		Idle,
-		Move,
-		Shrink,
-		ToHole,
-		Die,
-		Dead
-	}
+	public enum State { Idle, Move, Shrink, ToHole, Die, Dead }
 	private State _state;
-
-	private SnakeBody body;
-	private float dt;
 	private float speed = 0;
-	private Vector3 direction = Vector3.forward;
-	private Vector3 currentPosition = Vector3.zero;
 
+
+// BUILTIN METHODS ///////////////////////////////////////////////////////////////
 
 	// Use this for initialization
 	void Start ()
 	{
 		body = GetComponent<SnakeBody>();
+
+		// Grow cells
+		for( int i = 0; i < 2; i++ )
+		{	
+			body.Grow();
+		}
 	}
 	
 	// Update is called once per frame
+	void Update ()
+	{
+		switch( controlType )
+		{
+			case ControlType.Debug: DebugInput(); break;
+			case ControlType.PC: PCInput(); break;
+			// case ControlType.Android: AndroidInput(); break;
+		}
+	}
+
 	void FixedUpdate ()
 	{
 		ExecuteState();
-
-		if( Input.GetKeyDown("space") )
-			body.Grow();
 	}
+
+
+	void OnTriggerEnter( Collider other )
+	{
+		switch( other.tag )
+		{
+			case "Item":
+				for( int i = 0; i < other.GetComponent<Item>().nutritionValue; i++ )
+					body.Grow();
+				break;
+			default:
+				print("SnakeHeadCollider hit something not handeld by code!");
+				break;
+		}
+	}
+//////////////////////////////////////////////////////////// EO BUILTIN METHODS //
 
 
 // FSM MACHINE METHODS ////////////////////////////////////////////////////////
 
 	// Set currentState to transition to new state
-	public State currentState
+	private State currentState
 	{
 		get { return _state; }
 		set {
 			// If current state is set,
 			// run exit state code
-			if( _state != null)
+			if( _state != null )
 				ExitState( _state );
 
 			// Set new current state value
@@ -84,6 +102,9 @@ public class SnakeController : MonoBehaviour {
 			case State.Move:
 				MoveEnterState();
 				break;
+			case State.Shrink:
+				ShrinkEnterState();
+				break;
 		}
 	}
 
@@ -91,11 +112,14 @@ public class SnakeController : MonoBehaviour {
 	{
 		switch( currentState )
 		{
+			case State.Idle:
+				IdleState();
+				break;
 			case State.Move:
 				MoveState();
 				break;
-			case State.Idle:
-				IdleState();
+			case State.Shrink:
+				ShrinkState();
 				break;
 		}
 	}
@@ -110,9 +134,16 @@ public class SnakeController : MonoBehaviour {
 			case State.Move:
 				MoveExitState();
 				break;
+			case State.Shrink:
+				ShrinkExitState();
+				break;
 		}
 	}
-// EO FSM MACHINE METHODS ////////////////////////////////////////////////////////
+
+	private void DebugEnter  ( string state ){ if( FSM_DEBUG ) print( "\t-->( \t" + state + "\t )"         	); }
+	private void DebugExecute( string state ){ if( FSM_DEBUG ) print( "\t   ( \t" + state + "\t )"	); }
+	private void DebugExit   ( string state ){ if( FSM_DEBUG ) print( "\t   ( \t" + state + "\t )-->"     	); }
+//////////////////////////////////////////////////////// EO FSM MACHINE METHODS //
 
 
 // STATE METHODS ////////////////////////////////////////////////////////
@@ -120,19 +151,20 @@ public class SnakeController : MonoBehaviour {
 // IDLE STATE //
 	private void IdleEnterState()
 	{
-		if( FSM_DEBUG ) print("FSM -> IdleEnterState");
+		DebugEnter( "Idle" );
 	}
 
 	private void IdleState()
 	{
-		if( FSM_DEBUG ) print("FSM -> Idle");
-		if( Time.frameCount > 30 )
+		DebugExecute( "Idle" );
+
+		if( Time.time > 0 )
 			currentState = State.Move;
 	}
 
 	private void IdleExitState()
 	{
-		if( FSM_DEBUG ) print("FSM -> IdleExitState");
+		DebugExit( "Idle" );
 	}
 // EO IDLE STATE //
 
@@ -140,33 +172,37 @@ public class SnakeController : MonoBehaviour {
 // MOVE STATE //
 	private void MoveEnterState()
 	{
-		if( FSM_DEBUG ) print("FSM -> MoveEnterState");
+		DebugEnter( "Move" );
+	}
+
+	void OnGUI ()
+	{
+		if( controlType == ControlType.Android )
+			AndroidInput();
 	}
 
 	private void MoveState()
 	{
-		if( FSM_DEBUG ) print("FSM -> Move");
+		DebugExecute( "Move" );
 
-		// dt = Time.deltaTime;
-		dt = 0.025f;
-		// dt = 1f;
-
-		float turbo = Input.GetAxis("Vertical") * 5;
-		float turboRotation = Mathf.Max( 0, Input.GetAxis("Vertical") * 80 );
+		// Set boost
+		float boost = boostInput * 0.1f;
+		float boostRotation = Mathf.Max( 0, boostInput * 1 );
 
 		// Translate snake
-		float positionChange = speed * dt;
-		transform.Translate( Vector3.forward * positionChange );
-		speed += acceleration;
-		speed = Mathf.Min( speed, maxSpeed + turbo );
-		speed = Mathf.Max( speed, 0 );
 
+		// Calculate position
+		float positionChange = speed;
+		transform.Translate( Vector3.forward * positionChange );
+		// Calculate speed
+		speed += acceleration;
+		speed = Mathf.Min( speed, maxSpeed + boost );
+		speed = Mathf.Max( speed, 0 );
 		// Store current positon point
 		body.skeleton.PrependJoint( transform.position );
 
 		// // Rotate and translate snakes head
-		transform.Rotate( Vector3.up * Input.GetAxis("Horizontal") * ( rotationSpeed + turboRotation ) * dt );
-
+		transform.Rotate( Vector3.up * rotationInput * ( rotationSpeed + boostRotation ) );
 
 		//
 		body.UpdateBody( positionChange );
@@ -174,7 +210,160 @@ public class SnakeController : MonoBehaviour {
 
 	private void MoveExitState()
 	{
-		if( FSM_DEBUG ) print("FSM -> MoveExitState");
+		DebugExit( "Move" );
+		// if( FSM_DEBUG ) print("FSM -> MoveExitState");
 	}
 // EO MOVE STATE //
+
+// SHRINK STATE //
+
+
+	private float shrinkNumberOfCells = 2;
+	private float shrinkPosition;
+
+	private ChainNode head;
+	private ChainNode targetNode;
+
+	private void ShrinkEnterState()
+	{
+		DebugEnter( "Shrink" );
+
+
+
+		shrinkPosition = 0;
+
+
+		head = body.chain.head;
+		targetNode = head.next.next;
+
+
+		// string trace = "";
+		// ChainNode node = body.chain.tail;
+		// while( node != null ){
+
+
+		// 	node.value = ( node.value - head.value );
+		// 	trace += "node: " + node.value + "\n";
+
+		// 	node = node.previous;
+		// }
+		// // print( trace );
+
+
+
+	}
+
+	private void ShrinkState()
+	{
+		DebugExecute( "Shrink" );
+
+
+		// Move head along skeleton - from head to tail
+		float dis = Mathf.Abs( targetNode.value - head.value );
+		body.MoveChain( head, -dis/10 );
+		body.PutOnSkeleton( transform, body.zero - head.value );
+		// body.PutOnSkeleton( transform, -head.value );
+
+		// Destroy cells on path
+		if( head.Distance < 0.1f ){
+			body.DestroyCell( head.next );
+		}
+
+		// If arrived at target position,
+		// trim skeleton and reset zero value to heads value
+		if( dis < 0.1f )
+		{
+			print("end of shrinking");
+			body.skeleton.ShaveStart( body.zero - head.value );
+			body.zero = head.value;
+
+			// Switch state
+			currentState = State.Move;
+		}
+	}
+
+	private void ShrinkExitState()
+	{
+		DebugExit( "Shrink" );
+	}
+// EO SHRINK STATE //
+
+//////////////////////////////////////////////////////// EO STATE METHODS //
+
+// INPUTS ////////////////////////////////////////////////////////
+
+	private float rotationInput = 0;
+	private float boostInput = 0;
+
+	private bool shrinkFlag;
+
+	private void DebugInput ()
+	{
+		speed = 0.5f;
+
+		rotationInput = 0;
+		boostInput = 0;
+
+		// if( Time.frameCount == 7 )
+		// 	currentState = State.Shrink;
+
+		if( Input.GetKeyDown("space") )
+			body.Grow();
+
+		if( Input.GetKeyDown("backspace") )
+			currentState = State.Shrink;
+
+		// if( transform.position.x >= 5 && !shrinkFlag ){
+		// 	currentState = State.Shrink;
+		// 	shrinkFlag = true;
+		// }
+	}
+
+	private void PCInput ()
+	{
+		rotationInput = Input.GetAxis("Horizontal");
+		boostInput = Input.GetAxis("Vertical");
+
+
+		if( Input.GetKeyDown("space") )
+			body.Grow();
+
+		if( Input.GetKeyDown("backspace") )
+			currentState = State.Shrink;
+
+		if( Input.GetKeyDown("5") )
+			body.Grow(5);
+	}
+
+	private float boostTime = 0;
+
+	private void AndroidInput ()
+	{
+		// Draw buttons
+		float size = 150;
+		float padding = 30;
+		bool left = GUI.RepeatButton( new Rect( padding, Screen.height - size - padding, size, size), "<" );
+		bool right = GUI.RepeatButton( new Rect( Screen.width - size - padding, Screen.height - size - padding, size, size), ">" );
+
+		if( left ){
+			rotationInput = -1;
+		}
+		else if ( right ) {
+			rotationInput = 1;
+		}
+		else {
+			rotationInput = 0;
+		}
+
+		if( GUI.Button( new Rect( Screen.width/2 - size*2/2 + size + padding, Screen.height - size - padding, size*2, size), "BOOST" ) ){
+			// Add x seconds to boostTime
+			boostTime = Mathf.Max( Time.time, boostTime ) + 2;
+		}
+		boostInput = ( boostTime > Time.time ) ? 1 : 0;
+
+		if( GUI.Button( new Rect( Screen.width/2 - size*2/2 - size - padding, Screen.height - size - padding, size*2, size), "GROW" ) ){
+			body.Grow();
+		}
+	}
+//////////////////////////////////////////////////////// EO INPUTS //
 }
