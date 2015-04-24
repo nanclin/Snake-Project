@@ -12,8 +12,8 @@ public class SnakeController : MonoBehaviour {
 	private float rotationSpeed = 2;
 	public enum ControlType{ Debug, PC, Android }
 	public ControlType controlType = ControlType.Debug;
-	public float buffer = 0.5f;
-	public float bondStrength = 0.2f;
+	public float buffer;
+	public float bondStrength;
 
 	// Components
 	private SnakeBody body;
@@ -32,7 +32,7 @@ public class SnakeController : MonoBehaviour {
 		body = GetComponent<SnakeBody>();
 
 		// Grow cells
-		for( int i = 0; i < 3; i++ )
+		for( int i = 0; i < 5; i++ )
 		{	
 			body.Grow();
 		}
@@ -57,7 +57,7 @@ public class SnakeController : MonoBehaviour {
 
 	void OnTriggerEnter( Collider other )
 	{
-		print( "SnakeController - OnTriggerEnter" );
+		// print( "SnakeController - OnTriggerEnter" );
 
 		switch( other.tag )
 		{
@@ -66,7 +66,9 @@ public class SnakeController : MonoBehaviour {
 					body.Grow();
 				break;
 			case "Wall":
-				currentState = State.Shrink;
+				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
+				if( currentState != State.Shrink && !otherIsNeck )
+					currentState = State.Shrink;
 				break;
 			default:
 				print("SnakeHeadCollider hit something not handeld by code!");
@@ -215,6 +217,14 @@ public class SnakeController : MonoBehaviour {
 
 		//
 		body.UpdateBody( positionChange );
+
+		if( body.chain.head.Gap > 0.1f ){
+			ChainNode currentNode = body.chain.head.next;
+			while( currentNode != null ){
+				currentNode.prefab.GetComponent<BoxCollider>().enabled = true;
+				currentNode = currentNode.next;
+			}
+		}
 	}
 
 	private void MoveExitState()
@@ -227,7 +237,7 @@ public class SnakeController : MonoBehaviour {
 // SHRINK STATE //
 
 
-	private float shrinkNumberOfCells = 2;
+	private float shrinkNumberOfCells = 5;
 	private float shrinkCurrentNumberOfCells;
 	private float shrinkPosition;
 
@@ -262,8 +272,8 @@ public class SnakeController : MonoBehaviour {
 		// Move head along skeleton - from head to tail
 		float dis = Mathf.Abs( targetNode.value - head.value );
 		body.MoveChain( head, -dis/10 );
+		// body.MoveChain( head, -Mathf.Max( 0.02f, dis/10 ) );
 		body.PutOnSkeleton( transform, body.zero - head.value );
-		// body.PutOnSkeleton( transform, -head.value );
 
 		// Destroy cells on path
 		if( head.next != null && head.Distance < 0.1f ){
@@ -326,7 +336,7 @@ public class SnakeController : MonoBehaviour {
 
 
 		if( Input.GetKeyDown("space") )
-			body.Grow();
+			body.Grow(5);
 
 		if( Input.GetKeyDown("backspace") )
 			currentState = State.Shrink;

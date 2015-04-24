@@ -160,7 +160,7 @@ public class SnakeBody : MonoBehaviour {
 			chain.AddLast( new ChainNode( chain.tail.value, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
 
 			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -chain.tail.value + chain.head.value );
+			PutOnSkeleton( cell.transform, -chain.tail.value + zero );
 		}
 	}
 //////////////////////////////////////////////////////////// EO UPDATE BODY //
