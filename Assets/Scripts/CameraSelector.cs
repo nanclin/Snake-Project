@@ -12,7 +12,8 @@ public class CameraSelector : MonoBehaviour {
 	void Start () {
 		currentCamera.gameObject.SetActive( true );
 
-		// foreach( Transform camera in transform )
+		// foreach( Transform camera in cameras )
+			// camera.gameObject.SetActive( false );
 		// 	cameras.Add( camera );
 
 	}

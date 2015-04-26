@@ -68,9 +68,15 @@ public class SnakeController : MonoBehaviour {
 				break;
 			case "Wall":
 				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
-				if( currentState != State.Shrink && !otherIsNeck ){
-					currentState = State.Shrink;
-					// Debug.Break();
+				bool otherIsTail = other.gameObject == body.chain.tail.prefab;
+				if( currentState != State.Shrink )
+				{
+					if( otherIsTail ){
+						body.DestroyCell( body.chain.tail );
+						body.Grow();
+					}
+					else if( !otherIsNeck )
+						currentState = State.Shrink;
 				}
 
 				break;
@@ -230,16 +236,6 @@ public class SnakeController : MonoBehaviour {
 
 		//
 		body.UpdateBody( positionChange );
-
-
-
-		// if( body.chain.head.Gap > 0.1f ){
-		// 	ChainNode currentNode = body.chain.head.next;
-		// 	while( currentNode != null ){
-		// 		currentNode.prefab.GetComponent<BoxCollider>().enabled = true;
-		// 		currentNode = currentNode.next;
-		// 	}
-		// }
 	}
 
 	private void MoveExitState()

@@ -228,6 +228,10 @@ public class SnakeBody : MonoBehaviour {
 	public void Grow( int num = 1 )
 	{
 		growQueue += num;
+
+		// Wait before start growing
+		growTime = Time.time + growDelay;
+
 		// for( int i = 0; i < num; i++ )
 		// {
 		// 	// Instantiate cell
