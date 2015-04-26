@@ -11,10 +11,11 @@ public class SnakeBody : MonoBehaviour {
 	// Components
 	private Transform head;
 	public Transform cellPrefab;
+	public Transform spawnPoint;
 
 	// System
 	private SnakeController snakeController;
-	public SnakeSkeleton skeleton = new SnakeSkeleton();
+	public SnakeSkeleton skeleton;
 	public Chain chain;
 	// private List<Transform> cells = new List<Transform>();
 
@@ -22,25 +23,17 @@ public class SnakeBody : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
-		// Initialize skeleton and chain
+
 		snakeController = GetComponent<SnakeController>();
-		chain = new Chain();
 
-		// Create initial skeleton
-		skeleton.AppendJoint( transform.forward * 0 );
-		skeleton.AppendJoint( transform.forward * -10 );
-
-		// Put head to the chain
-		// cells.Add( transform );
-		chain.AddLast( new ChainNode( 0, 0.5f, this.gameObject, 1 ) );
+		SpawnSnake( spawnPoint );
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
 		// // Debug
-		// skeleton.Draw();
+		skeleton.Draw();
 		// chain.DrawChain( chain.head );
 	}
 
@@ -50,10 +43,46 @@ public class SnakeBody : MonoBehaviour {
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
+	public void SpawnSnake( Transform spawnPoint, int size = 3 )
+	{
+		// Initialize skeleton and chain
+		skeleton = new SnakeSkeleton();
+		chain = new Chain();
+
+		zero = 0;
+
+		// Reposition
+		transform.position = spawnPoint.position;
+		transform.rotation = spawnPoint.rotation;
+
+		// Create initial skeleton
+		skeleton.AppendJoint( transform.position + transform.forward * 0 );
+		skeleton.AppendJoint( transform.position + transform.forward * -10 );
+
+		// Put head to the chain
+		chain.AddLast( new ChainNode( 0, 0.5f, this.gameObject, 1 ) );
+
+		// GROW INITIAL SNAKE CELLS ///////////////////////////////////////////////////////////////
+		// while( growQueue-- > 0)
+		for( int i = 0; i < 3; i++ )
+		{
+			// Instantiate cell
+			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
+
+			float value = chain.tail.value;
+			// Add chain node for current cell
+			chain.AddLast( new ChainNode( value - snakeController.buffer * 2, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
+
+			// Put cell on the skeleton
+			PutOnSkeleton( cell.transform, -(value - snakeController.buffer * 2) );
+		}
+		//////////////////////////////////////////////////////////// EO GROW INITIAL SNAKE CELLS //
+	}
 
 // UPDATE BODY ///////////////////////////////////////////////////////////////
 
-	public float zero = 0;
+	[HideInInspector]
+	public float zero;
 
 	public void MoveChain( ChainNode currentNode, float moveBy )
 	{
@@ -96,6 +125,8 @@ public class SnakeBody : MonoBehaviour {
 
 	public void UpdateBody( float moveBy )
 	{
+		TryGrowing();
+
 		MoveChain( chain.head, moveBy );
 
 		skeleton.TrimEnd( Mathf.Max( Mathf.Min( -(chain.tail.value - chain.head.value) + 1, skeleton.length ), 0 ) );
@@ -147,23 +178,9 @@ public class SnakeBody : MonoBehaviour {
 
 
 	}
-
-
-	public void Grow( int num = 1 )
-	{
-		for( int i = 0; i < num; i++ )
-		{
-			// Instantiate cell
-			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
-
-			// Add chain node for current cell
-			chain.AddLast( new ChainNode( chain.tail.value, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
-
-			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -chain.tail.value + zero );
-		}
-	}
 //////////////////////////////////////////////////////////// EO UPDATE BODY //
+
+// METHODS ///////////////////////////////////////////////////////////////
 
 	public void Shrink()
 	{
@@ -181,4 +198,47 @@ public class SnakeBody : MonoBehaviour {
 		prefab.position = point.position;
 		prefab.rotation = point.rotation;
 	}
+
+	private int growQueue = 0;
+	private float growTime;
+	private float growDelay = 0.5f;
+
+	private void TryGrowing()
+	{
+		if( growQueue > 0 && Time.time >= growTime )
+		{
+			// INSTANTIATE SNAKE CELL ///////////////////////////////////////////////////////////////
+			// Instantiate cell
+			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
+
+			// Add chain node for current cell
+			chain.AddLast( new ChainNode( chain.tail.value, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
+
+			// Put cell on the skeleton
+			PutOnSkeleton( cell.transform, -chain.tail.value + zero );
+			//////////////////////////////////////////////////////////// EO INSTANTIATE SNAKE CELL //
+
+			growQueue--;
+
+			// Reset grow delay timer
+			growTime = Time.time + growDelay;
+		}
+	}
+
+	public void Grow( int num = 1 )
+	{
+		growQueue += num;
+		// for( int i = 0; i < num; i++ )
+		// {
+		// 	// Instantiate cell
+		// 	Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
+
+		// 	// Add chain node for current cell
+		// 	chain.AddLast( new ChainNode( chain.tail.value, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
+
+		// 	// Put cell on the skeleton
+		// 	PutOnSkeleton( cell.transform, -chain.tail.value + zero );
+		// }
+	}
+//////////////////////////////////////////////////////////// EO METHODS //
 }

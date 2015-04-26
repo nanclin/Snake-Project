@@ -32,7 +32,7 @@ public class SnakeController : MonoBehaviour {
 		body = GetComponent<SnakeBody>();
 
 		// Grow cells
-		for( int i = 0; i < 5; i++ )
+		for( int i = 0; i < 0; i++ )
 		{	
 			body.Grow();
 		}
@@ -231,13 +231,15 @@ public class SnakeController : MonoBehaviour {
 		//
 		body.UpdateBody( positionChange );
 
-		if( body.chain.head.Gap > 0.1f ){
-			ChainNode currentNode = body.chain.head.next;
-			while( currentNode != null ){
-				currentNode.prefab.GetComponent<BoxCollider>().enabled = true;
-				currentNode = currentNode.next;
-			}
-		}
+
+
+		// if( body.chain.head.Gap > 0.1f ){
+		// 	ChainNode currentNode = body.chain.head.next;
+		// 	while( currentNode != null ){
+		// 		currentNode.prefab.GetComponent<BoxCollider>().enabled = true;
+		// 		currentNode = currentNode.next;
+		// 	}
+		// }
 	}
 
 	private void MoveExitState()
@@ -321,7 +323,10 @@ public class SnakeController : MonoBehaviour {
 	{
 		DebugExecute( "Die" );
 
-		body.Grow(10);
+		// Respawn snake
+		body.SpawnSnake( body.spawnPoint );
+
+		// Switch state
 		currentState = State.Move;
 	}
 
@@ -342,7 +347,7 @@ public class SnakeController : MonoBehaviour {
 
 	private void DebugInput ()
 	{
-		speed = 0.5f;
+		speed = 1.5f;
 
 		rotationInput = 0;
 		boostInput = 0;
@@ -412,6 +417,7 @@ public class SnakeController : MonoBehaviour {
 
 // RAYCASTING ///////////////////////////////////////////////////////////////
 
+	[HideInInspector]
 	public GameObject source;
 	public LayerMask layerMask;
 

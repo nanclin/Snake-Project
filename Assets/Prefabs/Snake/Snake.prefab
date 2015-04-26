@@ -214,9 +214,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55732e7384e46428ab021edba5309b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlType: 1
-  buffer: .439999998
-  bondStrength: .600000024
+  controlType: 0
+  buffer: .550000012
+  bondStrength: 1
+  source: {fileID: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &11499584
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -230,6 +234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   marker: {fileID: 0}
   cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
+  spawnPoint: {fileID: 0}
   zero: 0
 --- !u!135 &13545252
 SphereCollider:
