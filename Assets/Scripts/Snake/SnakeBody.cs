@@ -39,7 +39,7 @@ public class SnakeBody : MonoBehaviour {
 
 	void OnGUI()
 	{
-		GUI.Label( new Rect( 10, 10, Screen.width, Screen.height ), chain.ToString() );
+		// GUI.Label( new Rect( 10, 10, Screen.width, Screen.height ), chain.ToString() );
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
