@@ -183,6 +183,11 @@ public class BezierSpline : MonoBehaviour {
 			EnforceMode(0);
 		}
 	}
+	public void RemoveCurve( )
+	{
+		if( points.Length > 4 )
+			Array.Resize(ref points, points.Length - 3);
+	}
 	
 	public void Reset () {
 		points = new Vector3[] {
@@ -192,8 +197,8 @@ public class BezierSpline : MonoBehaviour {
 			new Vector3(4f, 0f, 0f)
 		};
 		modes = new BezierControlPointMode[] {
-			BezierControlPointMode.Free,
-			BezierControlPointMode.Free
+			BezierControlPointMode.Aligned,
+			BezierControlPointMode.Aligned
 		};
 	}
 }

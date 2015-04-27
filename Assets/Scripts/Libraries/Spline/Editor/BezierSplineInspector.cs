@@ -20,10 +20,15 @@ public class BezierSplineInspector : Editor {
 	private Quaternion handleRotation;
 	private int selectedIndex = -1;
 
+	private bool showAllHandles = false;
+
 	public override void OnInspectorGUI () {
 		spline = target as BezierSpline;
 		EditorGUI.BeginChangeCheck();
+		
 		bool loop = EditorGUILayout.Toggle("Loop", spline.Loop);
+		showAllHandles = EditorGUILayout.Toggle("Show All Handles", showAllHandles);
+
 		if (EditorGUI.EndChangeCheck()) {
 			Undo.RecordObject(spline, "Toggle Loop");
 			EditorUtility.SetDirty(spline);
@@ -35,6 +40,11 @@ public class BezierSplineInspector : Editor {
 		if (GUILayout.Button("Add Curve")) {
 			Undo.RecordObject(spline, "Add Curve");
 			spline.AddCurve();
+			EditorUtility.SetDirty(spline);
+		}
+		if (GUILayout.Button("Remove Curve")) {
+			Undo.RecordObject(spline, "Remove Curve");
+			spline.RemoveCurve();
 			EditorUtility.SetDirty(spline);
 		}
 	}
@@ -63,6 +73,8 @@ public class BezierSplineInspector : Editor {
 		handleRotation = Tools.pivotRotation == PivotRotation.Local ?
 			handleTransform.rotation : Quaternion.identity;
 		
+		ShowDirections();
+
 		Vector3 p0 = ShowPoint(0);
 		for (int i = 1; i < spline.ControlPointCount; i += 3) {
 			Vector3 p1 = ShowPoint(i);
@@ -76,11 +88,10 @@ public class BezierSplineInspector : Editor {
 			Handles.DrawBezier(p0, p3, p1, p2, Color.white, null, 2f);
 			p0 = p3;
 		}
-		ShowDirections();
 	}
 
 	private void ShowDirections () {
-		Handles.color = Color.green;
+		Handles.color = Color.red;
 		Vector3 point = spline.GetPoint(0f);
 		Handles.DrawLine(point, point + spline.GetDirection(0f) * directionScale);
 		int steps = stepsPerCurve * spline.CurveCount;
@@ -96,12 +107,17 @@ public class BezierSplineInspector : Editor {
 		if (index == 0) {
 			size *= 2f;
 		}
+
+		bool isPoint = index%3==0;
+		if( isPoint )
+			size *= 1.5f;
+
 		Handles.color = modeColors[(int)spline.GetControlPointMode(index)];
 		if (Handles.Button(point, handleRotation, size * handleSize, size * pickSize, Handles.DotCap)) {
 			selectedIndex = index;
 			Repaint();
 		}
-		if (selectedIndex == index) {
+		if (selectedIndex == index || showAllHandles) {
 			EditorGUI.BeginChangeCheck();
 			point = Handles.DoPositionHandle(point, handleRotation);
 			if (EditorGUI.EndChangeCheck()) {
