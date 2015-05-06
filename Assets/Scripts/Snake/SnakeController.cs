@@ -4,7 +4,7 @@ using System.Collections;
 public class SnakeController : MonoBehaviour {
 
 	// Static
-	private static bool FSM_DEBUG = false;
+	private static bool FSM_DEBUG = GameManager.FSM_DEBUG;
 
 	// Handling
 	private float maxSpeed = 0.08f;
@@ -17,10 +17,11 @@ public class SnakeController : MonoBehaviour {
 
 	// Components
 	private SnakeBody body;
+	public GameManager gameManager;
 
 	// System
-	public enum State { Idle, Move, Shrink, ToHole, Die, Dead }
-	private State _state;
+	// public static enum SnakeState { Idle, Move, Shrink, OnRail, Die, Dead }
+	private SnakeState _state;
 	private float speed = 0;
 
 
@@ -36,6 +37,9 @@ public class SnakeController : MonoBehaviour {
 		{	
 			body.Grow();
 		}
+
+		// marker2.position = spline.GetPointBaked( 13.5f );
+
 	}
 	
 	// Update is called once per frame
@@ -62,26 +66,57 @@ public class SnakeController : MonoBehaviour {
 
 		switch( other.tag )
 		{
-			case "Item":
-				for( int i = 0; i < other.GetComponent<Item>().nutritionValue; i++ )
+			case "Food":
+				for( int i = 0; i < other.GetComponent<Item>().nutritionValue; i++ ){
 					body.Grow();
+					GameManager.SCORE++;
+				}
+				break;
+			case "Coin":
+				GameManager.SCORE += 10;
+				break;
+			case "Star":
+				GameManager.SCORE += 100;
+				GameManager.STARS++;
+				if( GameManager.STARS == 3 )
+					// gameManager.OpenExit();
+					gameManager.LevelFinished();
 				break;
 			case "Wall":
+				// if( body.chain.Count > 1 )
 				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
 				bool otherIsTail = other.gameObject == body.chain.tail.prefab;
-				if( currentState != State.Shrink )
+				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
 				{
 					if( otherIsTail ){
 						body.DestroyCell( body.chain.tail );
 						body.Grow();
 					}
 					else if( !otherIsNeck )
-						currentState = State.Shrink;
+						currentState = SnakeState.Shrink;
+						// GameManager.SCORE -= 3;
 				}
 
 				break;
+			case "Hole":
+				// print("SnakeController");
+				if( currentState != SnakeState.OnRail )
+				{
+					spline = other.transform.Find("Periscope Spline").GetComponent<BezierSpline>();
+					// if( spline == null )
+						// spline = other.transform.Find("Rail Spline").GetComponent<BezierSpline>();
+
+					var lookPos = -( transform.position - other.transform.position );
+					lookPos.y = 0;
+					var rotation = Quaternion.LookRotation( lookPos );
+					spline.transform.rotation = rotation;
+					spline.BakeSpline();
+
+					currentState = SnakeState.OnRail;
+				}
+				break;
 			default:
-				print("SnakeHeadCollider hit something not handeld by code!");
+				print("SnakeHeadCollider hit something not handeld by code! " + other);
 				break;
 		}
 	}
@@ -91,11 +126,11 @@ public class SnakeController : MonoBehaviour {
 // FSM MACHINE METHODS ////////////////////////////////////////////////////////
 
 	// Set currentState to transition to new state
-	private State currentState
+	public SnakeState currentState
 	{
 		get { return _state; }
 		set {
-			// State should not transition to itself
+			// SnakeState should not transition to itself
 			if( _state != value )
 			{
 				// If current state is set,
@@ -112,21 +147,24 @@ public class SnakeController : MonoBehaviour {
 		}
 	}
 
-	private void EnterState( State state )
+	private void EnterState( SnakeState state )
 	{
 		// print("EnterState: " + state);
 		switch( state )
 		{
-			case State.Idle:
+			case SnakeState.Idle:
 				IdleEnterState();
 				break;
-			case State.Move:
+			case SnakeState.Move:
 				MoveEnterState();
 				break;
-			case State.Shrink:
+			case SnakeState.OnRail:
+				OnRailEnterState();
+				break;
+			case SnakeState.Shrink:
 				ShrinkEnterState();
 				break;
-			case State.Die:
+			case SnakeState.Die:
 				DieEnterState();
 				break;
 		}
@@ -136,43 +174,49 @@ public class SnakeController : MonoBehaviour {
 	{
 		switch( currentState )
 		{
-			case State.Idle:
+			case SnakeState.Idle:
 				IdleState();
 				break;
-			case State.Move:
+			case SnakeState.Move:
 				MoveState();
 				break;
-			case State.Shrink:
+			case SnakeState.OnRail:
+				OnRailState();
+				break;
+			case SnakeState.Shrink:
 				ShrinkState();
 				break;
-			case State.Die:
+			case SnakeState.Die:
 				DieState();
 				break;
 		}
 	}
 
-	private void ExitState( State state )
+	private void ExitState( SnakeState state )
 	{
 		switch( state )
 		{
-			case State.Idle:
+			case SnakeState.Idle:
 				IdleExitState();
 				break;
-			case State.Move:
+			case SnakeState.Move:
 				MoveExitState();
 				break;
-			case State.Shrink:
+			case SnakeState.OnRail:
+				OnRailExitState();
+				break;
+			case SnakeState.Shrink:
 				ShrinkExitState();
 				break;
-			case State.Die:
+			case SnakeState.Die:
 				DieExitState();
 				break;
 		}
 	}
 
-	private void DebugEnter  ( string state ){ if( FSM_DEBUG ) print( "\t-->( \t" + state + "\t )"         	); }
-	private void DebugExecute( string state ){ if( FSM_DEBUG ) print( "\t   ( \t" + state + "\t )"	); }
-	private void DebugExit   ( string state ){ if( FSM_DEBUG ) print( "\t   ( \t" + state + "\t )-->"     	); }
+	private void DebugEnter  ( string state ){ if( FSM_DEBUG ) print( "SNAKE: \t-->( \t" + state + "\t )"         	); }
+	private void DebugExecute( string state ){ if( FSM_DEBUG ) print( "SNAKE: \t   ( \t" + state + "\t )"	); }
+	private void DebugExit   ( string state ){ if( FSM_DEBUG ) print( "SNAKE: \t   ( \t" + state + "\t )-->"     	); }
 //////////////////////////////////////////////////////// EO FSM MACHINE METHODS //
 
 
@@ -188,8 +232,8 @@ public class SnakeController : MonoBehaviour {
 	{
 		DebugExecute( "Idle" );
 
-		if( Time.time > 0 )
-			currentState = State.Move;
+		// if( Time.time > 0 )
+		// 	currentState = SnakeState.Move;
 	}
 
 	private void IdleExitState()
@@ -245,10 +289,100 @@ public class SnakeController : MonoBehaviour {
 	}
 // EO MOVE STATE //
 
+
+	public BezierSpline spline;
+	// private float startTime;
+	// private float duration = 5;
+
+	private float traversed;
+
+// ON RAIL STATE //
+	private void OnRailEnterState()
+	{
+		DebugEnter( "OnRail" );
+
+		// startTime = Time.time;
+		traversed = 0;
+
+		// // Make ground see trough
+		// GameObject ground = GameObject.Find("Ground");
+		// if( ground != null ){
+		// 	Color color = ground.GetComponent<Renderer>().material.color;
+		// 	ground.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 0.8f );
+		// }
+	}
+
+	public Transform marker1;
+	public Transform marker2;
+
+	private void OnRailState()
+	{
+		DebugExecute( "OnRail" );
+
+		// Translate snake
+
+		// Slow down boot towards the end of rail
+		float boost = 0.3f;
+		float slowDownStart = 5;
+		float slowDownEnd = 2;
+		float distanceToEnd = Mathf.Round( spline.length - traversed );
+
+		if( distanceToEnd < slowDownStart - slowDownEnd && spline.outgoingSpline == null ){
+			float zeroToOne =  1 - ( distanceToEnd - slowDownEnd) / slowDownStart;
+			boost = Mathf.Lerp( boost, 0, zeroToOne );
+		}
+
+		// Calculate speed
+		speed += acceleration;
+		speed = Mathf.Min( speed, maxSpeed + boost );
+		speed = Mathf.Max( speed, 0 );
+
+		traversed += speed;
+
+		// Transition to the next, outgoing spline, if any
+		if( traversed > spline.length && spline.outgoingSpline != null )
+		{
+			traversed = traversed - spline.length;
+			spline = spline.outgoingSpline;
+			// traversed = spline.length;
+			// currentState = SnakeState.Move;
+		}
+
+		TransformData data = spline.GetPointBaked( traversed );
+		transform.position = data.position;
+		transform.rotation = data.rotation;
+
+
+		// Store current positon point
+		body.skeleton.PrependJoint( transform.position );
+
+		//
+		body.UpdateBody( speed );
+
+
+		if( traversed >= spline.length )
+		{
+			currentState = SnakeState.Move;
+		}
+	}
+
+	private void OnRailExitState()
+	{
+		DebugExit( "OnRail" );
+
+		// // Make ground opaque again
+		// GameObject ground = GameObject.Find("Ground");
+		// if( ground != null ){
+		// 	Color color = ground.GetComponent<Renderer>().material.color;
+		// 	ground.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 1 );
+		// }
+	}
+// EO ON RAIL STATE //
+
 // SHRINK STATE //
 
 
-	private float shrinkNumberOfCells = 7;
+	private float shrinkNumberOfCells = 5;
 	private float shrinkCurrentNumberOfCells;
 	private float shrinkPosition;
 
@@ -260,6 +394,7 @@ public class SnakeController : MonoBehaviour {
 	private void ShrinkEnterState()
 	{
 		DebugEnter( "Shrink" );
+		// Debug.Break();
 
 		shrinkPosition = 0;
 		shrinkCurrentNumberOfCells = shrinkNumberOfCells;
@@ -280,6 +415,7 @@ public class SnakeController : MonoBehaviour {
 	{
 		DebugExecute( "Shrink" );
 
+
 		// Move head along skeleton - from head to tail
 		float dis = Mathf.Abs( targetNode.value - head.value );
 		body.MoveChain( head, -dis/10 );
@@ -299,7 +435,7 @@ public class SnakeController : MonoBehaviour {
 			body.zero = head.value;
 
 			// Switch state
-			currentState = dying ? State.Die : State.Move;
+			currentState = dying ? SnakeState.Die : SnakeState.Move;
 		}
 	}
 
@@ -319,20 +455,35 @@ public class SnakeController : MonoBehaviour {
 	{
 		DebugExecute( "Die" );
 
-		// Respawn snake
-		body.SpawnSnake( body.spawnPoint );
 
-		// Switch state
-		currentState = State.Move;
+		// // Switch state
+		// currentState = SnakeState.Move;
+
+		gameManager.GameOver();
 	}
 
 	private void DieExitState()
 	{
 		DebugExit( "Die" );
+
+		// // Respawn snake
+		// body.SpawnSnake( body.spawnPoint );
+		RespawnSnake();
 	}
 // EO DIE STATE //
 
 //////////////////////////////////////////////////////// EO STATE METHODS //
+
+// OTHER METHODS ///////////////////////////////////////////////////////////////
+
+	public void RespawnSnake()
+	{
+		while( body.chain.head.next != null )
+			body.DestroyCell( body.chain.head.next );
+
+		body.SpawnSnake( body.spawnPoint );
+	}
+//////////////////////////////////////////////////////////// EO OTHER METHODS //
 
 // INPUTS ////////////////////////////////////////////////////////
 
@@ -349,16 +500,16 @@ public class SnakeController : MonoBehaviour {
 		boostInput = 0;
 
 		// if( Time.frameCount == 7 )
-		// 	currentState = State.Shrink;
+		// 	currentState = SnakeState.Shrink;
 
 		if( Input.GetKeyDown("space") )
 			body.Grow();
 
 		if( Input.GetKeyDown("backspace") )
-			currentState = State.Shrink;
+			currentState = SnakeState.Shrink;
 
 		// if( transform.position.x >= 5 && !shrinkFlag ){
-		// 	currentState = State.Shrink;
+		// 	currentState = SnakeState.Shrink;
 		// 	shrinkFlag = true;
 		// }
 	}
@@ -370,13 +521,19 @@ public class SnakeController : MonoBehaviour {
 
 
 		if( Input.GetKeyDown("space") )
-			body.Grow(5);
+			body.Grow(1);
 
 		if( Input.GetKeyDown("backspace") )
-			currentState = State.Shrink;
+			currentState = SnakeState.Shrink;
 
 		if( Input.GetKeyDown("5") )
 			body.Grow(5);
+
+		if( Input.GetKeyDown("r") )
+			currentState = SnakeState.OnRail;
+
+		if( Input.GetKeyDown("k") )
+			currentState = SnakeState.Die;
 	}
 
 	private float boostTime = 0;

@@ -14,7 +14,7 @@ GameObject:
   - 114: {fileID: 11428674}
   m_Layer: 0
   m_Name: Food 2
-  m_TagString: Item
+  m_TagString: Food
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -73,7 +73,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b4af5ab4767a480486621a5c7fcba20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particles: {fileID: 172452, guid: 58c41a08cf4b841fe85f740344ff48ec, type: 2}
   spawner: {fileID: 0}
   nutritionValue: 3
 --- !u!135 &13587452

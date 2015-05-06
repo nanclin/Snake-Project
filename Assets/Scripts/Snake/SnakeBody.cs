@@ -9,7 +9,7 @@ public class SnakeBody : MonoBehaviour {
 	public Transform marker;
 
 	// Components
-	private Transform head;
+	public Transform head;
 	public Transform cellPrefab;
 	public Transform spawnPoint;
 
@@ -64,7 +64,7 @@ public class SnakeBody : MonoBehaviour {
 
 		// GROW INITIAL SNAKE CELLS ///////////////////////////////////////////////////////////////
 		// while( growQueue-- > 0)
-		for( int i = 0; i < 3; i++ )
+		for( int i = 0; i < 5; i++ )
 		{
 			// Instantiate cell
 			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;

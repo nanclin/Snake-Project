@@ -296,6 +296,9 @@ MonoBehaviour:
   controlType: 0
   buffer: .550000012
   bondStrength: 1
+  spline: {fileID: 0}
+  marker1: {fileID: 0}
+  marker2: {fileID: 0}
   source: {fileID: 0}
   layerMask:
     serializedVersion: 2

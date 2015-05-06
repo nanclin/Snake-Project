@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Item
   - Wall
+  - Hole
+  - Star
+  - Coin
+  - Food
   layers:
   - Default
   - TransparentFX

@@ -1,0 +1,269 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &109310
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 473454}
+  - 33: {fileID: 3365448}
+  - 136: {fileID: 13695658}
+  - 23: {fileID: 2364204}
+  - 114: {fileID: 11468672}
+  m_Layer: 0
+  m_Name: Hole
+  m_TagString: Hole
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &118376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 413594}
+  - 114: {fileID: 11431402}
+  m_Layer: 0
+  m_Name: Periscope Spline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &145534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 448952}
+  - 114: {fileID: 11413712}
+  m_Layer: 0
+  m_Name: Rail Spline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &413594
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 118376}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalScale: {x: .5, y: 20, z: .5}
+  m_Children: []
+  m_Father: {fileID: 473454}
+  m_RootOrder: 0
+--- !u!4 &448952
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 145534}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalScale: {x: .5, y: 20, z: .5}
+  m_Children: []
+  m_Father: {fileID: 473454}
+  m_RootOrder: 1
+--- !u!4 &473454
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109310}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -.5, z: 0}
+  m_LocalScale: {x: 2, y: .0500000007, z: 2}
+  m_Children:
+  - {fileID: 413594}
+  - {fileID: 448952}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!23 &2364204
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109310}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_Materials:
+  - {fileID: 2100000, guid: a8f02db5059af49569692f6467575055, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 1
+  m_ReflectionProbeUsage: 1
+  m_ProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_ImportantGI: 0
+  m_AutoUVMaxDistance: .5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+--- !u!33 &3365448
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109310}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &11413712
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 145534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a192e318c97b47b2ba784c17425bae8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  points:
+  - {x: 0, y: -2, z: 0}
+  - {x: 0, y: -3, z: 0}
+  - {x: 2, y: -4, z: 0}
+  - {x: 2, y: -4, z: -2}
+  - {x: 2, y: -4, z: -4}
+  - {x: 1, y: -4, z: -3.00000024}
+  - {x: 1, y: -4, z: -6}
+  - {x: 1, y: -4, z: -9}
+  - {x: 0, y: -3, z: -10}
+  - {x: 0, y: -2, z: -10}
+  - {x: 0, y: -.416996956, z: -10}
+  - {x: 0, y: 0, z: -10}
+  - {x: 0, y: 0, z: -9}
+  modes: 0100000002000000010000000100000001000000
+  outgoingSpline: {fileID: 0}
+  zD: {x: 0, y: 0, z: 0}
+  aD: {x: 0, y: 0, z: 0}
+  bD: {x: 0, y: 0, z: 0}
+  cD: {x: 0, y: 0, z: 0}
+  bakedSpline:
+  - {x: 0, y: -2, z: 0}
+  - {x: .0618165918, y: -2.31462288, z: -.00233270158}
+  - {x: .228604749, y: -2.62224793, z: -.0186616126}
+  - {x: .472372055, y: -2.91587687, z: -.0629829317}
+  - {x: .765126109, y: -3.18851137, z: -.149292901}
+  - {x: 1.07887459, y: -3.43315363, z: -.29158774}
+  - {x: 1.38562465, y: -3.64280486, z: -.503863454}
+  - {x: 1.6573844, y: -3.81046844, z: -.800116599}
+  - {x: 1.86616123, y: -3.92914438, z: -1.19434321}
+  - {x: 1.98396277, y: -3.99183583, z: -1.70053959}
+  - {x: 1.99198127, y: -4, z: -2.29187942}
+  - {x: 1.93308055, y: -3.99999976, z: -2.75054669}
+  - {x: 1.82869232, y: -4, z: -3.08324814}
+  - {x: 1.69281232, y: -3.99999976, z: -3.3389709}
+  - {x: 1.53943729, y: -4, z: -3.5667007}
+  - {x: 1.38256288, y: -4, z: -3.81542516}
+  - {x: 1.23618603, y: -4, z: -4.13413048}
+  - {x: 1.1143024, y: -4, z: -4.57180309}
+  - {x: 1.03090835, y: -4, z: -5.17743158}
+  - {x: 1, y: -4, z: -6}
+  - {x: .969091654, y: -3.96792531, z: -6.88205338}
+  - {x: .885697722, y: -3.87636685, z: -7.63813925}
+  - {x: .763813972, y: -3.73232269, z: -8.27525806}
+  - {x: .617436826, y: -3.54279017, z: -8.80040836}
+  - {x: .460562915, y: -3.31476903, z: -9.22058582}
+  - {x: .307187676, y: -3.05525589, z: -9.54278946}
+  - {x: .171307713, y: -2.77124953, z: -9.77401924}
+  - {x: .0669194609, y: -2.46974802, z: -9.92127132}
+  - {x: .00801867247, y: -2.15774918, z: -9.99154377}
+  - {x: 0, y: -1.75963247, z: -9.99985409}
+  - {x: 0, y: -1.33441591, z: -9.99606323}
+  - {x: 0, y: -.978855848, z: -9.98177528}
+  - {x: 0, y: -.687709332, z: -9.94999218}
+  - {x: 0, y: -.455735594, z: -9.89371681}
+  - {x: 0, y: -.277693272, z: -9.80594826}
+  - {x: 0, y: -.148339927, z: -9.67969131}
+  - {x: 0, y: -.0624343753, z: -9.50794601}
+  - {x: 0, y: -.0147350132, z: -9.28371429}
+  - {x: 0, y: 0, z: -9}
+  length: 15.9340153
+  bakedSteps: 38
+--- !u!114 &11431402
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 118376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a192e318c97b47b2ba784c17425bae8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  points:
+  - {x: 0, y: 0, z: -1}
+  - {x: 0, y: 0, z: -.282221854}
+  - {x: 0, y: -.141207695, z: 0}
+  - {x: 0, y: -2, z: 0}
+  modes: 0100000001000000
+  outgoingSpline: {fileID: 11413712}
+  zD: {x: 0, y: 0, z: 0}
+  aD: {x: 0, y: 0, z: 0}
+  bD: {x: 0, y: 0, z: 0}
+  cD: {x: 0, y: 0, z: 0}
+  bakedSpline:
+  - {x: 0, y: 0, z: -1}
+  - {x: 0, y: -.00581258535, z: -.797579825}
+  - {x: 0, y: -.0295559466, z: -.620373249}
+  - {x: 0, y: -.0806882679, z: -.467459828}
+  - {x: 0, y: -.168667823, z: -.337919891}
+  - {x: 0, y: -.302952886, z: -.230833203}
+  - {x: 0, y: -.493001759, z: -.145279884}
+  - {x: 0, y: -.748272598, z: -.0803399384}
+  - {x: 0, y: -1.07822382, z: -.0350932963}
+  - {x: 0, y: -1.49231339, z: -.00861999393}
+  - {x: 0, y: -2, z: 0}
+  length: 2.5984304
+  bakedSteps: 10
+--- !u!114 &11468672
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605b8d1e8dc9c429cb67d19044eef9a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  path: {fileID: 413594}
+  rotate: 1
+--- !u!136 &13695658
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109310}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: .25
+  m_Height: 120
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 109310}
+  m_IsPrefabParent: 1
