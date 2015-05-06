@@ -36,6 +36,7 @@ public class Spawner : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
+		// Initialize at the begining
 		Init();
 	}
 	
@@ -43,12 +44,11 @@ public class Spawner : MonoBehaviour {
 	void Update ()
 	{
 		while(
-			// spawnAtStart ||
 			( Time.time - lastSpawnTime >= spawnDelay ) &&
 			( itemList.Count < maxAlive || maxAlive == 0 ) &&
 			( takenFromStock < stock || stock == 0 )
 		){
-			Spawn();
+			SpawnItem();
 		}
 
 		if( Input.GetKeyDown("p") )
@@ -58,8 +58,37 @@ public class Spawner : MonoBehaviour {
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
+// STATIC METHODS ///////////////////////////////////////////////////////////////
 
-	public void Spawn()
+	// Sets all the spawners to initial state
+	public static void ResetSpawners()
+	{
+		foreach( Spawner spawner in spawnerList )
+			spawner.Init();
+	}
+//////////////////////////////////////////////////////////// EO STATIC METHODS //
+
+
+// SPAWNER CONTROLS ///////////////////////////////////////////////////////////////
+
+	// Set to initial state
+	public void Init()
+	{
+		// Remove all instances created by this Spawner
+		ItemCleanup();
+
+		// Reset stock
+		takenFromStock = 0;
+
+		// Reset timer
+		if( spawnAtStart )
+			lastSpawnTime = Time.time - spawnDelay;
+		else
+			lastSpawnTime = Time.time;
+	}
+
+	// Spawn item
+	public void SpawnItem()
 	{
 		// Keep track of stock
 		takenFromStock++;
@@ -80,7 +109,7 @@ public class Spawner : MonoBehaviour {
 	}
 
 	// Remove all instances created by this Spawner
-	public void Cleanup()
+	public void ItemCleanup()
 	{
 		// Destroy every item
 		foreach( Item item in itemList )
@@ -89,45 +118,36 @@ public class Spawner : MonoBehaviour {
 		itemList = new List<Item>();
 	}
 
-	// Set to initial state
-	public void Init()
-	{
-		// Cleanup old items
-		Cleanup();
 
-		// Reset stock
-		takenFromStock = 0;
-
-		// Reset timer
-		if( spawnAtStart )
-			lastSpawnTime = Time.time - spawnDelay;
-		else
-			lastSpawnTime = Time.time;
-	}
-
+	// Item is destroyed by Spawner to cleanup references
 	public void DestroyItem( Item item )
 	{
+		// Reset timer
 		if( itemList.Count == maxAlive )
 			lastSpawnTime = Time.time;
 
+		// Destroy item
 		itemList.Remove( item );
 		Destroy( item.gameObject );
 	}
+//////////////////////////////////////////////////////////// EO SPAWNER CONTROLS //
 
 	// Draw spawner area range
 	void OnDrawGizmos()
 	{
 		if( area ){
-	        // Gizmos.color = Color.red;
+			// Draw invisible layer to enable interactive selection in editor
 	        Gizmos.color = new Color( 1, 0, 0, 0f );
 	        Gizmos.DrawSphere( transform.position, range );
+	        // Draw wireframe
 	        Gizmos.color = Color.red;
 	        Gizmos.DrawWireSphere( transform.position, range );
 		}
 		else{
-	        // Gizmos.color = Color.red;
+			// Draw invisible layer to enable interactive selection in editor
 	        Gizmos.color = new Color( 1, 0, 0, 0f );
 	        Gizmos.DrawCube( transform.position, Vector3.one );
+	        // Draw wireframe
 	        Gizmos.color = Color.red;
 	        Gizmos.DrawWireCube( transform.position, Vector3.one );
 		}
