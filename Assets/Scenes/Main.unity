@@ -520,7 +520,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 188672, guid: 99b202444e1d04e3c9d4e5ff2756bf1f, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 99b202444e1d04e3c9d4e5ff2756bf1f, type: 2}
@@ -955,7 +955,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2256955c4cd21452a8586f4aeade18df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  marker: {fileID: 0}
+  cameraHolder: {fileID: 1057752927}
   snakeSpawnPoint: {fileID: 1897711206}
   snake: {fileID: 1717839845}
 --- !u!4 &769060007
@@ -1111,7 +1111,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 188672, guid: 84c274c57fd0b4eca89aa1833e03aa80, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 84c274c57fd0b4eca89aa1833e03aa80, type: 2}
@@ -1687,7 +1687,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1794453014
 Transform:
   m_ObjectHideFlags: 0
@@ -1811,7 +1811,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1897711205}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .600000024, y: 0, z: -7.5}
+  m_LocalPosition: {x: -.300000012, y: 0, z: -.800000012}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1861,7 +1861,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 188672, guid: fefe4f1c8ad7e410b850360d32c14f9e, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11499528, guid: fefe4f1c8ad7e410b850360d32c14f9e, type: 2}
       propertyPath: spawnDelay

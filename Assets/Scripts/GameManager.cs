@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour {
 	public static bool FSM_DEBUG = false;
 
 	// Debug
-	public Transform marker;
+	public Transform cameraHolder;
 
 	// System
 	public Transform snakeSpawnPoint;
@@ -180,6 +180,9 @@ public class GameManager : MonoBehaviour {
 		// Reset snake
 		snake.SpawnSnake( snakeSpawnPoint );
 		snake.currentState = SnakeState.Idle;
+
+		// Reset camera
+		cameraHolder.transform.position = snakeSpawnPoint.position;
 	}
 
 	private void NewGameState()
