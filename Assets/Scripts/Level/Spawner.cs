@@ -112,23 +112,29 @@ public class Spawner : MonoBehaviour {
 	public void ItemCleanup()
 	{
 		// Destroy every item
-		foreach( Item item in itemList )
-			DestroyItem( item );
+		int itemCount = itemList.Count;
+		for( int i = 0; i < itemCount; i++ ){
+			Item item = itemList[i];
+			DestroyItem( item, false );
+		}
 
 		itemList = new List<Item>();
 	}
 
 
 	// Item is destroyed by Spawner to cleanup references
-	public void DestroyItem( Item item )
+	public void DestroyItem( Item item, bool removeFromList = true )
 	{
 		// Reset timer
 		if( itemList.Count == maxAlive )
 			lastSpawnTime = Time.time;
 
 		// Destroy item
-		itemList.Remove( item );
-		Destroy( item.gameObject );
+		if( item != null ){
+			if(removeFromList)
+				itemList.Remove( item );
+			Destroy( item.gameObject );
+		}
 	}
 //////////////////////////////////////////////////////////// EO SPAWNER CONTROLS //
 

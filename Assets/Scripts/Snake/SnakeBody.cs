@@ -26,7 +26,7 @@ public class SnakeBody : MonoBehaviour {
 
 		snakeController = GetComponent<SnakeController>();
 
-		SpawnSnake( spawnPoint );
+		// Init( spawnPoint.position );
 	}
 	
 	// Update is called once per frame
@@ -43,11 +43,18 @@ public class SnakeBody : MonoBehaviour {
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
-	public void SpawnSnake( Transform spawnPoint, int size = 3 )
+	public void Init( Transform spawnPoint, int size = 3 )
 	{
+
+		// print( "chain.head: " + chain.head );
+		// while( chain.head != null && chain.head.next != null )
+		// 	DestroyCell( chain.head.next );
+
 		// Initialize skeleton and chain
 		skeleton = new SnakeSkeleton();
 		chain = new Chain();
+
+		growQueue = 0;
 
 		zero = 0;
 
@@ -181,11 +188,6 @@ public class SnakeBody : MonoBehaviour {
 //////////////////////////////////////////////////////////// EO UPDATE BODY //
 
 // METHODS ///////////////////////////////////////////////////////////////
-
-	public void Shrink()
-	{
-		DestroyCell( chain.tail.previous );
-	}
 
 	public void DestroyCell( ChainNode cell )
 	{

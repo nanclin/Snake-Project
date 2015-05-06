@@ -25,18 +25,13 @@ public class SnakeController : MonoBehaviour {
 	private float speed = 0;
 
 
-// BUILTIN METHODS ///////////////////////////////////////////////////////////////
+// UNITY METHODS ///////////////////////////////////////////////////////////////
 
 	// Use this for initialization
-	void Start ()
+	void Awake ()
 	{
 		body = GetComponent<SnakeBody>();
 
-		// Grow cells
-		for( int i = 0; i < 0; i++ )
-		{	
-			body.Grow();
-		}
 
 		// marker2.position = spline.GetPointBaked( 13.5f );
 
@@ -120,7 +115,7 @@ public class SnakeController : MonoBehaviour {
 				break;
 		}
 	}
-//////////////////////////////////////////////////////////// EO BUILTIN METHODS //
+//////////////////////////////////////////////////////////// EO UNITY METHODS //
 
 
 // FSM MACHINE METHODS ////////////////////////////////////////////////////////
@@ -468,7 +463,7 @@ public class SnakeController : MonoBehaviour {
 
 		// // Respawn snake
 		// body.SpawnSnake( body.spawnPoint );
-		RespawnSnake();
+		// SpawnSnake(  );
 	}
 // EO DIE STATE //
 
@@ -476,12 +471,18 @@ public class SnakeController : MonoBehaviour {
 
 // OTHER METHODS ///////////////////////////////////////////////////////////////
 
-	public void RespawnSnake()
+	public void SpawnSnake( Transform spawnPoint )
 	{
-		while( body.chain.head.next != null )
-			body.DestroyCell( body.chain.head.next );
+		// while( body.chain.head.next != null )
+		// 	body.DestroyCell( body.chain.head.next );
 
-		body.SpawnSnake( body.spawnPoint );
+		body.Init( spawnPoint );
+
+		// Grow cells
+		for( int i = 0; i < 0; i++ )
+		{	
+			body.Grow();
+		}
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 

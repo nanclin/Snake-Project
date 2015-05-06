@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour {
 	public Transform marker;
 
 	// System
+	public Transform snakeSpawnPoint;
 	public enum State { Idle, NewGame, Run, GameOver, LevelFinished }
 	private State _state;
 	private float sw = Screen.width;
@@ -55,8 +56,6 @@ public class GameManager : MonoBehaviour {
 			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nGame Over" );
 			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
 				currentState = State.NewGame;
-				snake.RespawnSnake();
-				snake.currentState = SnakeState.Idle;
 			}
 		}
 
@@ -68,15 +67,13 @@ public class GameManager : MonoBehaviour {
 
 		if( currentState == State.LevelFinished ){
 			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nCONGRATULATIONS!\n Tou finished this level!\nYour score is\n" + SCORE );
-			snake.currentState = SnakeState.Idle;
 			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
-				snake.RespawnSnake();
 				currentState = State.NewGame;
 			}
 		}
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
-	
+
 
 // FSM MACHINE METHODS ////////////////////////////////////////////////////////
 
@@ -179,6 +176,10 @@ public class GameManager : MonoBehaviour {
 		
 		// Reset spawners
 		Spawner.ResetSpawners();
+
+		// Reset snake
+		snake.SpawnSnake( snakeSpawnPoint );
+		snake.currentState = SnakeState.Idle;
 	}
 
 	private void NewGameState()
@@ -238,6 +239,8 @@ public class GameManager : MonoBehaviour {
 	private void LevelFinishedEnterState()
 	{
 		DebugEnter( "LevelFinished" );
+
+		snake.currentState = SnakeState.Idle;
 	}
 
 	private void LevelFinishedState()

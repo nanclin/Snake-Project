@@ -488,7 +488,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 497652, guid: 99b202444e1d04e3c9d4e5ff2756bf1f, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 11.1592312
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 497652, guid: 99b202444e1d04e3c9d4e5ff2756bf1f, type: 2}
       propertyPath: m_LocalPosition.y
@@ -496,7 +496,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 497652, guid: 99b202444e1d04e3c9d4e5ff2756bf1f, type: 2}
       propertyPath: m_LocalPosition.z
-      value: .173015401
+      value: 10.8000002
       objectReference: {fileID: 0}
     - target: {fileID: 497652, guid: 99b202444e1d04e3c9d4e5ff2756bf1f, type: 2}
       propertyPath: m_LocalRotation.x
@@ -956,6 +956,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   marker: {fileID: 0}
+  snakeSpawnPoint: {fileID: 1897711206}
   snake: {fileID: 1717839845}
 --- !u!4 &769060007
 Transform:
@@ -1078,7 +1079,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 497652, guid: 84c274c57fd0b4eca89aa1833e03aa80, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 5.79587984
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 497652, guid: 84c274c57fd0b4eca89aa1833e03aa80, type: 2}
       propertyPath: m_LocalPosition.y
@@ -1086,7 +1087,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 497652, guid: 84c274c57fd0b4eca89aa1833e03aa80, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -6.83394289
+      value: 6.4000001
       objectReference: {fileID: 0}
     - target: {fileID: 497652, guid: 84c274c57fd0b4eca89aa1833e03aa80, type: 2}
       propertyPath: m_LocalRotation.x
@@ -1809,8 +1810,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1897711205}
-  m_LocalRotation: {x: 0, y: 1.22189522e-06, z: 0, w: 1}
-  m_LocalPosition: {x: -6.8499999, y: 0, z: -10.4899998}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1864,6 +1865,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11499528, guid: fefe4f1c8ad7e410b850360d32c14f9e, type: 2}
       propertyPath: spawnDelay
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11499528, guid: fefe4f1c8ad7e410b850360d32c14f9e, type: 2}
+      propertyPath: stock
       value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
