@@ -18,7 +18,7 @@ public class Spawner : MonoBehaviour {
 	private int takenFromStock = 0;
 	public bool spawnAtStart;
 	public bool area;
-	[Range(1,100)] public float range;
+	[Range(1f,100f)] public float range;
 	public Item itemPrefab;
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////

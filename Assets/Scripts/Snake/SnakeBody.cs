@@ -45,10 +45,9 @@ public class SnakeBody : MonoBehaviour {
 
 	public void Init( Transform spawnPoint, int size = 5 )
 	{
-
-		// print( "chain.head: " + chain.head );
-		// while( chain.head != null && chain.head.next != null )
-		// 	DestroyCell( chain.head.next );
+		// Remove old cells
+		while( chain != null && chain.head.next != null )
+			DestroyCell( chain.head.next );
 
 		// Initialize skeleton and chain
 		skeleton = new SnakeSkeleton();
