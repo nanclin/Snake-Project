@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Item : MonoBehaviour {
 
-	public GameObject particles;
+	// public GameObject particles;
 	[HideInInspector]
 	public Spawner spawner;
 	public int nutritionValue = 1;
@@ -14,12 +14,7 @@ public class Item : MonoBehaviour {
 		switch( other.tag )
 		{
 			case "Player":
-				Instantiate( particles, transform.position, Quaternion.identity );
-
-				if( spawner != null)
-					spawner.numOfInstances--;
-					
-				Destroy( gameObject );
+				spawner.DestroyItem( this );
 				break;
 			default:
 				print("Item was hit by something not handeld by code!");
