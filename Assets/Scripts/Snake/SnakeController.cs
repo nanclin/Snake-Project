@@ -78,18 +78,18 @@ public class SnakeController : MonoBehaviour {
 					gameManager.LevelFinished();
 				break;
 			case "Wall":
-				// if( body.chain.Count > 1 )
-				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
+				bool otherIsNeck = ( other.gameObject == body.chain.head.next.prefab || body.chain.Count == 2 );
 				bool otherIsTail = other.gameObject == body.chain.tail.prefab;
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
 				{
-					if( otherIsTail ){
+					if( otherIsTail && body.chain.Count > 2 ){
 						body.DestroyCell( body.chain.tail );
 						body.Grow();
 					}
-					else if( !otherIsNeck )
+					if( !otherIsNeck ){
 						currentState = SnakeState.Shrink;
 						// GameManager.SCORE -= 3;
+					}
 				}
 
 				break;
