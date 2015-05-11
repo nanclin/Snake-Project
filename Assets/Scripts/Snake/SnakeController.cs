@@ -74,8 +74,8 @@ public class SnakeController : MonoBehaviour {
 				GameManager.SCORE += 100;
 				GameManager.STARS++;
 				if( GameManager.STARS == 3 )
-					// gameManager.OpenExit();
-					gameManager.LevelFinished();
+					gameManager.OpenExit();
+					// gameManager.LevelFinished();
 				break;
 			case "Wall":
 				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
@@ -96,15 +96,9 @@ public class SnakeController : MonoBehaviour {
 				// print("SnakeController");
 				if( currentState != SnakeState.OnRail )
 				{
+					hole = other.GetComponent<Hole>();
+					hole.RotatePeriscope( this.transform );
 					spline = other.transform.Find("Periscope Spline").GetComponent<BezierSpline>();
-					// if( spline == null )
-						// spline = other.transform.Find("Rail Spline").GetComponent<BezierSpline>();
-
-					var lookPos = -( transform.position - other.transform.position );
-					lookPos.y = 0;
-					var rotation = Quaternion.LookRotation( lookPos );
-					spline.transform.rotation = rotation;
-					spline.BakeSpline();
 
 					currentState = SnakeState.OnRail;
 				}
@@ -306,8 +300,7 @@ public class SnakeController : MonoBehaviour {
 		// }
 	}
 
-	public Transform marker1;
-	public Transform marker2;
+	public Hole hole;
 
 	private void OnRailState()
 	{
@@ -354,9 +347,15 @@ public class SnakeController : MonoBehaviour {
 		body.UpdateBody( speed );
 
 
+		// When snake comes to an end of the rail
 		if( traversed >= spline.length )
 		{
-			currentState = SnakeState.Move;
+			if( hole.type == HoleType.Hole )
+				currentState = SnakeState.Move;
+			else if( hole.type == HoleType.Exit ){
+				currentState = SnakeState.Idle;
+				gameManager.LevelFinished();
+			}
 		}
 	}
 
@@ -556,15 +555,18 @@ public class SnakeController : MonoBehaviour {
 			rotationInput = 0;
 		}
 
-		if( GUI.Button( new Rect( Screen.width/2 - size*2/2 + size + padding, Screen.height - size - padding, size*2, size), "BOOST" ) ){
+		// Boost
+		// if( GUI.Button( new Rect( Screen.width/2 - size*2/2 + size + padding, Screen.height - size - padding, size*2, size), "BOOST" ) ){
+		if( GUI.Button( new Rect( Screen.width/2 - size*2/2, Screen.height - size - padding, size*2, size), "BOOST" ) ){
 			// Add x seconds to boostTime
 			boostTime = Mathf.Max( Time.time, boostTime ) + 2;
 		}
 		boostInput = ( boostTime > Time.time ) ? 1 : 0;
 
-		if( GUI.Button( new Rect( Screen.width/2 - size*2/2 - size - padding, Screen.height - size - padding, size*2, size), "GROW" ) ){
-			body.Grow();
-		}
+		// // Grow
+		// if( GUI.Button( new Rect( Screen.width/2 - size*2/2 - size - padding, Screen.height - size - padding, size*2, size), "GROW" ) ){
+		// 	body.Grow();
+		// }
 	}
 //////////////////////////////////////////////////////// EO INPUTS //
 

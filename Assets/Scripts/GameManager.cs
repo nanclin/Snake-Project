@@ -18,7 +18,8 @@ public class GameManager : MonoBehaviour {
 
 	// System
 	public Transform snakeSpawnPoint;
-	public enum State { Idle, NewGame, Run, GameOver, LevelFinished }
+	public GameObject exit;
+	public enum State { Idle, NewGame, Run, GameOver, OpenExit, LevelFinished }
 	private State _state;
 	private float sw = Screen.width;
 	private float sh = Screen.height;
@@ -66,7 +67,7 @@ public class GameManager : MonoBehaviour {
 		}
 
 		if( currentState == State.LevelFinished ){
-			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nCONGRATULATIONS!\n Tou finished this level!\nYour score is\n" + SCORE );
+			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nCONGRATULATIONS!\n You finished this level!\nYour score is\n" + SCORE );
 			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
 				currentState = State.NewGame;
 			}
@@ -116,6 +117,9 @@ public class GameManager : MonoBehaviour {
 			case State.LevelFinished:
 				LevelFinishedEnterState();
 				break;
+			case State.OpenExit:
+				OpenExitEnterState();
+				break;
 		}
 	}
 
@@ -135,6 +139,9 @@ public class GameManager : MonoBehaviour {
 			case State.LevelFinished:
 				LevelFinishedState();
 				break;
+			case State.OpenExit:
+				OpenExitState();
+				break;
 		}
 	}
 
@@ -153,6 +160,9 @@ public class GameManager : MonoBehaviour {
 				break;
 			case State.LevelFinished:
 				LevelFinishedExitState();
+				break;
+			case State.OpenExit:
+				OpenExitExitState();
 				break;
 		}
 	}
@@ -183,6 +193,9 @@ public class GameManager : MonoBehaviour {
 
 		// Reset camera
 		cameraHolder.transform.position = snakeSpawnPoint.position;
+
+		// Reset exit
+		exit.SetActive( false );
 	}
 
 	private void NewGameState()
@@ -195,7 +208,6 @@ public class GameManager : MonoBehaviour {
 		DebugExit( "NewGame" );
 	}
 // EO NEW GAME STATE //
-
 
 // RUN GAME STATE //
 	private void RunEnterState()
@@ -215,7 +227,6 @@ public class GameManager : MonoBehaviour {
 		DebugExit( "Run" );
 	}
 // EO RUN GAME STATE //
-
 
 // GAME OVER STATE //
 	private void GameOverEnterState()
@@ -237,6 +248,49 @@ public class GameManager : MonoBehaviour {
 		currentState = State.GameOver;
 	}
 // EO GAME OVER STATE //
+
+// OPEN EXIT STATE //
+	private float openTime;
+	private void OpenExitEnterState()
+	{
+		DebugEnter( "OpenExit" );
+
+		openTime = Time.time;
+
+		// Set snake still
+		snake.currentState = SnakeState.Idle;
+
+		// Enable exit
+		exit.SetActive( true );
+	}
+
+	private void OpenExitState()
+	{
+		DebugExecute( "OpenExit" );
+
+
+		float timeElapsed = Time.time - openTime;
+		if( timeElapsed >= 5 )
+			currentState = State.Run;
+		else if( timeElapsed >= 4 )
+			cameraHolder.GetComponent<FollowTarget>().target = snake.transform;
+		else if( timeElapsed >= 1 )
+			cameraHolder.GetComponent<FollowTarget>().target = exit.transform;
+
+	}
+
+	private void OpenExitExitState()
+	{
+		DebugExit( "OpenExit" );
+
+		snake.currentState = SnakeState.Move;
+	}
+	public void OpenExit()
+	{
+		// print("EXIT IS NOW OPEN!");
+		currentState = State.OpenExit;
+	}
+// EO OPEN EXIT STATE //
 
 // LEVEL FINISHED STATE //
 	private void LevelFinishedEnterState()
@@ -266,10 +320,6 @@ public class GameManager : MonoBehaviour {
 
 // OTHER METHODS ///////////////////////////////////////////////////////////////
 
-	public void OpenExit()
-	{
-		print("EXIT IS NOW OPEN!");
-	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 
 }

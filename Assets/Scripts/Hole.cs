@@ -3,24 +3,25 @@ using System.Collections;
 
 public class Hole : MonoBehaviour {
 
-	public Transform target;
-	// public Transform ground;
+	public HoleType type = HoleType.Hole;
 	public Transform path;
-	public bool rotate = true;
 
 	private BezierSpline spline;
 
 	void Start()
 	{
-		// spline = path.GetComponent<BezierSpline>();
+		spline = path.GetComponent<BezierSpline>();
 	}
 
-	
-	// Update is called once per frame
-	void Update ()
+	public void RotatePeriscope( Transform target )
 	{
-	}
+		var lookPos = -( target.position - transform.position );
+		lookPos.y = 0;
+		var rotation = Quaternion.LookRotation( lookPos );
 
+		spline.transform.rotation = rotation;
+		spline.BakeSpline();
+	}
 
 	void OnTriggerEnter( Collider other )
 	{
@@ -35,4 +36,9 @@ public class Hole : MonoBehaviour {
 		// GetComponent<CapsuleCollider>().enabled = true;
 		// ground.GetComponent<Renderer>().material.color = Color.white;
 	}
+}
+
+public enum HoleType{
+	Hole,
+	Exit
 }
