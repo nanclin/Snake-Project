@@ -10,6 +10,8 @@ TagManager:
   - Star
   - Coin
   - Food
+  - Snake Cell
+  - Button
   layers:
   - Default
   - TransparentFX

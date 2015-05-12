@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Spawner : MonoBehaviour {
+public class Spawner : Initializer {
 
 	// Static
-	public static List<Spawner> spawnerList = new List<Spawner>();
+	// public static List<Spawner> spawnerList = new List<Spawner>();
 
 	// System
 	private List<Item> itemList = new List<Item>();
@@ -23,23 +23,6 @@ public class Spawner : MonoBehaviour {
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 
-	void OnEnable()
-	{
-		spawnerList.Add( this );
-	}
-
-	void OnDisable()
-	{
-		spawnerList.Remove( this );
-	}
-
-	// Use this for initialization
-	void Start ()
-	{
-		// Initialize at the begining
-		Init();
-	}
-	
 	// Update is called once per frame
 	void Update ()
 	{
@@ -50,29 +33,13 @@ public class Spawner : MonoBehaviour {
 		){
 			SpawnItem();
 		}
-
-		if( Input.GetKeyDown("p") )
-		{
-			Init();
-		}
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
-
-// STATIC METHODS ///////////////////////////////////////////////////////////////
-
-	// Sets all the spawners to initial state
-	public static void ResetSpawners()
-	{
-		foreach( Spawner spawner in spawnerList )
-			spawner.Init();
-	}
-//////////////////////////////////////////////////////////// EO STATIC METHODS //
-
 
 // SPAWNER CONTROLS ///////////////////////////////////////////////////////////////
 
 	// Set to initial state
-	public void Init()
+	override public void Init()
 	{
 		// Remove all instances created by this Spawner
 		ItemCleanup();
@@ -138,6 +105,7 @@ public class Spawner : MonoBehaviour {
 	}
 //////////////////////////////////////////////////////////// EO SPAWNER CONTROLS //
 
+// DEBUG ///////////////////////////////////////////////////////////////
 	// Draw spawner area range
 	void OnDrawGizmos()
 	{
@@ -158,4 +126,5 @@ public class Spawner : MonoBehaviour {
 	        Gizmos.DrawWireCube( transform.position, Vector3.one );
 		}
     }
+//////////////////////////////////////////////////////////// EO DEBUG //
 }

@@ -44,6 +44,14 @@ public class GameManager : MonoBehaviour {
 		ExecuteState();
 	}
 
+	void Update()
+	{
+		if( Input.GetKeyDown("i") )
+		{
+			Initializer.ResetAll();
+		}
+	}
+
 	void OnGUI ()
 	{
 		if( currentState == State.NewGame ){
@@ -184,18 +192,26 @@ public class GameManager : MonoBehaviour {
 		GameManager.SCORE = 0;
 		GameManager.STARS = 0;
 		
+		// Reset initializers
+		Initializer.ResetAll();
+		
 		// Reset spawners
-		Spawner.ResetSpawners();
+		// Spawner.ResetSpawners();
+		
 
 		// Reset snake
 		snake.SpawnSnake( snakeSpawnPoint );
 		snake.currentState = SnakeState.Idle;
 
 		// Reset camera
-		cameraHolder.transform.position = snakeSpawnPoint.position;
+		// cameraHolder.transform.position = snakeSpawnPoint.position;
 
 		// Reset exit
-		exit.SetActive( false );
+		if( exit )
+			exit.SetActive( false );
+
+		// Automatically start running game
+		currentState = State.Run;
 	}
 
 	private void NewGameState()

@@ -78,6 +78,7 @@ public class SnakeController : MonoBehaviour {
 					// gameManager.LevelFinished();
 				break;
 			case "Wall":
+			case "Snake Cell":
 				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
 				bool otherIsTail = other.gameObject == body.chain.tail.prefab;
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
@@ -102,6 +103,8 @@ public class SnakeController : MonoBehaviour {
 
 					currentState = SnakeState.OnRail;
 				}
+				break;
+			case "Button":
 				break;
 			default:
 				print("SnakeHeadCollider hit something not handeld by code! " + other);
