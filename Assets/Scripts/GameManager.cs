@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour {
 	public static int ROUND_DECIMALS = 5;
 	public static int SCORE;
 	public static int STARS;
+	public static float TIME;
+	public static float START_TIME;
 
 	// Static
 	public static bool FSM_DEBUG = false;
@@ -72,10 +74,19 @@ public class GameManager : MonoBehaviour {
 			currentState == State.GameOver ){
 			GUI.Box( new Rect( sw/2 - 100/2 - 60, 10, 100, 25 ), "Score: " + SCORE );
 			GUI.Box( new Rect( sw/2 - 100/2 + 60, 10, 100, 25 ), "Stars: " + STARS + " / 3" );
+
+			int m = (int)( TIME / 60f );
+			int s = (int)( TIME % 60f );
+			GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
 		}
 
 		if( currentState == State.LevelFinished ){
 			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nCONGRATULATIONS!\n You finished this level!\nYour score is\n" + SCORE );
+
+			int m = (int)( TIME / 60f );
+			int s = (int)( TIME % 60f );
+			GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
+			
 			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
 				currentState = State.NewGame;
 			}
@@ -191,6 +202,8 @@ public class GameManager : MonoBehaviour {
 		// Reset score
 		GameManager.SCORE = 0;
 		GameManager.STARS = 0;
+		GameManager.TIME = 0;
+		GameManager.START_TIME = Time.time;
 		
 		// Reset initializers
 		Initializer.ResetAll();
@@ -236,6 +249,8 @@ public class GameManager : MonoBehaviour {
 	private void RunState()
 	{
 		DebugExecute( "Run" );
+
+		TIME = (int)( Time.time - START_TIME );
 	}
 
 	private void RunExitState()
