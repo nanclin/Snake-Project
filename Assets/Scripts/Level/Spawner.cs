@@ -114,8 +114,9 @@ public class Spawner : Initializer {
 	        Gizmos.color = new Color( 1, 0, 0, 0f );
 	        Gizmos.DrawSphere( transform.position, range );
 	        // Draw wireframe
-	        Gizmos.color = Color.red;
-	        Gizmos.DrawWireSphere( transform.position, range );
+	        // Gizmos.color = Color.red;
+	        // Gizmos.DrawWireSphere( transform.position, range );
+	        MyDraw.DrawCircle( transform.position, range, Color.red );
 		}
 		else{
 			// Draw invisible layer to enable interactive selection in editor

@@ -43,7 +43,7 @@ public class SnakeBody : MonoBehaviour {
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
-	public void Init( Transform spawnPoint, int size = 3 )
+	public void Init( Transform spawnPoint, int size = 2 )
 	{
 		// Remove old cells
 		while( chain != null && chain.head.next != null )

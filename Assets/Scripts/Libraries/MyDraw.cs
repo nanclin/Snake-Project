@@ -56,7 +56,7 @@ public class MyDraw : MonoBehaviour {
 		Vector3 prevPoint = Quaternion.Euler(0, 45, 0) * Vector3.forward;
 		prevPoint = prevPoint.normalized * radius;
 
-		for( int i = 0; i <= 360; i += 360/18 )
+		for( int i = 0; i <= 360; i += 360/36 )
 		{
 			Vector3 currentPoint = Quaternion.Euler(0, i + 45, 0) * Vector3.forward;
 			currentPoint = currentPoint.normalized * radius;
@@ -65,6 +65,12 @@ public class MyDraw : MonoBehaviour {
 
 			prevPoint = currentPoint;
 		}
+	}
+
+	public static void DrawCross( Vector3 center, float radius, Color color )
+	{
+		DrawLineThroughPoint( center, Vector3.forward, color, radius );
+		DrawLineThroughPoint( center, Vector3.right, color, radius );
 	}
 
 

@@ -8,6 +8,7 @@ public class SnakeController : MonoBehaviour {
 
 	// Handling
 	private float maxSpeed = 0.08f;
+	// private float maxSpeed = 0.04f;
 	private float acceleration = 0.01f;
 	private float rotationSpeed = 3;
 	public enum ControlType{ Debug, PC, Android }
@@ -16,7 +17,7 @@ public class SnakeController : MonoBehaviour {
 	public float bondStrength;
 
 	// Components
-	private SnakeBody body;
+	public SnakeBody body;
 	public GameManager gameManager;
 
 	// System
@@ -75,7 +76,6 @@ public class SnakeController : MonoBehaviour {
 				GameManager.STARS++;
 				if( GameManager.STARS == 3 )
 					gameManager.OpenExit();
-					// gameManager.LevelFinished();
 				break;
 			case "Wall":
 			case "Snake Cell":
@@ -486,6 +486,17 @@ public class SnakeController : MonoBehaviour {
 		}
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
+
+// GETTERS/SETTERS ///////////////////////////////////////////////////////////////
+
+	[SerializeField]
+	public int Size
+	{
+		get{
+			return body.chain.Count;
+		}
+	}
+//////////////////////////////////////////////////////////// EO GETTERS/SETTERS //
 
 // INPUTS ////////////////////////////////////////////////////////
 
