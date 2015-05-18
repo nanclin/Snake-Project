@@ -12,6 +12,7 @@ GameObject:
   - 136: {fileID: 13695658}
   - 23: {fileID: 2364204}
   - 114: {fileID: 11468672}
+  - 114: {fileID: 11424620}
   m_Layer: 0
   m_Name: Hole
   m_TagString: Hole
@@ -193,6 +194,19 @@ MonoBehaviour:
   - {x: 0, y: 0, z: -9}
   length: 15.9340153
   bakedSteps: 38
+--- !u!114 &11424620
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d30e2531c5f2e4533b9571c1f9681167, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  innerRange: 5
+  outerRange: 13
 --- !u!114 &11431402
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -240,9 +254,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 605b8d1e8dc9c429cb67d19044eef9a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  type: 0
   path: {fileID: 413594}
-  rotate: 1
 --- !u!136 &13695658
 CapsuleCollider:
   m_ObjectHideFlags: 1

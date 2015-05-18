@@ -85,17 +85,7 @@ public class CameraSystem : Initializer
 
 		forwardAttractor = player.position + player.forward * forward;
 		Vector3 attractors = CameraAttractor.GetAttractorsVector( player.position, forwardAttractor );
-
-		// If any attractor in range
-		if( attractors.magnitude > 0 ){
-			// finalPosition = Vector3.Lerp( forwardAttractor, attractors, 0.5f ) + relCameraPos;
-			// finalPosition = Vector3.Lerp( attractors, player.position, 0.5f ) + relCameraPos;
-			finalPosition = attractors + relCameraPos;
-		}
-		else{
-			// finalPosition = forwardAttractor + relCameraPos;
-			finalPosition = player.position + relCameraPos;
-		}
+		finalPosition = attractors + relCameraPos;
 
 		// Apply final position
 		transform.position = Vector3.Lerp( transform.position, finalPosition, smooth * Time.deltaTime );

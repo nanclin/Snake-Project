@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d30e2531c5f2e4533b9571c1f9681167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  innerRange: 7
+  innerRange: 5
   outerRange: 20
 --- !u!114 &11445172
 MonoBehaviour:
