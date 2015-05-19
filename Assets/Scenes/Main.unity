@@ -1700,13 +1700,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   smooth: 3
-  forward: 3
-  innerRing: 5
-  outerRing: 13
-  liftStep: 1
-  maxLift: 23
-  forwardVsBody: .5
-  cube: {fileID: 1913479877}
+  lookForwardDis: 3
+  boundaryPower: 2
+  paddingHorizontal: .5
+  paddingVertical: .600000024
 --- !u!1001 &1419403553
 Prefab:
   m_ObjectHideFlags: 0

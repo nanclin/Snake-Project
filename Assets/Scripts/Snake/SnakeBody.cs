@@ -33,7 +33,7 @@ public class SnakeBody : MonoBehaviour {
 	void Update ()
 	{
 		// // Debug
-		skeleton.Draw();
+		// skeleton.Draw();
 		// chain.DrawChain( chain.head );
 	}
 

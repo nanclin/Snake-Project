@@ -63,20 +63,19 @@ public class CameraAttractor : MonoBehaviour {
 
 				// Half point between player and its forward vector
 				forwardHalf = Vector3.Lerp( playerPos, forwardPos, 1-influence );
-				MyDraw.DrawCircle( forwardHalf, 0.5f/2, Color.green );
+				if( CameraSystem.DEBUG ) MyDraw.DrawCircle( forwardHalf, 0.5f/2, Color.green );
 
 				// Get point on line between target and attractor (with influence)
 				targetVector = Vector3.Lerp( forwardHalf, attractor.transform.position, influence );
-				MyDraw.DrawSquare( targetVector, 0.5f, color );
+				if( CameraSystem.DEBUG ) MyDraw.DrawSquare( targetVector, 0.5f, color );
 				
 				// Half point between player and target vector
 				targetHalf = Vector3.Lerp( forwardHalf, targetVector, influence );
-				MyDraw.DrawCircle( targetHalf, 0.5f/2, Color.white * 2/3 );
+				if( CameraSystem.DEBUG ) MyDraw.DrawCircle( targetHalf, 0.5f/2, Color.white * 2/3 );
 
 
 				// DRAW DEBUG
-				Debug.DrawLine( forwardHalf, attractor.transform.position, color );
-				Debug.DrawLine( playerPos, forwardPos, Color.green );
+				if( CameraSystem.DEBUG ) Debug.DrawLine( forwardHalf, attractor.transform.position, color );
 
 
 				// Add vector to sum of attractor vectors
@@ -94,10 +93,11 @@ public class CameraAttractor : MonoBehaviour {
 // DEBUG ///////////////////////////////////////////////////////////////
 	void OnDrawGizmos()
 	{
-		// Gizmos.DrawWireSphere( transform.position, innerRange );
-		// Gizmos.DrawWireSphere( transform.position, outerRange );
-		MyDraw.DrawCircle( transform.position, innerRange, Color.white );
-		MyDraw.DrawCircle( transform.position, outerRange, Color.white );
+		if( CameraSystem.DEBUG )
+		{
+			MyDraw.DrawCircle( transform.position, innerRange, Color.white );
+			MyDraw.DrawCircle( transform.position, outerRange, Color.white );
+		}
 	}
 //////////////////////////////////////////////////////////// EO DEBUG //
 }

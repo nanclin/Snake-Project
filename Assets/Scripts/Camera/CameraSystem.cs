@@ -3,14 +3,19 @@ using System.Collections;
 
 public class CameraSystem : Initializer
 {
+	public static bool DEBUG = true;
+
 	public float smooth = 1.5f;
-	public float forward = 5f;
-	public float innerRing = 4;
-	public float outerRing = 10;
-	public float liftStep = 0.5f;
-	public float maxLift = 3;
-	[Range(0,1)]
-	public float forwardVsBody = 0.5f;
+	public float lookForwardDis = 5f;
+	public float boundaryPower = 15f;
+	[Range(0,1)] public float paddingHorizontal;
+	[Range(0,1)] public float paddingVertical;
+	// public float innerRing = 4;
+	// public float outerRing = 10;
+	// public float liftStep = 0.5f;
+	// public float maxLift = 3;
+	// [Range(0,1)]
+	// public float forwardVsBody = 0.5f;
 
 	private Transform player;
 	private SnakeController snake;
@@ -18,7 +23,7 @@ public class CameraSystem : Initializer
 
 	override public void Init()
 	{
-
+		transform.position = transform.position + relCameraPos;
 	}
 
 	void Awake()
@@ -32,9 +37,11 @@ public class CameraSystem : Initializer
 	private Vector3 forwardAttractor;
 	private Vector3 finalPosition;
 	
-	public Transform cube;
+	private Transform cube;
 	private Vector3 screenPos;
 	private Vector3 worldPos;
+
+
 	void FixedUpdate ()
 	{
 
@@ -83,9 +90,57 @@ public class CameraSystem : Initializer
 	
 		//////////////////////////////////////////////////////////// EO  //
 
-		forwardAttractor = player.position + player.forward * forward;
+		// Get camera
+		Camera camera = GetComponent<Camera>();
+
+		// Get points
+	
+		// Vertical distance of camera origin to snake		
+		float h = camera.transform.position.y - snake.transform.position.y;
+
+		// Get corner points of screen in world coordinates
+		Vector3 TR = camera.ScreenToWorldPoint( new Vector3(
+			Screen.width - Screen.width * paddingHorizontal / 2,
+			Screen.height - Screen.height * paddingVertical / 2,
+			h ) );
+		Vector3 TL = camera.ScreenToWorldPoint( new Vector3(
+			Screen.width * paddingHorizontal / 2,
+			Screen.height - Screen.height * paddingVertical / 2,
+			h ) );
+		Vector3 BR = camera.ScreenToWorldPoint( new Vector3(
+			Screen.width - Screen.width * paddingHorizontal / 2,
+			Screen.height * paddingVertical / 2,
+			h ) );
+		Vector3 BL = camera.ScreenToWorldPoint( new Vector3(
+			Screen.width * paddingHorizontal / 2,
+			Screen.height * paddingVertical / 2,
+			h ) );
+
+		// Draw boundary rectangle
+		Debug.DrawLine( TR, TL );
+		Debug.DrawLine( TR, BR );
+		Debug.DrawLine( TL, BL );
+		Debug.DrawLine( BR, BL );
+
+		// Get distances over the boundary
+		float disTop = ( snake.transform.position - TR ).z;
+		float disBottom = ( BR - snake.transform.position ).z;
+		float disLeft = ( TL - snake.transform.position ).x;
+		float disRight = ( snake.transform.position - TR ).x;
+
+		finalPosition =
+			  Vector3.forward * Mathf.Max( 0, disTop )    * boundaryPower
+			- Vector3.forward * Mathf.Max( 0, disBottom ) * boundaryPower
+			- Vector3.right   * Mathf.Max( 0, disLeft )   * boundaryPower
+			+ Vector3.right   * Mathf.Max( 0, disRight )  * boundaryPower
+			;
+		// transform.position = Vector3.Lerp( transform.position, finalPosition, smooth * 2 * Time.deltaTime );
+
+
+
+		forwardAttractor = player.position + player.forward * lookForwardDis;
 		Vector3 attractors = CameraAttractor.GetAttractorsVector( player.position, forwardAttractor );
-		finalPosition = attractors + relCameraPos;
+		finalPosition += attractors + relCameraPos;
 
 		// Apply final position
 		transform.position = Vector3.Lerp( transform.position, finalPosition, smooth * Time.deltaTime );
@@ -93,7 +148,7 @@ public class CameraSystem : Initializer
 
 	void OnDrawGizmos()
 	{
-		if( player ){
+		if( player && DEBUG ){
 
 			// Final position
 			MyDraw.DrawCircle( finalPosition - Vector3.up * finalPosition.y, 2, Color.yellow );
@@ -103,8 +158,7 @@ public class CameraSystem : Initializer
 
 			// Forward attractor
 			MyDraw.DrawSquare( forwardAttractor, 0.5f, Color.green );
-			// Gizmos.color = Color.green;
-			// Gizmos.DrawWireCube( forwardAttractor, Vector3.one );
+			Debug.DrawLine( player.position, forwardAttractor, Color.green );
 			
 			// // Snake body attractor
 			// Gizmos.color = Color.red;
