@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraSystem : Initializer
 {
-	public static bool DEBUG = true;
+	public static bool DEBUG = false;
 
 	public float smooth = 1.5f;
 	public float lookForwardDis = 5f;
@@ -117,10 +117,10 @@ public class CameraSystem : Initializer
 			h ) );
 
 		// Draw boundary rectangle
-		Debug.DrawLine( TR, TL );
-		Debug.DrawLine( TR, BR );
-		Debug.DrawLine( TL, BL );
-		Debug.DrawLine( BR, BL );
+		if( DEBUG ) Debug.DrawLine( TR, TL );
+		if( DEBUG ) Debug.DrawLine( TR, BR );
+		if( DEBUG ) Debug.DrawLine( TL, BL );
+		if( DEBUG ) Debug.DrawLine( BR, BL );
 
 		// Get distances over the boundary
 		float disTop = ( snake.transform.position - TR ).z;

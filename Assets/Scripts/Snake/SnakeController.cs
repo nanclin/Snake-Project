@@ -1,18 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SnakeController : MonoBehaviour {
+
+	public static List<SnakeController> POOL = new List<SnakeController>();
 
 	// Static
 	private static bool FSM_DEBUG = GameManager.FSM_DEBUG;
 
 	// Handling
 	private float maxSpeed = 0.08f;
+	public Color color = Color.green;
 	// private float maxSpeed = 0.04f;
 	private float acceleration = 0.01f;
 	private float rotationSpeed = 3;
-	public enum ControlType{ Debug, PC, Android }
+	public enum ControlType{ Debug, PC, Android, AI }
 	public ControlType controlType = ControlType.Debug;
+	public Transform spawnPoint;
 	public float buffer;
 	public float bondStrength;
 
@@ -28,11 +33,21 @@ public class SnakeController : MonoBehaviour {
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 
+	void OnEnable()
+	{
+		POOL.Add( this );
+	}
+	void OnDisable()
+	{
+		POOL.Remove( this );
+	}
+
 	// Use this for initialization
 	void Awake ()
 	{
 		body = GetComponent<SnakeBody>();
 
+		GetComponent<Renderer>().material.color = color;
 
 		// marker2.position = spline.GetPointBaked( 13.5f );
 
@@ -45,6 +60,7 @@ public class SnakeController : MonoBehaviour {
 		{
 			case ControlType.Debug: DebugInput(); break;
 			case ControlType.PC: PCInput(); break;
+			case ControlType.AI: AIInput(); break;
 			// case ControlType.Android: AndroidInput(); break;
 		}
 		// FadeObjectInFrontOfCamera();
@@ -456,7 +472,8 @@ public class SnakeController : MonoBehaviour {
 		// // Switch state
 		// currentState = SnakeState.Move;
 
-		gameManager.GameOver();
+		if( controlType != ControlType.AI )
+			gameManager.GameOver();
 	}
 
 	private void DieExitState()
@@ -473,18 +490,22 @@ public class SnakeController : MonoBehaviour {
 
 // OTHER METHODS ///////////////////////////////////////////////////////////////
 
-	public void SpawnSnake( Transform spawnPoint )
+	public void SpawnSnake()
 	{
 		// while( body.chain.head.next != null )
 		// 	body.DestroyCell( body.chain.head.next );
 
+		// print( "spawnPoint: " + spawnPoint );
+		// print( "SpawnSnake() body: " + body );
+		if( controlType == ControlType.AI )
+			spawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
 		body.Init( spawnPoint );
 
-		// Grow cells
-		for( int i = 0; i < 0; i++ )
-		{	
-			body.Grow();
-		}
+		// // Grow cells
+		// for( int i = 0; i < 0; i++ )
+		// {	
+		// 	body.Grow();
+		// }
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 
@@ -526,6 +547,71 @@ public class SnakeController : MonoBehaviour {
 		// 	currentState = SnakeState.Shrink;
 		// 	shrinkFlag = true;
 		// }
+	}
+
+	private void AIInput ()
+	{
+		float dis = 10;
+
+		Ray rayCenter = new Ray( transform.position, transform.forward );
+		Debug.DrawRay( rayCenter.origin, rayCenter.direction * dis, Color.red );
+
+		Vector3 left = Quaternion.AngleAxis( -45, Vector3.up ) * transform.forward;
+		Ray rayLeft = new Ray( transform.position, left );
+		Debug.DrawRay( rayLeft.origin, rayLeft.direction * dis, Color.red );
+
+		Vector3 right = Quaternion.AngleAxis( 45, Vector3.up ) * transform.forward;
+		Ray rayRight = new Ray( transform.position, right );
+		Debug.DrawRay( rayRight.origin, rayRight.direction * dis, Color.red );
+
+
+		// the raycast hit info will be filled by the Physics.Raycast() call further
+		RaycastHit hitCenter;
+		RaycastHit hitLeft;
+		RaycastHit hitRight;
+		// Ray ray = new Ray( a, b );
+
+		// bool isHit = Physics.Raycast( ray, out hit, 500, layerMask );
+		bool isHitCenter = Physics.Raycast( rayCenter, out hitCenter, dis );
+		bool isHitLeft = Physics.Raycast( rayLeft, out hitLeft, dis );
+		bool isHitRight = Physics.Raycast( rayRight, out hitRight, dis );
+
+		if ( isHitLeft ){
+			// print("hit");
+			rotationInput = 1;
+		}
+		else if ( isHitRight ){
+			// print("hit");
+			rotationInput = -1;
+		}
+		else if ( isHitCenter ){
+			// print("hit");
+			rotationInput = -1;
+		}
+		else{
+			rotationInput = 0;
+		}
+		
+
+		// rotationInput = Input.GetAxis("Horizontal");
+		// boostInput = Input.GetAxis("Vertical");
+		// boostInput = 1;
+
+
+		if( Input.GetKeyDown("space") )
+			body.Grow(1);
+
+		if( Input.GetKeyDown("backspace") )
+			currentState = SnakeState.Shrink;
+
+		if( Input.GetKeyDown("5") )
+			body.Grow(5);
+
+		if( Input.GetKeyDown("r") )
+			currentState = SnakeState.OnRail;
+
+		if( Input.GetKeyDown("k") )
+			currentState = SnakeState.Die;
 	}
 
 	private void PCInput ()

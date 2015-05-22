@@ -6,12 +6,12 @@ using System.Collections.Generic;
 public class SnakeBody : MonoBehaviour {
 
 	// Debug
-	public Transform marker;
+	// public Transform marker;
 
 	// Components
-	public Transform head;
+	// public Transform head;
 	public Transform cellPrefab;
-	public Transform spawnPoint;
+	// public Transform spawnPoint;
 
 	// System
 	private SnakeController snakeController;

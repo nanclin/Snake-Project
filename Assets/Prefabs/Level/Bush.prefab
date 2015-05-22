@@ -288,9 +288,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stock: 6
-  itemPrefab: {fileID: 0}
-  growDelayMin: 1
-  growDelayMax: 1
+  itemPrefab: {fileID: 11428674, guid: a2808bcc8df1c4baf8d1f67d15b8ae19, type: 2}
+  timing:
+    growDelayMin: 1
+    growDelayMax: 1
+    spawnDelayMin: .5
+    spawnDelayMax: .5
   throwForce: 300
 --- !u!135 &13527738
 SphereCollider:

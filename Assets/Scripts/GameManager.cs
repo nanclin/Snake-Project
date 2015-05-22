@@ -37,21 +37,13 @@ public class GameManager : MonoBehaviour {
 	void Start ()
 	{
 		currentState = State.NewGame;
-		// currentState = State.Run;
+		currentState = State.Run;
 	}
 
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
 		ExecuteState();
-	}
-
-	void Update()
-	{
-		if( Input.GetKeyDown("i") )
-		{
-			Initializer.ResetAll();
-		}
 	}
 
 	void OnGUI ()
@@ -212,9 +204,11 @@ public class GameManager : MonoBehaviour {
 		// Spawner.ResetSpawners();
 		
 
-		// Reset snake
-		snake.SpawnSnake( snakeSpawnPoint );
-		snake.currentState = SnakeState.Idle;
+		// Reset all snakes states
+		foreach( SnakeController snakeController in SnakeController.POOL ){
+			snakeController.SpawnSnake();
+			snakeController.currentState = SnakeState.Idle;
+		}
 
 		// Reset camera
 		// cameraHolder.transform.position = snakeSpawnPoint.position;
@@ -224,7 +218,7 @@ public class GameManager : MonoBehaviour {
 			exit.SetActive( false );
 
 		// Automatically start running game
-		currentState = State.Run;
+		// currentState = State.Run;
 	}
 
 	private void NewGameState()
@@ -243,7 +237,10 @@ public class GameManager : MonoBehaviour {
 	{
 		DebugEnter( "Run" );
 
-		snake.currentState = SnakeState.Move;
+		// Change all snakes states to move
+		foreach( SnakeController snakeController in SnakeController.POOL ){
+			snakeController.currentState = SnakeState.Move;
+		}
 	}
 
 	private void RunState()

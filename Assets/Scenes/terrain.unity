@@ -4448,6 +4448,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1202143350}
   - 114: {fileID: 1202143349}
+  - 114: {fileID: 1202143351}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -4482,6 +4483,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
+--- !u!114 &1202143351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1202143348}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b9f7751b6dba4e438a85bd20fc46fd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1249148830
 Prefab:
   m_ObjectHideFlags: 0
@@ -10704,6 +10716,14 @@ Prefab:
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 1202143349}
+    - target: {fileID: 13571150, guid: 222cd8125ca4845c8bd95b53164a6031, type: 2}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11499584, guid: 222cd8125ca4845c8bd95b53164a6031, type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 13545252, guid: 222cd8125ca4845c8bd95b53164a6031, type: 2}
     - {fileID: 13557116, guid: 222cd8125ca4845c8bd95b53164a6031, type: 2}
