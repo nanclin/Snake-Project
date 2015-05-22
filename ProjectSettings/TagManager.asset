@@ -12,6 +12,7 @@ TagManager:
   - Food
   - Snake Cell
   - Button
+  - Ground
   layers:
   - Default
   - TransparentFX

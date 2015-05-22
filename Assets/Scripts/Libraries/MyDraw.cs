@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MyDraw : MonoBehaviour {
+public class MyDraw
+{
 
 	// private static float[] angles = new float[] { -2f, 2f };
 	private static float[] angles = new float[] { 0f };
 	private static int STEP = 0;
 
 
-	public static void DrawLine(Vector3 position, Color color, float radius = 0.05f, float duration = 0) {
-
+	public static void DrawLine( Vector3 position, Color color, float radius = 0.05f, float duration = 0 )
+	{
 		float angle = ( 90 + angles[ STEP % angles.Length ] ) / 180 * Mathf.PI;
 
 		// Make every other line little longer

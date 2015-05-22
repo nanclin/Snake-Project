@@ -77,8 +77,9 @@ public class SnakeController : MonoBehaviour {
 				if( GameManager.STARS == 3 )
 					gameManager.OpenExit();
 				break;
-			case "Wall":
 			case "Snake Cell":
+			case "Ground":
+			case "Wall":
 				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
 				bool otherIsTail = other.gameObject == body.chain.tail.prefab;
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
@@ -107,7 +108,7 @@ public class SnakeController : MonoBehaviour {
 			case "Button":
 				break;
 			default:
-				print("SnakeHeadCollider hit something not handeld by code! " + other);
+				// print("SnakeHeadCollider hit something not handeld by code! " + other);
 				break;
 		}
 	}
@@ -378,7 +379,7 @@ public class SnakeController : MonoBehaviour {
 // SHRINK STATE //
 
 
-	private float shrinkNumberOfCells = 5;
+	private float shrinkNumberOfCells = 3;
 	private float shrinkCurrentNumberOfCells;
 	private float shrinkPosition;
 
@@ -414,7 +415,7 @@ public class SnakeController : MonoBehaviour {
 
 		// Move head along skeleton - from head to tail
 		float dis = Mathf.Abs( targetNode.value - head.value );
-		body.MoveChain( head, -dis/10 );
+		body.MoveChain( head, -dis/5 );
 		// body.MoveChain( head, -Mathf.Max( 0.02f, dis/10 ) );
 		body.PutOnSkeleton( transform, body.zero - head.value );
 
