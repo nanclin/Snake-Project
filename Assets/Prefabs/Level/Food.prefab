@@ -90,6 +90,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawner: {fileID: 0}
+  spawnManager: {fileID: 0}
   nutritionValue: 1
 --- !u!135 &13587452
 SphereCollider:

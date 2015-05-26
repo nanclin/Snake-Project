@@ -13,7 +13,7 @@ GameObject:
   - 54: {fileID: 5422298}
   - 23: {fileID: 2361144}
   - 114: {fileID: 11432910}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SnakeCell
   m_TagString: Snake Cell
   m_Icon: {fileID: 0}

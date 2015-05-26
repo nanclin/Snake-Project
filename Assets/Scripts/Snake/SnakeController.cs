@@ -7,7 +7,8 @@ public class SnakeController : MonoBehaviour {
 	public static List<SnakeController> POOL = new List<SnakeController>();
 
 	// Static
-	private static bool FSM_DEBUG = GameManager.FSM_DEBUG;
+	// private static bool FSM_DEBUG = GameManager.FSM_DEBUG;
+	private static bool FSM_DEBUG = false;
 
 	// Handling
 	private float maxSpeed = 0.08f;
@@ -15,11 +16,12 @@ public class SnakeController : MonoBehaviour {
 	// private float maxSpeed = 0.04f;
 	private float acceleration = 0.01f;
 	private float rotationSpeed = 3;
-	public enum ControlType{ Debug, PC, Android, AI }
-	public ControlType controlType = ControlType.Debug;
+	public enum ControlMode{ Debug, PC, Android, AI }
+	public ControlMode controlMode = ControlMode.Debug;
 	public Transform spawnPoint;
 	public float buffer;
 	public float bondStrength;
+	public LayerMask layerMask;
 
 	// Components
 	public SnakeBody body;
@@ -45,24 +47,45 @@ public class SnakeController : MonoBehaviour {
 	// Use this for initialization
 	void Awake ()
 	{
+		// Get body reference
 		body = GetComponent<SnakeBody>();
 
+		// Set Color of head
 		GetComponent<Renderer>().material.color = color;
-
-		// marker2.position = spline.GetPointBaked( 13.5f );
-
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		switch( controlType )
+		switch( controlMode )
 		{
-			case ControlType.Debug: DebugInput(); break;
-			case ControlType.PC: PCInput(); break;
-			case ControlType.AI: AIInput(); break;
-			// case ControlType.Android: AndroidInput(); break;
+			case ControlMode.Debug:   DebugInput();   break;
+			case ControlMode.PC:      PCInput();      break;
+			case ControlMode.AI:      AIInput();      break;
+			case ControlMode.Android: AndroidInput(); break;	// It should be called in OnGUI() method, not in Update()
 		}
+
+		// Debug keybidings
+		if( Input.GetKeyDown("space") )
+			body.Grow(1);
+
+		if( Input.GetKeyDown("backspace") )
+			currentState = SnakeState.Shrink;
+
+		if( Input.GetKeyDown("5") )
+			body.Grow(5);
+
+		if( Input.GetKeyDown("r") )
+			currentState = SnakeState.OnRail;
+
+		if( Input.GetKeyDown("k") )
+			currentState = SnakeState.Die;
+
+		if( Input.GetKeyDown("i") )
+			controlMode = controlMode == ControlMode.PC ? ControlMode.AI : ControlMode.PC;
+
+		boostInput = Input.GetAxis("Vertical");
+
 		// FadeObjectInFrontOfCamera();
 	}
 
@@ -84,15 +107,18 @@ public class SnakeController : MonoBehaviour {
 					GameManager.SCORE++;
 				}
 				break;
+
 			case "Coin":
 				GameManager.SCORE += 10;
 				break;
+
 			case "Star":
 				GameManager.SCORE += 100;
 				GameManager.STARS++;
 				if( GameManager.STARS == 3 )
 					gameManager.OpenExit();
 				break;
+
 			case "Snake Cell":
 			case "Ground":
 			case "Wall":
@@ -108,10 +134,9 @@ public class SnakeController : MonoBehaviour {
 						currentState = SnakeState.Shrink;
 					}
 				}
-
 				break;
+
 			case "Hole":
-				// print("SnakeController");
 				if( currentState != SnakeState.OnRail )
 				{
 					hole = other.GetComponent<Hole>();
@@ -121,8 +146,10 @@ public class SnakeController : MonoBehaviour {
 					currentState = SnakeState.OnRail;
 				}
 				break;
+
 			case "Button":
 				break;
+
 			default:
 				// print("SnakeHeadCollider hit something not handeld by code! " + other);
 				break;
@@ -259,8 +286,8 @@ public class SnakeController : MonoBehaviour {
 
 	void OnGUI ()
 	{
-		if( controlType == ControlType.Android )
-			AndroidInput();
+		if( controlMode == ControlMode.Android )
+			AndroidInputGUI();
 	}
 
 	private void MoveState()
@@ -468,11 +495,10 @@ public class SnakeController : MonoBehaviour {
 	{
 		DebugExecute( "Die" );
 
-
 		// // Switch state
 		// currentState = SnakeState.Move;
 
-		if( controlType != ControlType.AI )
+		if( controlMode != ControlMode.AI )
 			gameManager.GameOver();
 	}
 
@@ -492,20 +518,13 @@ public class SnakeController : MonoBehaviour {
 
 	public void SpawnSnake()
 	{
-		// while( body.chain.head.next != null )
-		// 	body.DestroyCell( body.chain.head.next );
-
-		// print( "spawnPoint: " + spawnPoint );
-		// print( "SpawnSnake() body: " + body );
-		if( controlType == ControlType.AI )
-			spawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
-		body.Init( spawnPoint );
-
-		// // Grow cells
-		// for( int i = 0; i < 0; i++ )
-		// {	
-		// 	body.Grow();
+		// // Randomly position AI snakes
+		// if( controlMode == ControlMode.AI ){
+		// 	spawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
+		// 	spawnPoint.Rotate( Vector3.up * Random.value * 360f );
 		// }
+		
+		body.Init( spawnPoint );
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 
@@ -525,191 +544,217 @@ public class SnakeController : MonoBehaviour {
 	private float rotationInput = 0;
 	private float boostInput = 0;
 
-	private bool shrinkFlag;
+
+	private float smoothInputHorizontal;
+	public float inputSensitivity = 5f;
+
+	private float SmoothInputHorizontal( float input )
+	{
+		// Smooth input
+		smoothInputHorizontal = Mathf.Lerp( smoothInputHorizontal, input, Time.deltaTime * inputSensitivity );
+		return smoothInputHorizontal;
+	}
+
 
 	private void DebugInput ()
 	{
-		speed = 1.5f;
+		// speed = 1.5f;
 
-		rotationInput = 0;
-		boostInput = 0;
-
-		// if( Time.frameCount == 7 )
-		// 	currentState = SnakeState.Shrink;
-
-		if( Input.GetKeyDown("space") )
-			body.Grow();
-
-		if( Input.GetKeyDown("backspace") )
-			currentState = SnakeState.Shrink;
-
-		// if( transform.position.x >= 5 && !shrinkFlag ){
-		// 	currentState = SnakeState.Shrink;
-		// 	shrinkFlag = true;
-		// }
+		// rotationInput = 0;
+		// boostInput = 0;
 	}
+
+
+	public float dis = 10;
+	public float angle = 45;
+	public int num = 1;
 
 	private void AIInput ()
 	{
-		float dis = 10;
+		int input = 0;
+		bool breakLoop = false;
+		float partAngle = (angle*2 / (num*2) );
+		for( int i = 0; i < num * 2 + 1; i++ )
+		{
+			Vector3 vector = Quaternion.AngleAxis( angle - partAngle * i, Vector3.up ) * transform.forward;
+			Ray ray = new Ray( transform.position, vector );
 
-		Ray rayCenter = new Ray( transform.position, transform.forward );
-		Debug.DrawRay( rayCenter.origin, rayCenter.direction * dis, Color.red );
+			RaycastHit hit;
+			if( Physics.Raycast( ray, out hit, dis, layerMask ) )
+			{
+				if( i < num ){
+					if( !breakLoop ) input = -1;
+				}
+				else{
+					if( !breakLoop ) input = 1;
+				}
+				Debug.DrawRay( ray.origin, ray.direction * dis, Color.red );
 
-		Vector3 left = Quaternion.AngleAxis( -45, Vector3.up ) * transform.forward;
-		Ray rayLeft = new Ray( transform.position, left );
-		Debug.DrawRay( rayLeft.origin, rayLeft.direction * dis, Color.red );
-
-		Vector3 right = Quaternion.AngleAxis( 45, Vector3.up ) * transform.forward;
-		Ray rayRight = new Ray( transform.position, right );
-		Debug.DrawRay( rayRight.origin, rayRight.direction * dis, Color.red );
-
-
-		// the raycast hit info will be filled by the Physics.Raycast() call further
-		RaycastHit hitCenter;
-		RaycastHit hitLeft;
-		RaycastHit hitRight;
-		// Ray ray = new Ray( a, b );
-
-		// bool isHit = Physics.Raycast( ray, out hit, 500, layerMask );
-		bool isHitCenter = Physics.Raycast( rayCenter, out hitCenter, dis );
-		bool isHitLeft = Physics.Raycast( rayLeft, out hitLeft, dis );
-		bool isHitRight = Physics.Raycast( rayRight, out hitRight, dis );
-
-		if ( isHitLeft ){
-			// print("hit");
-			rotationInput = 1;
+				breakLoop = true;
+			}
+			else{
+				if( !breakLoop ) input = 0;
+				Debug.DrawRay( ray.origin, ray.direction * dis, Color.red/3 );
+			}
 		}
-		else if ( isHitRight ){
-			// print("hit");
-			rotationInput = -1;
-		}
-		else if ( isHitCenter ){
-			// print("hit");
-			rotationInput = -1;
-		}
-		else{
-			rotationInput = 0;
-		}
+
+		rotationInput = SmoothInputHorizontal( input );
+
+
+
+		// Ray rayCenter = new Ray( transform.position, transform.forward );
+		// Debug.DrawRay( rayCenter.origin, rayCenter.direction * dis, Color.red );
+		
+		// Vector3 left = Quaternion.AngleAxis( -45, Vector3.up ) * transform.forward;
+		// Ray rayLeft = new Ray( transform.position, left );
+		// Debug.DrawRay( rayLeft.origin, rayLeft.direction * dis, Color.red );
+
+		// Vector3 right = Quaternion.AngleAxis( 45, Vector3.up ) * transform.forward;
+		// Ray rayRight = new Ray( transform.position, right );
+		// Debug.DrawRay( rayRight.origin, rayRight.direction * dis, Color.red );
+
+
+		// // the raycast hit info will be filled by the Physics.Raycast() call further
+		// RaycastHit hitCenter;
+		// RaycastHit hitLeft;
+		// RaycastHit hitRight;
+		// // Ray ray = new Ray( a, b );
+
+		// // bool isHit = Physics.Raycast( ray, out hit, 500, layerMask );
+		// bool isHitCenter = Physics.Raycast( rayCenter, out hitCenter, dis, layerMask );
+		// bool isHitLeft = Physics.Raycast( rayLeft, out hitLeft, dis, layerMask );
+		// bool isHitRight = Physics.Raycast( rayRight, out hitRight, dis, layerMask );
+
+		// if ( isHitLeft ){
+		// 	// print("hit");
+		// 	rotationInput = 1;
+		// }
+		// else if ( isHitRight ){
+		// 	// print("hit");
+		// 	rotationInput = -1;
+		// }
+		// else if ( isHitCenter ){
+		// 	// print("hit");
+		// 	rotationInput = -1;
+		// }
+		// else{
+		// 	rotationInput = 0;
+		// }
 		
 
 		// rotationInput = Input.GetAxis("Horizontal");
-		// boostInput = Input.GetAxis("Vertical");
+		boostInput = Input.GetAxis("Vertical");
 		// boostInput = 1;
-
-
-		if( Input.GetKeyDown("space") )
-			body.Grow(1);
-
-		if( Input.GetKeyDown("backspace") )
-			currentState = SnakeState.Shrink;
-
-		if( Input.GetKeyDown("5") )
-			body.Grow(5);
-
-		if( Input.GetKeyDown("r") )
-			currentState = SnakeState.OnRail;
-
-		if( Input.GetKeyDown("k") )
-			currentState = SnakeState.Die;
 	}
+
 
 	private void PCInput ()
 	{
-		rotationInput = Input.GetAxis("Horizontal");
+		// Get input by mouse clicking left or right side of the screen
+		int leftInput = Input.GetMouseButton(0) && Input.mousePosition.x <= Screen.width / 2 ? -1 : 0;
+		int rightInput = Input.GetMouseButton(0) && Input.mousePosition.x > Screen.width / 2 ? 1 : 0;
+
+		// Apply input values
+		// rotationInput = SmoothInputHorizontal( leftInput + rightInput );	        // Mouse click control
+		rotationInput = SmoothInputHorizontal( Input.GetAxisRaw( "Horizontal" ) );	// Smooth custom
+		// rotationInput = Input.GetAxis("Horizontal");		                        // Unity smooth
+		
 		boostInput = Input.GetAxis("Vertical");
-
-
-		if( Input.GetKeyDown("space") )
-			body.Grow(1);
-
-		if( Input.GetKeyDown("backspace") )
-			currentState = SnakeState.Shrink;
-
-		if( Input.GetKeyDown("5") )
-			body.Grow(5);
-
-		if( Input.GetKeyDown("r") )
-			currentState = SnakeState.OnRail;
-
-		if( Input.GetKeyDown("k") )
-			currentState = SnakeState.Die;
 	}
 
+	private bool boostEnabled = true;
 	private float boostTime = 0;
+
+	private int leftInput = 0;
+	private int rightInput = 0;
 
 	private void AndroidInput ()
 	{
+		rotationInput = SmoothInputHorizontal( leftInput + rightInput + Input.GetAxisRaw("Horizontal") );
+		// rotationInput = SmoothInputHorizontal( Input.GetAxisRaw("Horizontal") );
+	}
+	private void AndroidInputGUI ()
+	{
 		// Draw buttons
-		float size = 150;
+		float size = 100;
 		float padding = 30;
-		bool left = GUI.RepeatButton( new Rect( padding, Screen.height - size - padding, size, size), "<" );
-		bool right = GUI.RepeatButton( new Rect( Screen.width - size - padding, Screen.height - size - padding, size, size), ">" );
 
-		if( left ){
-			rotationInput = -1;
-		}
-		else if ( right ) {
-			rotationInput = 1;
-		}
-		else {
-			rotationInput = 0;
-		}
+		// Get inputs
+		leftInput = GUI.RepeatButton( new Rect( padding, Screen.height - size - padding, size, size), "<" ) ? -1 : 0;
+		rightInput = GUI.RepeatButton( new Rect( Screen.width - size - padding, Screen.height - size - padding, size, size), ">" ) ? 1 : 0;
+
+		GUI.Label( new Rect(0,0,Screen.width,100), "rotationInput: " + rotationInput );
 
 		// Boost
-		// if( GUI.Button( new Rect( Screen.width/2 - size*2/2 + size + padding, Screen.height - size - padding, size*2, size), "BOOST" ) ){
-		if( GUI.Button( new Rect( Screen.width/2 - size*2/2, Screen.height - size - padding, size*2, size), "BOOST" ) ){
-			// Add x seconds to boostTime
-			boostTime = Mathf.Max( Time.time, boostTime ) + 2;
+		if( boostEnabled ){
+			// if( GUI.Button( new Rect( Screen.width/2 - size*2/2 + size + padding, Screen.height - size - padding, size*2, size), "BOOST" ) ){
+			if( GUI.Button( new Rect( Screen.width/2 - size*2/2, Screen.height - size - padding, size*2, size), "BOOST" ) ){
+				// Add x seconds to boostTime
+				boostTime = Mathf.Max( Time.time, boostTime ) + 1;
+				boostEnabled = false;
+			}
 		}
-		boostInput = ( boostTime > Time.time ) ? 1 : 0;
+		int boostDir = ( boostTime > Time.time ) ? 1 : 0;
+		if( boostDir > 0 )
+			boostInput = SmoothBoost( boostDir );
+		else
+			boostEnabled = true;
 
 		// // Grow
 		// if( GUI.Button( new Rect( Screen.width/2 - size*2/2 - size - padding, Screen.height - size - padding, size*2, size), "GROW" ) ){
 		// 	body.Grow();
 		// }
 	}
+
+	private float smoothBoost = 0;
+	public float boostAcceleration = 2f;
+	
+	private float SmoothBoost( float boost )
+	{
+		smoothBoost = Mathf.Lerp( smoothBoost, boost, Time.deltaTime * boostAcceleration );
+		return smoothBoost;
+	}
 //////////////////////////////////////////////////////// EO INPUTS //
 
 // RAYCASTING ///////////////////////////////////////////////////////////////
 
-	[HideInInspector]
-	public GameObject source;
-	public LayerMask layerMask;
+	// [HideInInspector]
+	// public GameObject source;
+	// public LayerMask layerMask;
 
-	private GameObject lastOther;
+	// private GameObject lastOther;
 
 
-	private void FadeObjectInFrontOfCamera()
-	{
+	// private void FadeObjectInFrontOfCamera()
+	// {
 		
-		// Vector3 a = transform.position;
-		Vector3 a = source.transform.position;
-		Vector3 b = transform.position - source.transform.position;
+	// 	// Vector3 a = transform.position;
+	// 	Vector3 a = source.transform.position;
+	// 	Vector3 b = transform.position - source.transform.position;
 
-		RaycastHit hit;
-		Ray ray = new Ray( a, b );
+	// 	RaycastHit hit;
+	// 	Ray ray = new Ray( a, b );
 
-		bool isHit = Physics.Raycast( ray, out hit, 100, layerMask );
-		print( "isHit: " + isHit );
+	// 	bool isHit = Physics.Raycast( ray, out hit, 100, layerMask );
+	// 	print( "isHit: " + isHit );
 
-		if ( isHit ){
-            // print("There is something in front of the object! " + hit.collider);
-            // Debug.Break();
+	// 	if ( isHit ){
+ //            // print("There is something in front of the object! " + hit.collider);
+ //            // Debug.Break();
 
-            lastOther = hit.collider.gameObject;
+ //            lastOther = hit.collider.gameObject;
 
-            Color color = lastOther.GetComponent<Renderer>().material.color;
-            lastOther.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 0.1f );
-		}
-		else{
-			if( lastOther != null ){
-	            Color color = lastOther.GetComponent<Renderer>().material.color;
-	            lastOther.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 1 );
-	        }
-		}
+ //            Color color = lastOther.GetComponent<Renderer>().material.color;
+ //            lastOther.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 0.1f );
+	// 	}
+	// 	else{
+	// 		if( lastOther != null ){
+	//             Color color = lastOther.GetComponent<Renderer>().material.color;
+	//             lastOther.GetComponent<Renderer>().material.color = new Color( color.r, color.g, color.b, 1 );
+	//         }
+	// 	}
 
-        Debug.DrawRay( a, b * 100 );
-	}
+ //        Debug.DrawRay( a, b * 100 );
+	// }
 //////////////////////////////////////////////////////////// EO RAYCASTING //
 }

@@ -70,7 +70,7 @@ GameObject:
   - 114: {fileID: 11499584}
   - 135: {fileID: 13571150}
   - 54: {fileID: 5402770}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Snake
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -293,17 +293,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55732e7384e46428ab021edba5309b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlType: 0
+  color: {r: 0, g: 1, b: .462069035, a: .384313732}
+  controlMode: 0
+  spawnPoint: {fileID: 0}
   buffer: .550000012
   bondStrength: 1
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 0
   body: {fileID: 0}
   gameManager: {fileID: 0}
   spline: {fileID: 0}
   hole: {fileID: 0}
-  source: {fileID: 0}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 0
+  inputSensitivity: 5
+  dis: 3
+  angle: 90
+  num: 2
+  boostAcceleration: 5
 --- !u!114 &11481934
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -325,15 +331,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 151626}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3a4eff5549494e48b901c172c21599e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  marker: {fileID: 0}
-  head: {fileID: 0}
   cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
-  spawnPoint: {fileID: 0}
   zero: 0
 --- !u!124 &12426868
 Behaviour:

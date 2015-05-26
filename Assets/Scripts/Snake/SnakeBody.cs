@@ -221,7 +221,7 @@ public class SnakeBody : MonoBehaviour {
 
 			growQueue--;
 
-			// Reset grow delay timer
+			// Reset grow delay timer (wait before growing next cell)
 			growTime = Time.time + growDelay;
 		}
 	}
@@ -231,19 +231,7 @@ public class SnakeBody : MonoBehaviour {
 		growQueue += num;
 
 		// Wait before start growing
-		growTime = Time.time + growDelay;
-
-		// for( int i = 0; i < num; i++ )
-		// {
-		// 	// Instantiate cell
-		// 	Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
-
-		// 	// Add chain node for current cell
-		// 	chain.AddLast( new ChainNode( chain.tail.value, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
-
-		// 	// Put cell on the skeleton
-		// 	PutOnSkeleton( cell.transform, -chain.tail.value + zero );
-		// }
+		// growTime = Time.time + growDelay;
 	}
 //////////////////////////////////////////////////////////// EO METHODS //
 }
