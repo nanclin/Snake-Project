@@ -518,11 +518,11 @@ public class SnakeController : MonoBehaviour {
 
 	public void SpawnSnake()
 	{
-		// // Randomly position AI snakes
-		// if( controlMode == ControlMode.AI ){
-		// 	spawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
-		// 	spawnPoint.Rotate( Vector3.up * Random.value * 360f );
-		// }
+		// Randomly position AI snakes
+		if( controlMode == ControlMode.AI ){
+			spawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
+			spawnPoint.Rotate( Vector3.up * Random.value * 360f );
+		}
 		
 		body.Init( spawnPoint );
 	}
@@ -569,9 +569,23 @@ public class SnakeController : MonoBehaviour {
 	public float angle = 45;
 	public int num = 1;
 
+	[Range(0,90)]public float angleAccuracy;
+
+	public List<Transform> points = new List<Transform>();
+	private int currentID = 0;
+	Vector3 currentTarget;
+
+	public enum SteerType{ Mouse, Item, Checkpoint }
+	public SteerType steerType = SteerType.Checkpoint;
+
 	private void AIInput ()
 	{
-		int input = 0;
+
+		SnakeAI snakeAI = new SnakeAI();
+
+	// AVOID WITH RAYS VISION ///////////////////////////////////////////////////////////////
+		float wallAvoidanceInput = 0;
+		float followTargetInput = 0;
 		bool breakLoop = false;
 		float partAngle = (angle*2 / (num*2) );
 		for( int i = 0; i < num * 2 + 1; i++ )
@@ -583,68 +597,57 @@ public class SnakeController : MonoBehaviour {
 			if( Physics.Raycast( ray, out hit, dis, layerMask ) )
 			{
 				if( i < num ){
-					if( !breakLoop ) input = -1;
+					if( !breakLoop ) wallAvoidanceInput = -1;
 				}
 				else{
-					if( !breakLoop ) input = 1;
+					if( !breakLoop ) wallAvoidanceInput = 1;
 				}
 				Debug.DrawRay( ray.origin, ray.direction * dis, Color.red );
 
 				breakLoop = true;
 			}
 			else{
-				if( !breakLoop ) input = 0;
+				if( !breakLoop ) wallAvoidanceInput = 0;
 				Debug.DrawRay( ray.origin, ray.direction * dis, Color.red/3 );
 			}
 		}
 
-		rotationInput = SmoothInputHorizontal( input );
+	// STEER ///////////////////////////////////////////////////////////////
+	
+		// followTargetInput = snakeAI.SteerToTarget( transform, target, angleAccuracy );
 
+		switch( steerType ){
+			case SteerType.Mouse:
 
+				// Get mouse position in world
+				Vector3 mouseTarget = Input.mousePosition;
+				mouseTarget = new Vector3( mouseTarget.x, mouseTarget.y, Camera.main.gameObject.transform.position.y );
+				mouseTarget = Camera.main.ScreenToWorldPoint( mouseTarget );
 
-		// Ray rayCenter = new Ray( transform.position, transform.forward );
-		// Debug.DrawRay( rayCenter.origin, rayCenter.direction * dis, Color.red );
-		
-		// Vector3 left = Quaternion.AngleAxis( -45, Vector3.up ) * transform.forward;
-		// Ray rayLeft = new Ray( transform.position, left );
-		// Debug.DrawRay( rayLeft.origin, rayLeft.direction * dis, Color.red );
+				rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, mouseTarget, angleAccuracy ) );
+				break;
+			case SteerType.Item:
+				rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), angleAccuracy ) );
+				break;
+			case SteerType.Checkpoint:
 
-		// Vector3 right = Quaternion.AngleAxis( 45, Vector3.up ) * transform.forward;
-		// Ray rayRight = new Ray( transform.position, right );
-		// Debug.DrawRay( rayRight.origin, rayRight.direction * dis, Color.red );
+				Vector3 currentTarget = points[ currentID ].position;
+				float distance = (currentTarget - transform.position).magnitude;
+				if( distance < 3 ){
+					currentID = (currentID + 1) % points.Count;
+				}
+				float followCheckpointInput = snakeAI.SteerToTarget( transform, currentTarget, angleAccuracy );
 
-
-		// // the raycast hit info will be filled by the Physics.Raycast() call further
-		// RaycastHit hitCenter;
-		// RaycastHit hitLeft;
-		// RaycastHit hitRight;
-		// // Ray ray = new Ray( a, b );
-
-		// // bool isHit = Physics.Raycast( ray, out hit, 500, layerMask );
-		// bool isHitCenter = Physics.Raycast( rayCenter, out hitCenter, dis, layerMask );
-		// bool isHitLeft = Physics.Raycast( rayLeft, out hitLeft, dis, layerMask );
-		// bool isHitRight = Physics.Raycast( rayRight, out hitRight, dis, layerMask );
-
-		// if ( isHitLeft ){
-		// 	// print("hit");
-		// 	rotationInput = 1;
-		// }
-		// else if ( isHitRight ){
-		// 	// print("hit");
-		// 	rotationInput = -1;
-		// }
-		// else if ( isHitCenter ){
-		// 	// print("hit");
-		// 	rotationInput = -1;
-		// }
-		// else{
-		// 	rotationInput = 0;
-		// }
-		
-
+				rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, currentTarget, angleAccuracy ) );
+				break;
+				
+		}
 		// rotationInput = Input.GetAxis("Horizontal");
-		boostInput = Input.GetAxis("Vertical");
-		// boostInput = 1;
+		if( wallAvoidanceInput > 0 )
+			rotationInput = SmoothInputHorizontal( wallAvoidanceInput );
+		// rotationInput = SmoothInputHorizontal( followCheckpointInput );
+		// rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), angleAccuracy ) );
+
 	}
 
 
@@ -683,7 +686,6 @@ public class SnakeController : MonoBehaviour {
 		leftInput = GUI.RepeatButton( new Rect( padding, Screen.height - size - padding, size, size), "<" ) ? -1 : 0;
 		rightInput = GUI.RepeatButton( new Rect( Screen.width - size - padding, Screen.height - size - padding, size, size), ">" ) ? 1 : 0;
 
-		GUI.Label( new Rect(0,0,Screen.width,100), "rotationInput: " + rotationInput );
 
 		// Boost
 		if( boostEnabled ){
@@ -708,7 +710,7 @@ public class SnakeController : MonoBehaviour {
 
 	private float smoothBoost = 0;
 	public float boostAcceleration = 2f;
-	
+
 	private float SmoothBoost( float boost )
 	{
 		smoothBoost = Mathf.Lerp( smoothBoost, boost, Time.deltaTime * boostAcceleration );
@@ -757,4 +759,28 @@ public class SnakeController : MonoBehaviour {
  //        Debug.DrawRay( a, b * 100 );
 	// }
 //////////////////////////////////////////////////////////// EO RAYCASTING //
+}
+
+class SnakeAI : MonoBehaviour
+{
+	public float SteerToTarget( Transform transform, Vector3 target, float angleAccuracy )
+	{
+		// Draw line to the selected target
+		Debug.DrawLine( target, transform.position, Color.white * 0.8f );
+
+		Vector3 vectorToTarget = target - transform.position;
+		float angleDif = Vector3.Angle( vectorToTarget, transform.forward );
+
+		if( angleDif > angleAccuracy )
+		{
+			Vector3 projection = Vector3.Project( vectorToTarget, transform.right );
+
+			return Vector3.Dot( transform.right, projection.normalized );
+
+			// Draw steer direction
+			// Debug.DrawRay( transform.position, projection.normalized, Color.red );
+			// Debug.DrawRay( transform.position, vectorToTarget, Color.white );
+		}
+		return 0;
+	}
 }
