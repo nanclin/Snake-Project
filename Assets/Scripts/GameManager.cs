@@ -1,9 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 public class GameManager : MonoBehaviour {
+
+// // SINGLETON ///////////////////////////////////////////////////////////////
+// 	private static GameManager _instance;
+
+// 	public static GameManager Instance{
+// 		get
+// 		{
+// 			if( Instance == null )
+// 			{
+// 				_instance = Object.FindObjectOfType( typeof( GameManager ) ) as GameManager;
+
+// 				if (_instance == null)
+// 				{
+// 					GameObject go = new GameObject( "Game Manager" );
+// 					DontDestroyOnLoad( go );
+// 					_instance = go.AddComponent<GameManager>();
+// 				}
+// 			}
+// 			return _instance;
+// 		}
+// 	}
+// //////////////////////////////////////////////////////////// EO SINGLETON //
 
 	// Global
 	public static int ROUND_DECIMALS = 5;
@@ -21,8 +42,8 @@ public class GameManager : MonoBehaviour {
 	// System
 	public Transform snakeSpawnPoint;
 	public GameObject exit;
-	public enum State { Idle, NewGame, Run, GameOver, OpenExit, LevelFinished }
-	private State _state;
+	public enum GameState { Idle, NewGame, Run, GameOver, OpenExit, LevelFinished }
+	private GameState _state;
 	private float sw = Screen.width;
 	private float sh = Screen.height;
 	private float bw = 150;
@@ -36,8 +57,8 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		currentState = State.NewGame;
-		currentState = State.Run;
+		currentState = GameState.NewGame;
+		currentState = GameState.Run;
 	}
 
 	// Update is called once per frame
@@ -48,22 +69,22 @@ public class GameManager : MonoBehaviour {
 
 	void OnGUI ()
 	{
-		if( currentState == State.NewGame ){
+		if( currentState == GameState.NewGame ){
 			GUI.Box( new Rect( 0, 0, sw, sh ), "Snake Project\nMay 2015\nNejc Anclin" );
 			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "Begin Game" ) ){
-				currentState = State.Run;
+				currentState = GameState.Run;
 			}
 		}
-		else if( currentState == State.GameOver )
+		else if( currentState == GameState.GameOver )
 		{	
 			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nGame Over" );
 			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
-				currentState = State.NewGame;
+				currentState = GameState.NewGame;
 			}
 		}
 
-		if( currentState == State.Run ||
-			currentState == State.GameOver ){
+		if( currentState == GameState.Run ||
+			currentState == GameState.GameOver ){
 			GUI.Box( new Rect( sw/2 - 100/2 - 60, 10, 100, 25 ), "Score: " + SCORE );
 			GUI.Box( new Rect( sw/2 - 100/2 + 60, 10, 100, 25 ), "Stars: " + STARS + " / 3" );
 
@@ -72,7 +93,7 @@ public class GameManager : MonoBehaviour {
 			GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
 		}
 
-		if( currentState == State.LevelFinished ){
+		if( currentState == GameState.LevelFinished ){
 			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nCONGRATULATIONS!\n You finished this level!\nYour score is\n" + SCORE );
 
 			int m = (int)( TIME / 60f );
@@ -80,21 +101,20 @@ public class GameManager : MonoBehaviour {
 			GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
 			
 			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
-				currentState = State.NewGame;
+				currentState = GameState.NewGame;
 			}
 		}
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
-
 // FSM MACHINE METHODS ////////////////////////////////////////////////////////
 
 	// Set currentState to transition to new state
-	private State currentState
+	private GameState currentState
 	{
 		get { return _state; }
 		set {
-			// State should not transition to itself
+			// GameState should not transition to itself
 			if( _state != value )
 			{
 				// If current state is set,
@@ -111,24 +131,24 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	private void EnterState( State state )
+	private void EnterState( GameState state )
 	{
 		// print("EnterState: " + state);
 		switch( state )
 		{
-			case State.NewGame:
+			case GameState.NewGame:
 				NewGameEnterState();
 				break;
-			case State.Run:
+			case GameState.Run:
 				RunEnterState();
 				break;
-			case State.GameOver:
+			case GameState.GameOver:
 				GameOverEnterState();
 				break;
-			case State.LevelFinished:
+			case GameState.LevelFinished:
 				LevelFinishedEnterState();
 				break;
-			case State.OpenExit:
+			case GameState.OpenExit:
 				OpenExitEnterState();
 				break;
 		}
@@ -138,41 +158,41 @@ public class GameManager : MonoBehaviour {
 	{
 		switch( currentState )
 		{
-			case State.NewGame:
+			case GameState.NewGame:
 				NewGameState();
 				break;
-			case State.Run:
+			case GameState.Run:
 				RunState();
 				break;
-			case State.GameOver:
+			case GameState.GameOver:
 				GameOverState();
 				break;
-			case State.LevelFinished:
+			case GameState.LevelFinished:
 				LevelFinishedState();
 				break;
-			case State.OpenExit:
+			case GameState.OpenExit:
 				OpenExitState();
 				break;
 		}
 	}
 
-	private void ExitState( State state )
+	private void ExitState( GameState state )
 	{
 		switch( state )
 		{
-			case State.NewGame:
+			case GameState.NewGame:
 				NewGameExitState();
 				break;
-			case State.Run:
+			case GameState.Run:
 				RunExitState();
 				break;
-			case State.GameOver:
+			case GameState.GameOver:
 				GameOverExitState();
 				break;
-			case State.LevelFinished:
+			case GameState.LevelFinished:
 				LevelFinishedExitState();
 				break;
-			case State.OpenExit:
+			case GameState.OpenExit:
 				OpenExitExitState();
 				break;
 		}
@@ -218,7 +238,7 @@ public class GameManager : MonoBehaviour {
 			exit.SetActive( false );
 
 		// Automatically start running game
-		// currentState = State.Run;
+		// currentState = GameState.Run;
 	}
 
 	private void NewGameState()
@@ -273,7 +293,7 @@ public class GameManager : MonoBehaviour {
 	}
 	public void GameOver()
 	{
-		currentState = State.GameOver;
+		currentState = GameState.GameOver;
 	}
 // EO GAME OVER STATE //
 
@@ -299,7 +319,7 @@ public class GameManager : MonoBehaviour {
 
 		float timeElapsed = Time.time - openTime;
 		if( timeElapsed >= 5 )
-			currentState = State.Run;
+			currentState = GameState.Run;
 		else if( timeElapsed >= 4 )
 			cameraHolder.GetComponent<FollowTarget>().target = snake.transform;
 		else if( timeElapsed >= 1 )
@@ -316,7 +336,7 @@ public class GameManager : MonoBehaviour {
 	public void OpenExit()
 	{
 		// print("EXIT IS NOW OPEN!");
-		currentState = State.OpenExit;
+		currentState = GameState.OpenExit;
 	}
 // EO OPEN EXIT STATE //
 
@@ -340,14 +360,9 @@ public class GameManager : MonoBehaviour {
 	}
 	public void LevelFinished()
 	{
-		currentState = State.LevelFinished;
+		currentState = GameState.LevelFinished;
 	}
 // EO LEVEL FINISHED STATE //
 
 //////////////////////////////////////////////////////// EO STATE METHODS //
-
-// OTHER METHODS ///////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////// EO OTHER METHODS //
-
 }

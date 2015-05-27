@@ -42,7 +42,7 @@ public class Item : MonoBehaviour {
 				closestLocation = location;
 			}
 
-			Debug.DrawLine( location, position, Color.white * 0.7f );
+			// Debug.DrawLine( location, position, Color.white * 0.6f );
 		}
 		return closestLocation;
 	}

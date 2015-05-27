@@ -13,6 +13,7 @@ TagManager:
   - Snake Cell
   - Button
   - Ground
+  - AI
   layers:
   - Default
   - TransparentFX

@@ -16,8 +16,8 @@ public class SnakeController : MonoBehaviour {
 	// private float maxSpeed = 0.04f;
 	private float acceleration = 0.01f;
 	private float rotationSpeed = 3;
-	public enum ControlMode{ Debug, PC, Android, AI }
-	public ControlMode controlMode = ControlMode.Debug;
+	public enum SteerMode{ Debug, PC, Android, AI }
+	public SteerMode steerMode = SteerMode.Debug;
 	public Transform spawnPoint;
 	public float buffer;
 	public float bondStrength;
@@ -50,19 +50,21 @@ public class SnakeController : MonoBehaviour {
 		// Get body reference
 		body = GetComponent<SnakeBody>();
 
-		// Set Color of head
-		GetComponent<Renderer>().material.color = color;
+		path = new NavMeshPath();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		switch( controlMode )
+		boostInput = Input.GetAxis("Vertical");
+
+		if( currentState != SnakeState.Die )
+		switch( steerMode )
 		{
-			case ControlMode.Debug:   DebugInput();   break;
-			case ControlMode.PC:      PCInput();      break;
-			case ControlMode.AI:      AIInput();      break;
-			case ControlMode.Android: AndroidInput(); break;	// It should be called in OnGUI() method, not in Update()
+			case SteerMode.Debug:   DebugInput();   break;
+			case SteerMode.PC:      PCInput();      break;
+			case SteerMode.AI:      AIInput();      break;
+			case SteerMode.Android: AndroidInput(); break;	// It should be called in OnGUI() method, not in Update()
 		}
 
 		// Debug keybidings
@@ -82,9 +84,8 @@ public class SnakeController : MonoBehaviour {
 			currentState = SnakeState.Die;
 
 		if( Input.GetKeyDown("i") )
-			controlMode = controlMode == ControlMode.PC ? ControlMode.AI : ControlMode.PC;
+			steerMode = steerMode == SteerMode.PC ? SteerMode.AI : SteerMode.PC;
 
-		boostInput = Input.GetAxis("Vertical");
 
 		// FadeObjectInFrontOfCamera();
 	}
@@ -97,8 +98,8 @@ public class SnakeController : MonoBehaviour {
 
 	void OnTriggerEnter( Collider other )
 	{
-		// print( "SnakeController - OnTriggerEnter" );
-
+		print( "other: " + other );
+		// Debug.Break();
 		switch( other.tag )
 		{
 			case "Food":
@@ -122,6 +123,7 @@ public class SnakeController : MonoBehaviour {
 			case "Snake Cell":
 			case "Ground":
 			case "Wall":
+			case "Player":
 				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
 				bool otherIsTail = other.gameObject == body.chain.tail.prefab;
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
@@ -286,7 +288,7 @@ public class SnakeController : MonoBehaviour {
 
 	void OnGUI ()
 	{
-		if( controlMode == ControlMode.Android )
+		if( steerMode == SteerMode.Android )
 			AndroidInputGUI();
 	}
 
@@ -498,7 +500,7 @@ public class SnakeController : MonoBehaviour {
 		// // Switch state
 		// currentState = SnakeState.Move;
 
-		if( controlMode != ControlMode.AI )
+		if( steerMode != SteerMode.AI )
 			gameManager.GameOver();
 	}
 
@@ -519,7 +521,7 @@ public class SnakeController : MonoBehaviour {
 	public void SpawnSnake()
 	{
 		// Randomly position AI snakes
-		if( controlMode == ControlMode.AI ){
+		if( steerMode == SteerMode.AI ){
 			spawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
 			spawnPoint.Rotate( Vector3.up * Random.value * 360f );
 		}
@@ -561,7 +563,7 @@ public class SnakeController : MonoBehaviour {
 		// speed = 1.5f;
 
 		// rotationInput = 0;
-		// boostInput = 0;
+		boostInput = 0;
 	}
 
 
@@ -569,28 +571,72 @@ public class SnakeController : MonoBehaviour {
 	public float angle = 45;
 	public int num = 1;
 
-	[Range(0,90)]public float angleAccuracy;
+	[Range(0,90)]public float directionAccuracy;
 
 	public List<Transform> points = new List<Transform>();
+	public Vector3[] corners;
 	private int currentID = 0;
 	Vector3 currentTarget;
 
-	public enum SteerType{ Mouse, Item, Checkpoint }
+	public enum SteerType{ None, Wander, Mouse, Item, Checkpoint, Pathfinding }
 	public SteerType steerType = SteerType.Checkpoint;
+
+	[Range(0,90)] public float rate = 0.5f;
+	[Range(0,5)] public float strength = 0.5f;
+	[Range(0,1)] public float fanEffect = 0.5f;
+
+	private SnakeAI snakeAI = new SnakeAI();
+	private NavMeshPath path;
+
+	private void GeneratePath( Vector3 targetLocation, bool random = false )
+	{
+		if( random )
+			targetLocation = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
+
+		NavMesh.CalculatePath( transform.position, targetLocation, NavMesh.AllAreas, path );
+
+		currentID = 0;
+		corners = path.corners;
+	}
 
 	private void AIInput ()
 	{
+		if( Input.GetMouseButtonDown(0) )
+		{
+			// Get mouse position in world
+			Vector3 mouseTarget = Input.mousePosition;
+			mouseTarget = new Vector3( mouseTarget.x, mouseTarget.y, Camera.main.gameObject.transform.position.y );
+			mouseTarget = Camera.main.ScreenToWorldPoint( mouseTarget );
 
-		SnakeAI snakeAI = new SnakeAI();
+			GeneratePath( mouseTarget );
+		}
+
+		if( path != null && path.corners.Length > 0 )
+		{
+			Vector3 prevCorner = path.corners[0];
+			for( int i = 1; i < path.corners.Length; i++ )
+			{
+				Vector3	corner = path.corners[i];
+				Debug.DrawLine( prevCorner, corner );
+				prevCorner = corner;
+			}
+		}
+		// // Draw angle accuracy lines
+		// Debug.DrawRay( transform.position, Quaternion.Euler(0, directionAccuracy, 0) * transform.forward * 100, Color.blue * 0.2f );
+		// Debug.DrawRay( transform.position, Quaternion.Euler(0, -directionAccuracy, 0) * transform.forward * 100, Color.blue * 0.2f );
+
+		float inputAI = 0;
 
 	// AVOID WITH RAYS VISION ///////////////////////////////////////////////////////////////
+		
+		float angleDyanmic = angle * ( ( Mathf.Lerp( 1, Mathf.Abs(smoothInputHorizontal), fanEffect ) ) );
+
 		float wallAvoidanceInput = 0;
-		float followTargetInput = 0;
 		bool breakLoop = false;
-		float partAngle = (angle*2 / (num*2) );
+		float partAngle = (angleDyanmic*2 / (num*2) );
 		for( int i = 0; i < num * 2 + 1; i++ )
 		{
-			Vector3 vector = Quaternion.AngleAxis( angle - partAngle * i, Vector3.up ) * transform.forward;
+			Vector3 vector = Quaternion.AngleAxis( angleDyanmic - partAngle * i, Vector3.up ) * transform.forward;
 			Ray ray = new Ray( transform.position, vector );
 
 			RaycastHit hit;
@@ -614,40 +660,66 @@ public class SnakeController : MonoBehaviour {
 
 	// STEER ///////////////////////////////////////////////////////////////
 	
-		// followTargetInput = snakeAI.SteerToTarget( transform, target, angleAccuracy );
+		// followTargetInput = snakeAI.SteerToTarget( transform, target, directionAccuracy );
 
-		switch( steerType ){
+		switch( steerType )
+		{
 			case SteerType.Mouse:
-
 				// Get mouse position in world
 				Vector3 mouseTarget = Input.mousePosition;
 				mouseTarget = new Vector3( mouseTarget.x, mouseTarget.y, Camera.main.gameObject.transform.position.y );
 				mouseTarget = Camera.main.ScreenToWorldPoint( mouseTarget );
 
-				rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, mouseTarget, angleAccuracy ) );
+				inputAI = snakeAI.SteerToTarget( transform, mouseTarget, directionAccuracy );
 				break;
-			case SteerType.Item:
-				rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), angleAccuracy ) );
-				break;
-			case SteerType.Checkpoint:
 
+			case SteerType.Item:
+				inputAI = snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), directionAccuracy );
+				break;
+
+			case SteerType.Checkpoint:
 				Vector3 currentTarget = points[ currentID ].position;
 				float distance = (currentTarget - transform.position).magnitude;
 				if( distance < 3 ){
 					currentID = (currentID + 1) % points.Count;
 				}
-				float followCheckpointInput = snakeAI.SteerToTarget( transform, currentTarget, angleAccuracy );
 
-				rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, currentTarget, angleAccuracy ) );
+				inputAI = snakeAI.SteerToTarget( transform, currentTarget, directionAccuracy );
 				break;
-				
-		}
-		// rotationInput = Input.GetAxis("Horizontal");
-		if( wallAvoidanceInput > 0 )
-			rotationInput = SmoothInputHorizontal( wallAvoidanceInput );
-		// rotationInput = SmoothInputHorizontal( followCheckpointInput );
-		// rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), angleAccuracy ) );
 
+			case SteerType.Pathfinding:
+				if( corners.Length == 0 )
+					GeneratePath( Vector3.zero, true );
+
+				Vector3 currentCorner = corners[ currentID ];
+				distance = (currentCorner - transform.position).magnitude;
+				if( distance < 1 ){
+					if( currentID >= corners.Length - 1 )
+					{
+						GeneratePath( Vector3.zero, true );
+					}
+					else{
+						// currentID = (currentID + 1) % corners.Length;
+						currentID = currentID + 1;
+					}
+				}
+
+				inputAI = snakeAI.SteerToTarget( transform, currentCorner, directionAccuracy );
+				break;
+
+			case SteerType.Wander:
+				inputAI = snakeAI.Wander( transform, rate, strength, directionAccuracy );
+				// inputAI = Input.GetAxis("Horizontal");
+				break;	
+		}
+
+		// rotationInput = Input.GetAxis("Horizontal");
+		if( Mathf.Abs( wallAvoidanceInput ) > 0 )
+			inputAI = wallAvoidanceInput;
+		// rotationInput = SmoothInputHorizontal( followCheckpointInput );
+		// rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), directionAccuracy ) );
+
+		rotationInput = SmoothInputHorizontal( inputAI );
 	}
 
 
@@ -763,24 +835,53 @@ public class SnakeController : MonoBehaviour {
 
 class SnakeAI : MonoBehaviour
 {
-	public float SteerToTarget( Transform transform, Vector3 target, float angleAccuracy )
+	public float SteerToTarget( Transform transform, Vector3 target, float directionAccuracy )
 	{
 		// Draw line to the selected target
-		Debug.DrawLine( target, transform.position, Color.white * 0.8f );
+		Debug.DrawLine( target, transform.position, Color.green );
 
 		Vector3 vectorToTarget = target - transform.position;
-		float angleDif = Vector3.Angle( vectorToTarget, transform.forward );
+		float directionOffset = Vector3.Angle( vectorToTarget, transform.forward );
 
-		if( angleDif > angleAccuracy )
+		if( directionOffset > directionAccuracy )
 		{
 			Vector3 projection = Vector3.Project( vectorToTarget, transform.right );
 
-			return Vector3.Dot( transform.right, projection.normalized );
-
 			// Draw steer direction
-			// Debug.DrawRay( transform.position, projection.normalized, Color.red );
-			// Debug.DrawRay( transform.position, vectorToTarget, Color.white );
+			Debug.DrawRay( transform.position, projection.normalized, Color.blue );
+			
+			// Return steer direction
+			return Vector3.Dot( transform.right, projection.normalized );
 		}
+
+		// Don't steer
 		return 0;
+	}
+
+	private float directionAngle = 0;
+	public float Wander( Transform transform, float rate, float strength, float directionAccuracy )
+	{
+		Vector3 circleCenter = transform.position + transform.forward * Mathf.Sqrt(2) * strength;
+
+		// Change wander direction
+		// if( Time.frameCount%3 == 0 )
+			directionAngle += Random.Range( -rate, rate );
+
+		// Find location to steer towards
+		Vector3 directionVector = transform.forward * strength;
+		directionVector = Quaternion.Euler(0, directionAngle, 0) * directionVector;
+
+		// DEBUG
+		// MyDraw.DrawCircle( circleCenter, 1, Color.black );
+		MyDraw.DrawCircle( circleCenter, strength, Color.white * 0.6f );
+		Debug.DrawRay( circleCenter, directionVector, Color.white * 0.6f );
+		
+		if( Time.frameCount%10 == 0 ){
+			// Steer towards wander location
+			return SteerToTarget( transform, circleCenter + directionVector, directionAccuracy );
+		}
+		else{
+			return 0;
+		}
 	}
 }

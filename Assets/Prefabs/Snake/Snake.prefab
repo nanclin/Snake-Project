@@ -9,7 +9,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 489058}
   - 33: {fileID: 3390370}
-  - 135: {fileID: 13557116}
   - 23: {fileID: 2362706}
   m_Layer: 0
   m_Name: Eye Right
@@ -27,7 +26,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 410552}
   - 33: {fileID: 3339890}
-  - 135: {fileID: 13545252}
   - 23: {fileID: 2314286}
   m_Layer: 0
   m_Name: Eye Left
@@ -55,7 +53,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &151626
 GameObject:
   m_ObjectHideFlags: 0
@@ -70,7 +68,7 @@ GameObject:
   - 114: {fileID: 11499584}
   - 135: {fileID: 13571150}
   - 54: {fileID: 5402770}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Snake
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -110,8 +108,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 136566}
-  m_LocalRotation: {x: .147535414, y: .688964605, z: -.146389365, w: .694356799}
-  m_LocalPosition: {x: -3.85999942, y: 2.54999995, z: -.0299999956}
+  m_LocalRotation: {x: .20783785, y: -5.53505721e-08, z: 2.60500684e-07, w: .978163302}
+  m_LocalPosition: {x: 0, y: 3.0999999, z: -5.69999981}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 453852}
@@ -293,22 +291,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55732e7384e46428ab021edba5309b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0, g: 1, b: .462069035, a: .384313732}
-  controlMode: 0
+  color: {r: 0, g: 1, b: 0, a: 1}
+  steerMode: 0
   spawnPoint: {fileID: 0}
   buffer: .550000012
   bondStrength: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   body: {fileID: 0}
   gameManager: {fileID: 0}
   spline: {fileID: 0}
   hole: {fileID: 0}
   inputSensitivity: 5
   dis: 3
-  angle: 90
-  num: 2
+  angle: 20
+  num: 1
+  directionAccuracy: 5
+  points:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  corners: []
+  steerType: 5
+  rate: 40
+  strength: .5
+  fanEffect: 0
   boostAcceleration: 5
 --- !u!114 &11481934
 MonoBehaviour:
@@ -345,30 +354,6 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 136566}
   m_Enabled: 1
---- !u!135 &13545252
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 111544}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: .5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &13557116
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 104454}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: .5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &13571150
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -380,7 +365,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: .5
-  m_Center: {x: 0, y: 0, z: .449999988}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
