@@ -6,16 +6,16 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour {
 
 	// Global
+	public static GameManager INSTANCE;
 	public static int ROUND_DECIMALS = 5;
 	public static int SCORE;
 	public static int STARS;
 	public static float TIME;
 	public static float START_TIME;
-	public static GameManager INSTANCE;
 
 	// Static
 	public static bool FSM_DEBUG = false;
-
+	
 	// System
 	public enum GameState { Idle, NewGame, Run, GameOver, OpenExit, LevelFinished }
 	private GameState _state;

@@ -291,34 +291,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55732e7384e46428ab021edba5309b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0, g: 1, b: 0, a: 1}
-  steerMode: 0
-  spawnPoint: {fileID: 0}
-  buffer: .550000012
-  bondStrength: 1
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 256
+  settings:
+    color: {r: 0, g: 1, b: 0, a: 1}
+    randomSpawnPosition: 0
+    buffer: .550000012
+    bondStrength: 1
+    bornLength: 6
+  handling:
+    steerMode: 0
+    maxSpeed: .0799999982
+    acceleration: .00999999978
+    rotationSpeed: 3
+    inputSensitivity: 5
+  snakeAI:
+    steerType: 4
+    directionAccuracy: 10
+    rate: .5
+    strength: .5
+    fanEffect: .5
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 0
   body: {fileID: 0}
-  gameManager: {fileID: 0}
+  respawnPoint: {fileID: 0}
   spline: {fileID: 0}
   hole: {fileID: 0}
-  inputSensitivity: 5
   dis: 3
   angle: 20
   num: 1
-  directionAccuracy: 5
   points:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   corners: []
-  steerType: 5
-  rate: 40
-  strength: .5
-  fanEffect: 0
-  boostAcceleration: 5
 --- !u!114 &11481934
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -331,9 +337,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraHolder: {fileID: 0}
-  snakeSpawnPoint: {fileID: 0}
-  exit: {fileID: 0}
   snake: {fileID: 0}
+  exit: {fileID: 0}
 --- !u!114 &11499584
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -345,7 +350,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a4eff5549494e48b901c172c21599e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  head: {fileID: 0}
   cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
+  tail: {fileID: 0}
   zero: 0
 --- !u!124 &12426868
 Behaviour:

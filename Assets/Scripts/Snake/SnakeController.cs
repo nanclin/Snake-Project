@@ -5,34 +5,47 @@ using System.Collections.Generic;
 [RequireComponent(typeof(SnakeBody))]
 public class SnakeController : Initializer {
 
-	public static List<SnakeController> POOL = new List<SnakeController>();
+	[System.Serializable]
+	public class Settings
+	{
+		public Color color = Color.green;
+		public bool randomSpawnPosition = false;
+		[Range( 0, 1 )] public float buffer = 0.55f;
+		[Range( 0, 1 )] public float bondStrength = 1f;
+		[Range( 0, 10 )] public int bornLength = 3;
+	}
+
+	[System.Serializable]
+	public class Handling
+	{
+		public ControlMode controlMode = SnakeController.ControlMode.Debug;
+		[Range( 0, 1f )] public float maxSpeed = 0.08f;
+		[Range( 0, 0.1f )] public float acceleration = 0.01f;
+		[Range( 0, 90 )] public float rotationSpeed = 3;
+		[Range( 0, 10 )] public float inputSensitivity = 5f;
+	}
+
 
 	// Static
-	// private static bool FSM_DEBUG = GameManager.FSM_DEBUG;
+	public static List<SnakeController> POOL = new List<SnakeController>();
 	private static bool FSM_DEBUG = false;
 
-	// Handling
-	private float maxSpeed = 0.08f;
-	public Color color = Color.green;
-	public bool randomSpawnPosition;
-	// private float maxSpeed = 0.04f;
-	private float acceleration = 0.01f;
-	private float rotationSpeed = 3;
-	
-	public enum SteerMode{ Debug, PC, Android, AI }
-	public SteerMode steerMode = SteerMode.Debug;
-	public float buffer;
-	public float bondStrength;
-	public LayerMask layerMask;
+	// Enums
+	public enum ControlMode{ PC, Android, AI, Debug }
+	public enum SteerMode{ None, Wander, Mouse, Item, Checkpoint, Pathfinding }
 
+	// Settings
+	// Handling
+	public Settings settings = new Settings();
+	public Handling handling = new Handling();
+	public SnakeAI snakeAI = new SnakeAI();
+	
 	// Components
 	[HideInInspector] public SnakeBody body;
-	// public GameManager gameManager;
 
 	// System
 	[HideInInspector] public Transform respawnPoint;
 	private SnakeState _state;
-	private float speed = 0;
 
 	override public void Init()
 	{
@@ -56,7 +69,7 @@ public class SnakeController : Initializer {
 		// Get body reference
 		body = GetComponent<SnakeBody>();
 
-		path = new NavMeshPath();
+		snakeAI.path = new NavMeshPath();
 
 		// Set respawn point
 		respawnPoint = transform;
@@ -68,12 +81,12 @@ public class SnakeController : Initializer {
 		boostInput = Input.GetAxis("Vertical");
 
 		if( currentState != SnakeState.Die )
-		switch( steerMode )
+		switch( handling.controlMode )
 		{
-			case SteerMode.Debug:   DebugInput();   break;
-			case SteerMode.PC:      PCInput();      break;
-			case SteerMode.AI:      AIInput();      break;
-			case SteerMode.Android: AndroidInput(); break;
+			case ControlMode.Debug:   DebugInput();   break;
+			case ControlMode.PC:      PCInput();      break;
+			case ControlMode.AI:      AIInput();      break;
+			case ControlMode.Android: AndroidInput(); break;
 		}
 
 		// Debug keybidings
@@ -93,7 +106,7 @@ public class SnakeController : Initializer {
 			currentState = SnakeState.Die;
 
 		if( Input.GetKeyDown("i") )
-			steerMode = steerMode == SteerMode.PC ? SteerMode.AI : SteerMode.PC;
+			handling.controlMode = handling.controlMode == ControlMode.PC ? ControlMode.AI : ControlMode.PC;
 
 
 		// FadeObjectInFrontOfCamera();
@@ -114,8 +127,8 @@ public class SnakeController : Initializer {
 					body.Grow();
 					GameManager.SCORE++;
 				}
-				color = RandomColor.GetRandomColor();
-				body.SetColor( color );
+				settings.color = RandomColor.GetRandomColor();
+				body.SetColor( settings.color );
 				break;
 
 			case "Coin":
@@ -297,10 +310,11 @@ public class SnakeController : Initializer {
 
 	void OnGUI ()
 	{
-		if( steerMode == SteerMode.Android )
+		if( handling.controlMode == ControlMode.Android )
 			AndroidInputGUI();
 	}
 
+	private float speed = 0;
 	private void MoveState()
 	{
 		DebugExecute( "Move" );
@@ -314,15 +328,15 @@ public class SnakeController : Initializer {
 		float positionChange = speed;
 		transform.Translate( Vector3.forward * positionChange );
 		// Calculate speed
-		speed += acceleration;
-		speed = Mathf.Min( speed, maxSpeed + boost );
+		speed += handling.acceleration;
+		speed = Mathf.Min( speed, handling.maxSpeed + boost );
 		speed = Mathf.Max( speed, 0 );
 		// Store current positon point
 		body.skeleton.PrependJoint( transform.position );
 		//////////////////////////////////////////////////////////// EO TRANSLATE SNAKE //
 
 		// // Rotate and translate snakes head
-		transform.Rotate( Vector3.up * rotationInput * ( rotationSpeed + boostRotation ) );
+		transform.Rotate( Vector3.up * rotationInput * ( handling.rotationSpeed + boostRotation ) );
 
 		//
 		body.UpdateBody( positionChange );
@@ -335,7 +349,7 @@ public class SnakeController : Initializer {
 // EO MOVE STATE //
 
 
-	public BezierSpline spline;
+	[HideInInspector] public BezierSpline spline;
 	// private float startTime;
 	// private float duration = 5;
 
@@ -357,7 +371,7 @@ public class SnakeController : Initializer {
 		// }
 	}
 
-	public Hole hole;
+	[HideInInspector] public Hole hole;
 
 	private void OnRailState()
 	{
@@ -377,8 +391,8 @@ public class SnakeController : Initializer {
 		}
 
 		// Calculate speed
-		speed += acceleration;
-		speed = Mathf.Min( speed, maxSpeed + boost );
+		speed += handling.acceleration;
+		speed = Mathf.Min( speed, handling.maxSpeed + boost );
 		speed = Mathf.Max( speed, 0 );
 
 		traversed += speed;
@@ -469,7 +483,7 @@ public class SnakeController : Initializer {
 		// body.MoveChain( head, -Mathf.Max( 0.02f, dis/10 ) );
 		body.PutOnSkeleton( transform, body.zero - head.value );
 
-		// Destroy cells on path
+		// Destroy cells on snakeAI.path
 		if( head.next != null && head.Distance < 0.1f ){
 			body.DestroyCell( head.next );
 		}
@@ -505,7 +519,7 @@ public class SnakeController : Initializer {
 		// // Switch state
 		// currentState = SnakeState.Move;
 
-		if( steerMode != SteerMode.AI )
+		if( handling.controlMode != ControlMode.AI )
 			// GameManager.INSTANCE.GameOver();
 			GameManager.INSTANCE.currentState = GameManager.GameState.GameOver;
 	}
@@ -527,12 +541,12 @@ public class SnakeController : Initializer {
 	public void SpawnSnake()
 	{
 		// Randomly position AI snakes
-		if( randomSpawnPosition ){
+		if( settings.randomSpawnPosition ){
 			respawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
 			respawnPoint.Rotate( Vector3.up * Random.value * 360f );
 		}
 		
-		body.Init( respawnPoint );
+		body.Init( respawnPoint, settings.bornLength );
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 
@@ -554,12 +568,11 @@ public class SnakeController : Initializer {
 
 
 	private float smoothInputHorizontal;
-	public float inputSensitivity = 5f;
 
 	private float SmoothInputHorizontal( float input )
 	{
 		// Smooth input
-		smoothInputHorizontal = Mathf.Lerp( smoothInputHorizontal, input, Time.deltaTime * inputSensitivity );
+		smoothInputHorizontal = Mathf.Lerp( smoothInputHorizontal, input, Time.deltaTime * handling.inputSensitivity );
 		return smoothInputHorizontal;
 	}
 
@@ -573,36 +586,25 @@ public class SnakeController : Initializer {
 	}
 
 
-	public float dis = 10;
-	public float angle = 45;
-	public int num = 1;
+	[HideInInspector] public float dis = 10;
+	[HideInInspector] public float angle = 45;
+	[HideInInspector] public int num = 1;
 
-	[Range(0,90)]public float directionAccuracy;
 
-	public List<Transform> points = new List<Transform>();
-	public Vector3[] corners;
+	[HideInInspector] public List<Transform> points = new List<Transform>();
+	[HideInInspector] public Vector3[] corners;
 	private int currentID = 0;
 	Vector3 currentTarget;
-
-	public enum SteerType{ None, Wander, Mouse, Item, Checkpoint, Pathfinding }
-	public SteerType steerType = SteerType.Checkpoint;
-
-	[Range(0,90)] public float rate = 0.5f;
-	[Range(0,5)] public float strength = 0.5f;
-	[Range(0,1)] public float fanEffect = 0.5f;
-
-	private SnakeAI snakeAI = new SnakeAI();
-	private NavMeshPath path;
 
 	private void GeneratePath( Vector3 targetLocation, bool random = false )
 	{
 		if( random )
 			targetLocation = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
 
-		NavMesh.CalculatePath( transform.position, targetLocation, NavMesh.AllAreas, path );
+		NavMesh.CalculatePath( transform.position, targetLocation, NavMesh.AllAreas, snakeAI.path );
 
 		currentID = 0;
-		corners = path.corners;
+		corners = snakeAI.path.corners;
 	}
 
 	private void AIInput ()
@@ -617,12 +619,12 @@ public class SnakeController : Initializer {
 			GeneratePath( mouseTarget );
 		}
 
-		if( path != null && path.corners.Length > 0 )
+		if( snakeAI.path != null && snakeAI.path.corners.Length > 0 )
 		{
-			Vector3 prevCorner = path.corners[0];
-			for( int i = 1; i < path.corners.Length; i++ )
+			Vector3 prevCorner = snakeAI.path.corners[0];
+			for( int i = 1; i < snakeAI.path.corners.Length; i++ )
 			{
-				Vector3	corner = path.corners[i];
+				Vector3	corner = snakeAI.path.corners[i];
 				Debug.DrawLine( prevCorner, corner );
 				prevCorner = corner;
 			}
@@ -635,7 +637,7 @@ public class SnakeController : Initializer {
 
 	// AVOID WITH RAYS VISION ///////////////////////////////////////////////////////////////
 		
-		float angleDyanmic = angle * ( ( Mathf.Lerp( 1, Mathf.Abs(smoothInputHorizontal), fanEffect ) ) );
+		float angleDyanmic = angle * ( ( Mathf.Lerp( 1, Mathf.Abs(smoothInputHorizontal), snakeAI.fanEffect ) ) );
 
 		float wallAvoidanceInput = 0;
 		bool breakLoop = false;
@@ -646,7 +648,7 @@ public class SnakeController : Initializer {
 			Ray ray = new Ray( transform.position, vector );
 
 			RaycastHit hit;
-			if( Physics.Raycast( ray, out hit, dis, layerMask ) )
+			if( Physics.Raycast( ray, out hit, dis, snakeAI.layerMask ) )
 			{
 				if( i < num ){
 					if( !breakLoop ) wallAvoidanceInput = -1;
@@ -668,32 +670,32 @@ public class SnakeController : Initializer {
 	
 		// followTargetInput = snakeAI.SteerToTarget( transform, target, directionAccuracy );
 
-		switch( steerType )
+		switch( snakeAI.steerMode )
 		{
-			case SteerType.Mouse:
+			case SteerMode.Mouse:
 				// Get mouse position in world
 				Vector3 mouseTarget = Input.mousePosition;
 				mouseTarget = new Vector3( mouseTarget.x, mouseTarget.y, Camera.main.gameObject.transform.position.y );
 				mouseTarget = Camera.main.ScreenToWorldPoint( mouseTarget );
 
-				inputAI = snakeAI.SteerToTarget( transform, mouseTarget, directionAccuracy );
+				inputAI = snakeAI.SteerToTarget( transform, mouseTarget );
 				break;
 
-			case SteerType.Item:
-				inputAI = snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), directionAccuracy );
+			case SteerMode.Item:
+				inputAI = snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ) );
 				break;
 
-			case SteerType.Checkpoint:
+			case SteerMode.Checkpoint:
 				Vector3 currentTarget = points[ currentID ].position;
 				float distance = (currentTarget - transform.position).magnitude;
 				if( distance < 3 ){
 					currentID = (currentID + 1) % points.Count;
 				}
 
-				inputAI = snakeAI.SteerToTarget( transform, currentTarget, directionAccuracy );
+				inputAI = snakeAI.SteerToTarget( transform, currentTarget );
 				break;
 
-			case SteerType.Pathfinding:
+			case SteerMode.Pathfinding:
 				if( corners.Length == 0 )
 					GeneratePath( Vector3.zero, true );
 
@@ -710,11 +712,11 @@ public class SnakeController : Initializer {
 					}
 				}
 
-				inputAI = snakeAI.SteerToTarget( transform, currentCorner, directionAccuracy );
+				inputAI = snakeAI.SteerToTarget( transform, currentCorner );
 				break;
 
-			case SteerType.Wander:
-				inputAI = snakeAI.Wander( transform, rate, strength, directionAccuracy );
+			case SteerMode.Wander:
+				inputAI = snakeAI.Wander( transform );
 				// inputAI = Input.GetAxis("Horizontal");
 				break;	
 		}
@@ -723,7 +725,7 @@ public class SnakeController : Initializer {
 		if( Mathf.Abs( wallAvoidanceInput ) > 0 )
 			inputAI = wallAvoidanceInput;
 		// rotationInput = SmoothInputHorizontal( followCheckpointInput );
-		// rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ), directionAccuracy ) );
+		// rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ) ) );
 
 		rotationInput = SmoothInputHorizontal( inputAI );
 	}
@@ -787,11 +789,10 @@ public class SnakeController : Initializer {
 	}
 
 	private float smoothBoost = 0;
-	public float boostAcceleration = 2f;
 
 	private float SmoothBoost( float boost )
 	{
-		smoothBoost = Mathf.Lerp( smoothBoost, boost, Time.deltaTime * boostAcceleration );
+		smoothBoost = Mathf.Lerp( smoothBoost, boost, Time.deltaTime * 5 );
 		return smoothBoost;
 	}
 //////////////////////////////////////////////////////// EO INPUTS //
@@ -837,57 +838,68 @@ public class SnakeController : Initializer {
  //        Debug.DrawRay( a, b * 100 );
 	// }
 //////////////////////////////////////////////////////////// EO RAYCASTING //
-}
 
-class SnakeAI
-{
-	public float SteerToTarget( Transform transform, Vector3 target, float directionAccuracy )
+	[System.Serializable]
+	public class SnakeAI
 	{
-		// Draw line to the selected target
-		Debug.DrawLine( target, transform.position, Color.green );
+		public SteerMode steerMode = SteerMode.Checkpoint;
 
-		Vector3 vectorToTarget = target - transform.position;
-		float directionOffset = Vector3.Angle( vectorToTarget, transform.forward );
+		[Range( 0, 90 )] public float directionAccuracy = 10;
+		[Range( 0, 90 )] public float rate = 0.5f;
+		[Range( 0, 5 )] public float strength = 0.5f;
+		[Range( 0, 1 )] public float fanEffect = 0.5f;
 
-		if( directionOffset > directionAccuracy )
+		[HideInInspector] public LayerMask layerMask = 5;
+		public NavMeshPath path;
+
+		public float SteerToTarget( Transform transform, Vector3 target )
 		{
-			Vector3 projection = Vector3.Project( vectorToTarget, transform.right );
+			// Draw line to the selected target
+			Debug.DrawLine( target, transform.position, Color.green );
 
-			// Draw steer direction
-			Debug.DrawRay( transform.position, projection.normalized, Color.blue );
-			
-			// Return steer direction
-			return Vector3.Dot( transform.right, projection.normalized );
-		}
+			Vector3 vectorToTarget = target - transform.position;
+			float directionOffset = Vector3.Angle( vectorToTarget, transform.forward );
 
-		// Don't steer
-		return 0;
-	}
+			if( directionOffset > directionAccuracy )
+			{
+				Vector3 projection = Vector3.Project( vectorToTarget, transform.right );
 
-	private float directionAngle = 0;
-	public float Wander( Transform transform, float rate, float strength, float directionAccuracy )
-	{
-		Vector3 circleCenter = transform.position + transform.forward * Mathf.Sqrt(2) * strength;
+				// Draw steer direction
+				Debug.DrawRay( transform.position, projection.normalized, Color.blue );
+				
+				// Return steer direction
+				return Vector3.Dot( transform.right, projection.normalized );
+			}
 
-		// Change wander direction
-		// if( Time.frameCount%3 == 0 )
-			directionAngle += Random.Range( -rate, rate );
-
-		// Find location to steer towards
-		Vector3 directionVector = transform.forward * strength;
-		directionVector = Quaternion.Euler(0, directionAngle, 0) * directionVector;
-
-		// DEBUG
-		// MyDraw.DrawCircle( circleCenter, 1, Color.black );
-		MyDraw.DrawCircle( circleCenter, strength, Color.white * 0.6f );
-		Debug.DrawRay( circleCenter, directionVector, Color.white * 0.6f );
-		
-		if( Time.frameCount%10 == 0 ){
-			// Steer towards wander location
-			return SteerToTarget( transform, circleCenter + directionVector, directionAccuracy );
-		}
-		else{
+			// Don't steer
 			return 0;
+		}
+
+		private float directionAngle = 0;
+		public float Wander( Transform transform )
+		{
+			Vector3 circleCenter = transform.position + transform.forward * Mathf.Sqrt(2) * strength;
+
+			// Change wander direction
+			// if( Time.frameCount%3 == 0 )
+				directionAngle += Random.Range( -rate, rate );
+
+			// Find location to steer towards
+			Vector3 directionVector = transform.forward * strength;
+			directionVector = Quaternion.Euler(0, directionAngle, 0) * directionVector;
+
+			// DEBUG
+			// MyDraw.DrawCircle( circleCenter, 1, Color.black );
+			MyDraw.DrawCircle( circleCenter, strength, Color.white * 0.6f );
+			Debug.DrawRay( circleCenter, directionVector, Color.white * 0.6f );
+			
+			if( Time.frameCount%10 == 0 ){
+				// Steer towards wander location
+				return SteerToTarget( transform, circleCenter + directionVector );
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 }
