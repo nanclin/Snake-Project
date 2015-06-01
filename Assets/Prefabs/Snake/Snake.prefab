@@ -299,30 +299,30 @@ MonoBehaviour:
     bondStrength: 1
     lengthOnBorn: 2
   handling:
-    controlMode: 0
+    controlMode: 2
     maxSpeed: .0799999982
     acceleration: .00999999978
     rotationSpeed: 3
     inputSensitivity: 5
   snakeAI:
-    steerMode: 4
+    steerMode: 5
+    numOfRays: 1
+    visionDistance: 3
+    visionAngle: 10
     directionAccuracy: 10
     rate: .5
     strength: .5
-    fanEffect: .5
+    fanEffect: 0
     checkpoints:
     - {fileID: 0}
     - {fileID: 0}
     layerMask:
       serializedVersion: 2
-      m_Bits: 0
+      m_Bits: 256
   body: {fileID: 0}
   respawnPoint: {fileID: 0}
   spline: {fileID: 0}
   hole: {fileID: 0}
-  dis: 3
-  angle: 20
-  num: 1
 --- !u!114 &11462130
 MonoBehaviour:
   m_ObjectHideFlags: 1

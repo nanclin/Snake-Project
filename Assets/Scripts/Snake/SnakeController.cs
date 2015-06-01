@@ -591,12 +591,8 @@ public class SnakeController : Initializer {
 	}
 
 
-	[HideInInspector] public float dis = 10;
-	[HideInInspector] public float angle = 45;
-	[HideInInspector] public int num = 1;
-
-	private Vector3[] corners;
 	private int currentID = 0;
+	private Vector3[] corners;
 	private Vector3 currentTarget;
 
 	private void GeneratePath( Vector3 targetLocation, bool random = false )
@@ -632,40 +628,40 @@ public class SnakeController : Initializer {
 				prevCorner = corner;
 			}
 		}
-		// // Draw angle accuracy lines
-		// Debug.DrawRay( transform.position, Quaternion.Euler(0, directionAccuracy, 0) * transform.forward * 100, Color.blue * 0.2f );
-		// Debug.DrawRay( transform.position, Quaternion.Euler(0, -directionAccuracy, 0) * transform.forward * 100, Color.blue * 0.2f );
+		// Draw angle accuracy lines
+		Debug.DrawRay( transform.position, Quaternion.Euler(0, snakeAI.directionAccuracy, 0) * transform.forward * 100, Color.blue * 0.2f );
+		Debug.DrawRay( transform.position, Quaternion.Euler(0, -snakeAI.directionAccuracy, 0) * transform.forward * 100, Color.blue * 0.2f );
 
 		float inputAI = 0;
 
 	// AVOID WITH RAYS VISION ///////////////////////////////////////////////////////////////
 		
-		float angleDyanmic = angle * ( ( Mathf.Lerp( 1, Mathf.Abs(smoothInputHorizontal), snakeAI.fanEffect ) ) );
+		float angleDyanmic = snakeAI.visionAngle * ( ( Mathf.Lerp( 1, Mathf.Abs(smoothInputHorizontal), snakeAI.fanEffect ) ) );
 
 		float wallAvoidanceInput = 0;
 		bool breakLoop = false;
-		float partAngle = (angleDyanmic*2 / (num*2) );
-		for( int i = 0; i < num * 2 + 1; i++ )
+		float partAngle = (angleDyanmic*2 / (snakeAI.numOfRays*2) );
+		for( int i = 0; i < snakeAI.numOfRays * 2 + 1; i++ )
 		{
 			Vector3 vector = Quaternion.AngleAxis( angleDyanmic - partAngle * i, Vector3.up ) * transform.forward;
 			Ray ray = new Ray( transform.position, vector );
 
 			RaycastHit hit;
-			if( Physics.Raycast( ray, out hit, dis, snakeAI.layerMask ) )
+			if( Physics.Raycast( ray, out hit, snakeAI.visionDistance, snakeAI.layerMask ) )
 			{
-				if( i < num ){
+				if( i < snakeAI.numOfRays ){
 					if( !breakLoop ) wallAvoidanceInput = -1;
 				}
 				else{
 					if( !breakLoop ) wallAvoidanceInput = 1;
 				}
-				Debug.DrawRay( ray.origin, ray.direction * dis, Color.red );
+				Debug.DrawRay( ray.origin, ray.direction * snakeAI.visionDistance, Color.red );
 
 				breakLoop = true;
 			}
 			else{
 				if( !breakLoop ) wallAvoidanceInput = 0;
-				Debug.DrawRay( ray.origin, ray.direction * dis, Color.red/3 );
+				Debug.DrawRay( ray.origin, ray.direction * snakeAI.visionDistance, Color.red/3 );
 			}
 		}
 
@@ -699,7 +695,7 @@ public class SnakeController : Initializer {
 				break;
 
 			case SteerMode.Pathfinding:
-				if( corners.Length == 0 )
+				if( corners == null )
 					GeneratePath( Vector3.zero, true );
 
 				Vector3 currentCorner = corners[ currentID ];
@@ -841,20 +837,34 @@ public class SnakeController : Initializer {
 	// }
 //////////////////////////////////////////////////////////// EO RAYCASTING //
 
+// SNAKE AI ///////////////////////////////////////////////////////////////
 	[System.Serializable]
 	public class SnakeAI
 	{
+		// Steering AI
 		public SteerMode steerMode = SteerMode.Checkpoint;
-
 		[Range( 0, 90 )] public float directionAccuracy = 10;
+		
+		// Avoindance settings
+		[Range( 0, 5 )] public int numOfRays = 1;
+		[Range( 0, 100 )] public float visionDistance = 5;
+		[Range( 0, 90 )] public float visionAngle = 20;
+		[Range( 0, 1 )] public float fanEffect = 0.5f;
+		
+		// Wander mode settings
 		[Range( 0, 90 )] public float rate = 0.5f;
 		[Range( 0, 5 )] public float strength = 0.5f;
-		[Range( 0, 1 )] public float fanEffect = 0.5f;
+		
+		// Chekpoints mode settings
 		public List<Transform> checkpoints = new List<Transform>();
 
+		// System
 		[HideInInspector] public LayerMask layerMask = 256;
 		public NavMeshPath path;
 
+		/**
+		 * SteerToTarget
+		 */
 		public float SteerToTarget( Transform transform, Vector3 target )
 		{
 			// Draw line to the selected target
@@ -878,6 +888,9 @@ public class SnakeController : Initializer {
 			return 0;
 		}
 
+		/**
+		 * Wander
+		 */
 		private float directionAngle = 0;
 		public float Wander( Transform transform )
 		{
@@ -905,4 +918,5 @@ public class SnakeController : Initializer {
 			}
 		}
 	}
+//////////////////////////////////////////////////////////// EO SNAKE AI //
 }
