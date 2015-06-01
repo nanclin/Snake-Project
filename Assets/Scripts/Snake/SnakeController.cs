@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SnakeController : MonoBehaviour {
+[RequireComponent(typeof(SnakeBody))]
+public class SnakeController : Initializer {
 
 	public static List<SnakeController> POOL = new List<SnakeController>();
 
@@ -19,7 +20,6 @@ public class SnakeController : MonoBehaviour {
 	
 	public enum SteerMode{ Debug, PC, Android, AI }
 	public SteerMode steerMode = SteerMode.Debug;
-	public Transform spawnPoint;
 	public float buffer;
 	public float bondStrength;
 	public LayerMask layerMask;
@@ -29,10 +29,14 @@ public class SnakeController : MonoBehaviour {
 	// public GameManager gameManager;
 
 	// System
-	// public static enum SnakeState { Idle, Move, Shrink, OnRail, Die, Dead }
+	[HideInInspector] public Transform respawnPoint;
 	private SnakeState _state;
 	private float speed = 0;
 
+	override public void Init()
+	{
+
+	}
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 
@@ -52,6 +56,9 @@ public class SnakeController : MonoBehaviour {
 		body = GetComponent<SnakeBody>();
 
 		path = new NavMeshPath();
+
+		// Set respawn point
+		respawnPoint = transform;
 	}
 	
 	// Update is called once per frame
@@ -518,11 +525,11 @@ public class SnakeController : MonoBehaviour {
 	{
 		// Randomly position AI snakes
 		if( steerMode == SteerMode.AI ){
-			spawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
-			spawnPoint.Rotate( Vector3.up * Random.value * 360f );
+			respawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
+			respawnPoint.Rotate( Vector3.up * Random.value * 360f );
 		}
 		
-		body.Init( spawnPoint );
+		body.Init( respawnPoint );
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 

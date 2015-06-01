@@ -26,7 +26,6 @@ public class GameManager : MonoBehaviour {
 
 	// Components
 	public Transform cameraHolder;
-	[HideInInspector] public Transform snakeSpawnPoint;
 	[HideInInspector] public SnakeController snake;
 	[HideInInspector] public GameObject exit;
 
@@ -197,12 +196,10 @@ public class GameManager : MonoBehaviour {
 
 		// SET LEVEL REFERENCES ///////////////////////////////////////////////////////////////
 		snake = GameObject.FindWithTag("Player").GetComponent<SnakeController>();
-		snakeSpawnPoint = GameObject.FindWithTag("Respawn").transform;
 		exit = GameObject.FindWithTag("Exit");
 		if( exit != null )
 			exit.SetActive( false );
 		//////////////////////////////////////////////////////////// EO SET LEVEL REFERENCES //
-
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 

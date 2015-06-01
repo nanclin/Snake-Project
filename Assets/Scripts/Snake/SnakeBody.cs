@@ -27,7 +27,7 @@ public class SnakeBody : MonoBehaviour {
 
 		snakeController = GetComponent<SnakeController>();
 
-		// Init( spawnPoint.position );
+		Init( snakeController.respawnPoint );
 		
 		SetColor( snakeController.color );
 	}
