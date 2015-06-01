@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -16,6 +16,7 @@ public class SnakeController : MonoBehaviour {
 	// private float maxSpeed = 0.04f;
 	private float acceleration = 0.01f;
 	private float rotationSpeed = 3;
+	
 	public enum SteerMode{ Debug, PC, Android, AI }
 	public SteerMode steerMode = SteerMode.Debug;
 	public Transform spawnPoint;
@@ -24,8 +25,8 @@ public class SnakeController : MonoBehaviour {
 	public LayerMask layerMask;
 
 	// Components
-	public SnakeBody body;
-	public GameManager gameManager;
+	[HideInInspector] public SnakeBody body;
+	// public GameManager gameManager;
 
 	// System
 	// public static enum SnakeState { Idle, Move, Shrink, OnRail, Die, Dead }
@@ -64,7 +65,7 @@ public class SnakeController : MonoBehaviour {
 			case SteerMode.Debug:   DebugInput();   break;
 			case SteerMode.PC:      PCInput();      break;
 			case SteerMode.AI:      AIInput();      break;
-			case SteerMode.Android: AndroidInput(); break;	// It should be called in OnGUI() method, not in Update()
+			case SteerMode.Android: AndroidInput(); break;
 		}
 
 		// Debug keybidings
@@ -98,8 +99,6 @@ public class SnakeController : MonoBehaviour {
 
 	void OnTriggerEnter( Collider other )
 	{
-		print( "other: " + other );
-		// Debug.Break();
 		switch( other.tag )
 		{
 			case "Food":
@@ -117,7 +116,7 @@ public class SnakeController : MonoBehaviour {
 				GameManager.SCORE += 100;
 				GameManager.STARS++;
 				if( GameManager.STARS == 3 )
-					gameManager.OpenExit();
+					GameManager.INSTANCE.currentState = GameManager.GameState.OpenExit;
 				break;
 
 			case "Snake Cell":
@@ -172,7 +171,7 @@ public class SnakeController : MonoBehaviour {
 			{
 				// If current state is set,
 				// run exit state code
-				if( _state != null )
+				// if( _state != null )
 					ExitState( _state );
 
 				// Set new current state value
@@ -300,8 +299,7 @@ public class SnakeController : MonoBehaviour {
 		float boost = boostInput * 0.1f;
 		float boostRotation = Mathf.Max( 0, boostInput * 1 );
 
-		// Translate snake
-
+		// TRANSLATE SNAKE ///////////////////////////////////////////////////////////////
 		// Calculate position
 		float positionChange = speed;
 		transform.Translate( Vector3.forward * positionChange );
@@ -311,6 +309,7 @@ public class SnakeController : MonoBehaviour {
 		speed = Mathf.Max( speed, 0 );
 		// Store current positon point
 		body.skeleton.PrependJoint( transform.position );
+		//////////////////////////////////////////////////////////// EO TRANSLATE SNAKE //
 
 		// // Rotate and translate snakes head
 		transform.Rotate( Vector3.up * rotationInput * ( rotationSpeed + boostRotation ) );
@@ -322,7 +321,6 @@ public class SnakeController : MonoBehaviour {
 	private void MoveExitState()
 	{
 		DebugExit( "Move" );
-		// if( FSM_DEBUG ) print("FSM -> MoveExitState");
 	}
 // EO MOVE STATE //
 
@@ -403,7 +401,7 @@ public class SnakeController : MonoBehaviour {
 				currentState = SnakeState.Move;
 			else if( hole.type == HoleType.Exit ){
 				currentState = SnakeState.Idle;
-				gameManager.LevelFinished();
+				GameManager.INSTANCE.currentState = GameManager.GameState.LevelFinished;
 			}
 		}
 	}
@@ -426,7 +424,6 @@ public class SnakeController : MonoBehaviour {
 
 	private float shrinkNumberOfCells = 3;
 	private float shrinkCurrentNumberOfCells;
-	private float shrinkPosition;
 
 	private ChainNode head;
 	private ChainNode targetNode;
@@ -436,9 +433,7 @@ public class SnakeController : MonoBehaviour {
 	private void ShrinkEnterState()
 	{
 		DebugEnter( "Shrink" );
-		// Debug.Break();
 
-		shrinkPosition = 0;
 		shrinkCurrentNumberOfCells = shrinkNumberOfCells;
 		head = body.chain.head;
 
@@ -501,7 +496,8 @@ public class SnakeController : MonoBehaviour {
 		// currentState = SnakeState.Move;
 
 		if( steerMode != SteerMode.AI )
-			gameManager.GameOver();
+			// GameManager.INSTANCE.GameOver();
+			GameManager.INSTANCE.currentState = GameManager.GameState.GameOver;
 	}
 
 	private void DieExitState()
@@ -833,7 +829,7 @@ public class SnakeController : MonoBehaviour {
 //////////////////////////////////////////////////////////// EO RAYCASTING //
 }
 
-class SnakeAI : MonoBehaviour
+class SnakeAI
 {
 	public float SteerToTarget( Transform transform, Vector3 target, float directionAccuracy )
 	{

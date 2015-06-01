@@ -4,34 +4,13 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
-// // SINGLETON ///////////////////////////////////////////////////////////////
-// 	private static GameManager _instance;
-
-// 	public static GameManager Instance{
-// 		get
-// 		{
-// 			if( Instance == null )
-// 			{
-// 				_instance = Object.FindObjectOfType( typeof( GameManager ) ) as GameManager;
-
-// 				if (_instance == null)
-// 				{
-// 					GameObject go = new GameObject( "Game Manager" );
-// 					DontDestroyOnLoad( go );
-// 					_instance = go.AddComponent<GameManager>();
-// 				}
-// 			}
-// 			return _instance;
-// 		}
-// 	}
-// //////////////////////////////////////////////////////////// EO SINGLETON //
-
 	// Global
 	public static int ROUND_DECIMALS = 5;
 	public static int SCORE;
 	public static int STARS;
 	public static float TIME;
 	public static float START_TIME;
+	public static GameManager INSTANCE;
 
 	// Static
 	public static bool FSM_DEBUG = false;
@@ -54,6 +33,10 @@ public class GameManager : MonoBehaviour {
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 
+	void Awake()
+	{
+		INSTANCE = this;
+	}
 	// Use this for initialization
 	void Start ()
 	{
@@ -110,7 +93,7 @@ public class GameManager : MonoBehaviour {
 // FSM MACHINE METHODS ////////////////////////////////////////////////////////
 
 	// Set currentState to transition to new state
-	private GameState currentState
+	public GameState currentState
 	{
 		get { return _state; }
 		set {
@@ -119,7 +102,7 @@ public class GameManager : MonoBehaviour {
 			{
 				// If current state is set,
 				// run exit state code
-				if( _state != null )
+				// if( _state != null )
 					ExitState( _state );
 
 				// Set new current state value
@@ -291,10 +274,6 @@ public class GameManager : MonoBehaviour {
 	{
 		DebugExit( "GameOver" );
 	}
-	public void GameOver()
-	{
-		currentState = GameState.GameOver;
-	}
 // EO GAME OVER STATE //
 
 // OPEN EXIT STATE //
@@ -333,11 +312,6 @@ public class GameManager : MonoBehaviour {
 
 		snake.currentState = SnakeState.Move;
 	}
-	public void OpenExit()
-	{
-		// print("EXIT IS NOW OPEN!");
-		currentState = GameState.OpenExit;
-	}
 // EO OPEN EXIT STATE //
 
 // LEVEL FINISHED STATE //
@@ -357,10 +331,6 @@ public class GameManager : MonoBehaviour {
 	private void LevelFinishedExitState()
 	{
 		DebugExit( "LevelFinished" );
-	}
-	public void LevelFinished()
-	{
-		currentState = GameState.LevelFinished;
 	}
 // EO LEVEL FINISHED STATE //
 
