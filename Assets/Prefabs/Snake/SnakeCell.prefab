@@ -13,6 +13,7 @@ GameObject:
   - 54: {fileID: 5422298}
   - 23: {fileID: 2361144}
   - 114: {fileID: 11432910}
+  - 114: {fileID: 11422526}
   m_Layer: 8
   m_Name: SnakeCell
   m_TagString: Snake Cell
@@ -90,6 +91,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11422526
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 132030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7ca7774dadc74c72aca629fe6182ac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0, g: 0, b: 0, a: 0}
+  body: {fileID: 0}
 --- !u!114 &11432910
 MonoBehaviour:
   m_ObjectHideFlags: 1

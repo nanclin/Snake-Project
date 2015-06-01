@@ -114,6 +114,8 @@ public class SnakeController : Initializer {
 					body.Grow();
 					GameManager.SCORE++;
 				}
+				color = RandomColor.GetRandomColor();
+				body.SetColor( color );
 				break;
 
 			case "Coin":

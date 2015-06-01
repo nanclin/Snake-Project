@@ -40,14 +40,22 @@ public class Chain {
 		}
 		tail = newNode;
 
-		_count++;
 
 		// // Reposition newly added ChainNode
 		// if( tail.previous != null )
 		// 	MoveChain( tail.previous, 0 );
+		
+		if( _count > 0 ){
+			newNode.prefab.GetComponent<SnakeBodyCell>().OnCellDestroy += RemoveNode;
+		}
+
+
+		_count++;
 	}
 	public void RemoveNode( ChainNode node )
 	{
+		// Remove view
+		node.prefab.GetComponent<SnakeBodyCell>().OnCellDestroy -= RemoveNode;
 		GameObject.Destroy( node.prefab );
 
 		if( node != head && node != tail ){
@@ -140,7 +148,7 @@ public class Chain {
 		int i = 0;
 		while( node != null )
 		{
-			// trace += "Node " + i + "\n";
+			trace += "Node " + i + "\n";
 			// trace += "  value: " + node.value + "\n";
 			// trace += "  buffer: " + node.buffer + "\n";
 			// trace += "  bondStrength: " + node.bondStrength + "\n";
@@ -222,4 +230,10 @@ public class ChainNode
 
 	// 	}
 	// }
+	
+	
+	[SerializeField]
+	public SnakeBodyCell GetCellScript() {
+		return prefab.gameObject.GetComponent<SnakeBodyCell>();
+	}
 }

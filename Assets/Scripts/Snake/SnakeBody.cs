@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,27 +9,28 @@ public class SnakeBody : MonoBehaviour {
 	// public Transform marker;
 
 	// Components
-	// public Transform head;
+	[HideInInspector] public Transform head;
 	public Transform cellPrefab;
 	// public Transform spawnPoint;
 
 	// System
-	private SnakeController snakeController;
-	public SnakeSkeleton skeleton;
-	public Chain chain;
-	private List<GameObject> cellList = new List<GameObject>();
+	                  private SnakeController     snakeController;
+	                  public  SnakeSkeleton       skeleton;
+	                  public  Chain               chain;
+	                  private List<SnakeBodyCell> cellList = new List<SnakeBodyCell>();
+	[HideInInspector] public  SnakeBodyCell       tail;
 	// private List<Transform> cells = new List<Transform>();
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 
 		snakeController = GetComponent<SnakeController>();
 
 		Init( snakeController.respawnPoint );
 		
-		SetColor( snakeController.color );
+		head = snakeController.transform;
 	}
 	
 	// Update is called once per frame
@@ -43,14 +44,24 @@ public class SnakeBody : MonoBehaviour {
 	void OnGUI()
 	{
 		// GUI.Label( new Rect( 10, 10, Screen.width, Screen.height ), chain.ToString() );
+		
+		string debugString = "";
+		foreach( SnakeBodyCell cell in cellList ){
+			debugString += cell.isTail + " \n";
+		}
+		// GUI.Label( new Rect( 10, 10, Screen.width, Screen.height ), debugString );
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
-	public void Init( Transform spawnPoint, int size = 2 )
+	public void Init( Transform spawnPoint, int size = 1)
 	{
+		snakeController = GetComponent<SnakeController>();
+
 		// Remove old cells
-		while( chain != null && chain.head.next != null )
+		while( chain != null && chain.head.next != null ){
+			// print( "DestroyCell: " + 111 );
 			DestroyCell( chain.head.next );
+		}
 
 		// Initialize skeleton and chain
 		skeleton = new SnakeSkeleton();
@@ -69,28 +80,28 @@ public class SnakeBody : MonoBehaviour {
 		skeleton.AppendJoint( transform.position + transform.forward * -10 );
 
 		// Put head to the chain
-		chain.AddLast( new ChainNode( 0, 0.5f, this.gameObject, 1 ) );
+		chain.AddLast( new ChainNode( 0, snakeController.buffer, this.gameObject, 1 ) );
+
+		// Set Color of head
+		snakeController.GetComponent<Renderer>().material.color = snakeController.color;
 
 		// GROW INITIAL SNAKE CELLS ///////////////////////////////////////////////////////////////
 		for( int i = 0; i < size; i++ )
 		{
-			// Instantiate cell
-			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
+			SnakeBodyCell cell = InstantiateCell();
 
-			// Keep list of all body cells
-			cellList.Add( cell.gameObject );
-
-			float value = chain.tail.value;
 			// Add chain node for current cell
-			chain.AddLast( new ChainNode( value - snakeController.buffer * 2, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
+			ChainNode node = new ChainNode( chain.tail.value - snakeController.buffer * 2, snakeController.buffer, cell.gameObject, snakeController.bondStrength );
+			chain.AddLast( node );
+			cell.node = node;
 
 			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -(value - snakeController.buffer * 2) );
+			PutOnSkeleton( cell.transform, -(chain.tail.value - snakeController.buffer * 2) );
 		}
-		// Set color of cells
-		SetColor( snakeController.color );
 		//////////////////////////////////////////////////////////// EO GROW INITIAL SNAKE CELLS //
 	}
+
+
 
 // UPDATE BODY ///////////////////////////////////////////////////////////////
 
@@ -110,22 +121,11 @@ public class SnakeBody : MonoBehaviour {
 		{
 
 			float gap = currentNode.Gap;
-			float dis = currentNode.Distance;
 			
 			if( gap > 0 )
 				MoveChain( currentNode.next, gap );
 			else
 				MoveChain( currentNode.next, 0 );
-
-			// string trace = "";
-			// trace += "CURRENT NODE:\n";
-			// trace += "value: " + (float) Math.Round( currentNode.value, GameManager.ROUND_DECIMALS ) + "\n";
-			// trace += "\n NEXT NODE:\n";
-			// trace += "value: " + (float) Math.Round( currentNode.next.value, GameManager.ROUND_DECIMALS ) + "\n";
-			// trace += "\n RELATIONS:\n";
-			// trace += "dis: " + (float) Math.Round( dis, GameManager.ROUND_DECIMALS ) + "\n";
-			// trace += "gap: " + (float) Math.Round( gap, GameManager.ROUND_DECIMALS ) + "\n";
-			// Debug.Log( trace );
 		}
 
 		// Put prefabs on skeleton
@@ -195,26 +195,40 @@ public class SnakeBody : MonoBehaviour {
 
 // METHODS ///////////////////////////////////////////////////////////////
 
+	// Change color of the snake
 	public void SetColor( Color color )
 	{
-
 		// Set Color of head
 		snakeController.GetComponent<Renderer>().material.color = color;
 
-		for( int i = 0; i < cellList.Count; i++ )
-		{
-			// print( "cellList[i]: " + cellList[i] );
-			GameObject cell = cellList[i];
-			cell.GetComponent<Renderer>().material.color = color;
-		}
+		// Set color of body cells
+		foreach( SnakeBodyCell cell in cellList )
+			cell.SetColor( color );
 	}
 
-	public void DestroyCell( ChainNode cell )
+	public void DestroyCell( ChainNode node )
 	{
 		// Remove from list of all body cells
-		cellList.Remove( cell.prefab );
+		cellList.Remove( node.prefab.GetComponent<SnakeBodyCell>() );
 
-		chain.RemoveNode( cell );
+		chain.RemoveNode( node );
+
+		// if( node.prefab.gameObject.GetComponent<SnakeBodyCell>().isTail )
+			// tail.gameObject.GetComponent<Renderer>().material.color = snakeController.color;
+
+		// SnakeBodyCell cellScript = node.prefab.gameObject.GetComponent<SnakeBodyCell>();
+		SnakeBodyCell cellScriptPrevious = node.previous.GetCellScript();
+		// print( "cellScript: " + cellScript );
+		// print( "node.previous: " + node.previous );
+		// print( "cellScriptPrevious: " + cellScriptPrevious );
+
+		// if( cellScriptPrevious != null && cellScript.isTail != null && cellScriptPrevious.isTail != null ){
+		if( cellScriptPrevious != null ){
+			cellScriptPrevious.isTail = true;
+			cellScriptPrevious.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+		}
+		tail = cellScriptPrevious;
+
 	}
 
 	public void PutOnSkeleton( Transform prefab, float position )
@@ -228,13 +242,51 @@ public class SnakeBody : MonoBehaviour {
 	private float growTime;
 	private float growDelay = 0.5f;
 
+	private SnakeBodyCell InstantiateCell()
+	{
+		// Instantiate cell
+		SnakeBodyCell cell = (Instantiate( cellPrefab, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
+
+		// // Set color to new cell
+		cell.SetColor( snakeController.color );
+		cell.body = this;
+
+		// Set tail value
+		cell.isTail = true;
+		if( tail != null )
+			tail.GetComponent<SnakeBodyCell>().isTail = false;
+		tail = cell;
+
+		// // Keep list of all body cells
+		cellList.Add( cell );
+
+		return cell;
+	}
+
 	private void TryGrowing()
 	{
 		if( growQueue > 0 && Time.time >= growTime )
 		{
 			// INSTANTIATE SNAKE CELL ///////////////////////////////////////////////////////////////
 			// Instantiate cell
-			Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
+			// Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
+			SnakeBodyCell cell = (Instantiate( cellPrefab, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
+
+			// Keep list of all body cells
+			cellList.Add( cell );
+
+			// Set color to new cell
+			cell.SetColor( snakeController.color );
+			cell.body = this;
+
+			// // Set tail value
+			// cell.isTail = true;
+			// cell.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+			// if( tail != null ){
+			// 	tail.GetComponent<SnakeBodyCell>().isTail = false;
+			// 	tail.gameObject.GetComponent<Renderer>().material.color = snakeController.color;
+			// }
+			// tail = cell;
 
 			// Add chain node for current cell
 			chain.AddLast( new ChainNode( chain.tail.value, snakeController.buffer, cell.gameObject, snakeController.bondStrength ) );
@@ -242,11 +294,6 @@ public class SnakeBody : MonoBehaviour {
 			// Put cell on the skeleton
 			PutOnSkeleton( cell.transform, -chain.tail.value + zero );
 			//////////////////////////////////////////////////////////// EO INSTANTIATE SNAKE CELL //
-
-			// Keep list of all body cells
-			cellList.Add( cell.gameObject );
-
-			SetColor( snakeController.color );
 
 			growQueue--;
 
