@@ -35,7 +35,7 @@ public class SnakeBody : MonoBehaviour
 	{
 		// // Debug
 		// skeleton.Draw();
-		// chain.DrawChain( chain.head );
+		// chain.DrawChain( chain.first );
 	}
 
 	void OnGUI()
@@ -53,8 +53,8 @@ public class SnakeBody : MonoBehaviour
 	public void Init()
 	{
 		// Remove old cells
-		while( chain != null && chain.head.next != null )
-			DestroyCell( chain.head.next );
+		while( chain != null && chain.first.next != null )
+			DestroyCell( chain.first.next );
 
 		// Initialize skeleton and chain
 		_skeleton = new SnakeSkeleton();
@@ -84,12 +84,12 @@ public class SnakeBody : MonoBehaviour
 			SnakeBodyCell cell = InstantiateCell();
 
 			// Add chain node for current cell
-			ChainNode node = new ChainNode( chain.tail.value - snakeController.settings.buffer * 2, snakeController.settings.buffer, cell.gameObject, snakeController.settings.bondStrength );
+			ChainNode node = new ChainNode( chain.last.value - snakeController.settings.buffer * 2, snakeController.settings.buffer, cell.gameObject, snakeController.settings.bondStrength );
 			chain.AddLast( node );
 			cell.node = node;
 
 			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -(chain.tail.value - snakeController.settings.buffer * 2) - 1f );
+			PutOnSkeleton( cell.transform, -(chain.last.value - snakeController.settings.buffer * 2) - 1f );
 		}
 		//////////////////////////////////////////////////////////// EO GROW INITIAL SNAKE CELLS //
 	}
@@ -120,7 +120,7 @@ public class SnakeBody : MonoBehaviour
 		}
 
 		// Put prefabs on skeleton
-		if( currentNode != chain.head ){
+		if( currentNode != chain.first ){
 			PutOnSkeleton( currentNode.prefab.transform, zero - currentNode.value );
 		}
 	}
@@ -129,9 +129,9 @@ public class SnakeBody : MonoBehaviour
 	{
 		TryGrowing();
 
-		MoveChain( chain.head, moveBy );
+		MoveChain( chain.first, moveBy );
 
-		skeleton.TrimEnd( Mathf.Max( Mathf.Min( -(chain.tail.value - chain.head.value) + 1, skeleton.length ), 0 ) );
+		skeleton.TrimEnd( Mathf.Max( Mathf.Min( -(chain.last.value - chain.first.value) + 1, skeleton.length ), 0 ) );
 
 
 		// // Grow parts in realtime
@@ -139,7 +139,7 @@ public class SnakeBody : MonoBehaviour
 		// 	Grow();
 
 
-			// ChainNode node = chain.head;
+			// ChainNode node = chain.first;
 
 			// node.value += moveBy;
 
@@ -159,15 +159,15 @@ public class SnakeBody : MonoBehaviour
 		// string trace = "";
 
 		// int i = 0;
-		// ChainNode currentNode = chain.head.next;
+		// ChainNode currentNode = chain.first.next;
 
 		// while( currentNode != null && i < 100)
 		// {
 		// 	// Get and reposition currentCell
 		// 	Transform currentCell = cells[i];
-		// 	PutOnSkeleton( currentCell.gameObject, -currentNode.value + chain.head.value );
+		// 	PutOnSkeleton( currentCell.gameObject, -currentNode.value + chain.first.value );
 
-		// 		// trace += currentNode.value + " : " + chain.head.value + "\n";
+		// 		// trace += currentNode.value + " : " + chain.first.value + "\n";
 
 		// 	// Move to next node
 		// 	currentNode = currentNode.next;
@@ -175,8 +175,8 @@ public class SnakeBody : MonoBehaviour
 		// }
 		// 	// print( trace );
 
-		// 	// skeleton.TrimEnd( Mathf.Max( Mathf.Min( -(chain.tail.value - chain.head.value) + 1, skeleton.length ), 0 ) );
-		// // print( -(chain.tail.value - chain.head.value) );
+		// 	// skeleton.TrimEnd( Mathf.Max( Mathf.Min( -(chain.last.value - chain.first.value) + 1, skeleton.length ), 0 ) );
+		// // print( -(chain.last.value - chain.first.value) );
 
 
 	}
@@ -275,10 +275,10 @@ public class SnakeBody : MonoBehaviour
 			// tail = cell;
 
 			// Add chain node for current cell
-			chain.AddLast( new ChainNode( chain.tail.value, snakeController.settings.buffer, cell.gameObject, snakeController.settings.bondStrength ) );
+			chain.AddLast( new ChainNode( chain.last.value, snakeController.settings.buffer, cell.gameObject, snakeController.settings.bondStrength ) );
 
 			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -chain.tail.value + zero );
+			PutOnSkeleton( cell.transform, -chain.last.value + zero );
 			//////////////////////////////////////////////////////////// EO INSTANTIATE SNAKE CELL //
 
 			growQueue--;

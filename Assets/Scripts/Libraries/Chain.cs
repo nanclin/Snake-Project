@@ -8,8 +8,8 @@ public class Chain {
 	// Handling
 
 	// System
-	public ChainNode head;
-	public ChainNode tail;
+	public ChainNode first;
+	public ChainNode last;
 	private int _count = 0;
 
 	// private LinkedList<ChainNode> = new LinkedList<ChainNode>();
@@ -30,20 +30,20 @@ public class Chain {
 
 	public void AddLast( ChainNode newNode )
 	{
-		if( head == null )
-			head = newNode;
+		if( first == null )
+			first = newNode;
 		else
-			newNode.previous = tail;
+			newNode.previous = last;
 
-		if( tail != null ) {
-			tail.next = newNode;
+		if( last != null ) {
+			last.next = newNode;
 		}
-		tail = newNode;
+		last = newNode;
 
 
 		// // Reposition newly added ChainNode
-		// if( tail.previous != null )
-		// 	MoveChain( tail.previous, 0 );
+		// if( last.previous != null )
+		// 	MoveChain( last.previous, 0 );
 		
 		if( _count > 0 ){
 			newNode.prefab.GetComponent<SnakeBodyCell>().OnCellDestroy += RemoveNode;
@@ -58,17 +58,17 @@ public class Chain {
 		node.prefab.GetComponent<SnakeBodyCell>().OnCellDestroy -= RemoveNode;
 		GameObject.Destroy( node.prefab );
 
-		if( node != head && node != tail ){
+		if( node != first && node != last ){
 			node.previous.next = node.next;
 			node.next.previous = node.previous;
 		}
-		if( node == tail ){
+		if( node == last ){
 			if( node.previous != null)
-				tail = node.previous;
+				last = node.previous;
 			node.previous.next = null;
 		}
-		if( node == head ){
-			head = node.next;
+		if( node == first ){
+			first = node.next;
 			node.next.previous = null;
 		}
 
@@ -144,7 +144,7 @@ public class Chain {
 
 		trace += "count: " + _count + "\n";
 
-		ChainNode node = head;
+		ChainNode node = first;
 		int i = 0;
 		while( node != null )
 		{

@@ -151,12 +151,12 @@ public class SnakeController : Initializer {
 			case "Ground":
 			case "Wall":
 			case "Player":
-				bool otherIsNeck = other.gameObject == body.chain.head.next.prefab;
-				bool otherIsTail = other.gameObject == body.chain.tail.prefab;
+				bool otherIsNeck = other.gameObject == body.chain.first.next.prefab;
+				bool otherIsTail = other.gameObject == body.chain.last.prefab;
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
 				{
 					if( otherIsTail && body.chain.Count > 2 ){
-						body.DestroyCell( body.chain.tail );
+						body.DestroyCell( body.chain.last );
 						body.Grow();
 					}
 					else if( !otherIsNeck ){
@@ -464,7 +464,7 @@ public class SnakeController : Initializer {
 		DebugEnter( "Shrink" );
 
 		shrinkCurrentNumberOfCells = shrinkNumberOfCells;
-		head = body.chain.head;
+		head = body.chain.first;
 
 		// Get target node (node to which snake is going to be shrinked)
 		targetNode = head;
@@ -474,7 +474,7 @@ public class SnakeController : Initializer {
 
 		// If target node is the last node of the snake,
 		// this is last, dying shrink
-		dying = ( targetNode == body.chain.tail );
+		dying = ( targetNode == body.chain.last );
 	}
 
 	private void ShrinkState()
@@ -664,6 +664,7 @@ public class SnakeController : Initializer {
 				Debug.DrawRay( ray.origin, ray.direction * snakeAI.visionDistance, Color.red/3 );
 			}
 		}
+	//////////////////////////////////////////////////////////// EO AVOID WITH RAYS VISION //
 
 	// STEER ///////////////////////////////////////////////////////////////
 	
@@ -725,6 +726,8 @@ public class SnakeController : Initializer {
 			inputAI = wallAvoidanceInput;
 		// rotationInput = SmoothInputHorizontal( followCheckpointInput );
 		// rotationInput = SmoothInputHorizontal( snakeAI.SteerToTarget( transform, Item.GetClosest( transform.position ) ) );
+
+	//////////////////////////////////////////////////////////// EO STEER //
 
 		rotationInput = SmoothInputHorizontal( inputAI );
 	}
