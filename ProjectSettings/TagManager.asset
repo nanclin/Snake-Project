@@ -4,17 +4,17 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Ground
-  - Wall
-  - Exit
   - Item
-  - Food
+  - Wall
   - Hole
   - Star
   - Coin
+  - Food
   - Snake Cell
   - Button
+  - Ground
   - AI
+  - Exit
   layers:
   - Default
   - TransparentFX
