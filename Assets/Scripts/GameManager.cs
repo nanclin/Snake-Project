@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -15,12 +16,7 @@ public class GameManager : MonoBehaviour {
 	// Static
 	public static bool FSM_DEBUG = false;
 
-	// Debug
-	public Transform cameraHolder;
-
 	// System
-	public Transform snakeSpawnPoint;
-	public GameObject exit;
 	public enum GameState { Idle, NewGame, Run, GameOver, OpenExit, LevelFinished }
 	private GameState _state;
 	private float sw = Screen.width;
@@ -29,7 +25,10 @@ public class GameManager : MonoBehaviour {
 	private float bh = 100;
 
 	// Components
-	public SnakeController snake;
+	public Transform cameraHolder;
+	[HideInInspector] public Transform snakeSpawnPoint;
+	[HideInInspector] public SnakeController snake;
+	[HideInInspector] public GameObject exit;
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 
@@ -37,9 +36,12 @@ public class GameManager : MonoBehaviour {
 	{
 		INSTANCE = this;
 	}
+
 	// Use this for initialization
 	void Start ()
 	{
+		LoadLevel();
+
 		currentState = GameState.NewGame;
 		currentState = GameState.Run;
 	}
@@ -186,6 +188,23 @@ public class GameManager : MonoBehaviour {
 	private void DebugExit   ( string state ){ if( FSM_DEBUG ) print( "GAME: \t   ( \t" + state + "\t )-->"     	); }
 //////////////////////////////////////////////////////// EO FSM MACHINE METHODS //
 
+// OTHER METHODS ///////////////////////////////////////////////////////////////
+
+	private void LoadLevel()
+	{
+		// Load scene
+		// [code...]
+
+		// SET LEVEL REFERENCES ///////////////////////////////////////////////////////////////
+		snake = GameObject.FindWithTag("Player").GetComponent<SnakeController>();
+		snakeSpawnPoint = GameObject.FindWithTag("Respawn").transform;
+		exit = GameObject.FindWithTag("Exit");
+		if( exit != null )
+			exit.SetActive( false );
+		//////////////////////////////////////////////////////////// EO SET LEVEL REFERENCES //
+
+	}
+//////////////////////////////////////////////////////////// EO OTHER METHODS //
 
 // STATE METHODS ////////////////////////////////////////////////////////
 
@@ -297,12 +316,12 @@ public class GameManager : MonoBehaviour {
 
 
 		float timeElapsed = Time.time - openTime;
-		if( timeElapsed >= 5 )
+		if( timeElapsed >= 1 )
 			currentState = GameState.Run;
-		else if( timeElapsed >= 4 )
-			cameraHolder.GetComponent<FollowTarget>().target = snake.transform;
-		else if( timeElapsed >= 1 )
-			cameraHolder.GetComponent<FollowTarget>().target = exit.transform;
+		// else if( timeElapsed >= 4 )
+		// 	cameraHolder.GetComponent<FollowTarget>().target = snake.transform;
+		// else if( timeElapsed >= 1 )
+		// 	cameraHolder.GetComponent<FollowTarget>().target = exit.transform;
 
 	}
 

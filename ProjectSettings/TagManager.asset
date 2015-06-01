@@ -4,15 +4,16 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Item
+  - Ground
   - Wall
+  - Exit
+  - Item
+  - Food
   - Hole
   - Star
   - Coin
-  - Food
   - Snake Cell
   - Button
-  - Ground
   - AI
   layers:
   - Default
