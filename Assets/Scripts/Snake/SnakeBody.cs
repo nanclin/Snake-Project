@@ -27,6 +27,7 @@ public class SnakeBody : MonoBehaviour
 
 		// Get snake head body cell reference
 		_head = snakeController.GetComponent<SnakeBodyCell>();
+		cellList.Add( _head );
 	}
 
 	// Update is called once per frame
@@ -186,9 +187,6 @@ public class SnakeBody : MonoBehaviour
 	// Change color of the snake
 	public void SetColor( Color color )
 	{
-		// Set Color of head
-		snakeController.GetComponent<Renderer>().material.color = color;
-
 		// Set color of body cells
 		foreach( SnakeBodyCell cell in cellList )
 			cell.SetColor( color );
