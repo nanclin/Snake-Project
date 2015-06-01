@@ -66,6 +66,7 @@ GameObject:
   - 23: {fileID: 2341952}
   - 114: {fileID: 11439882}
   - 114: {fileID: 11499584}
+  - 114: {fileID: 11462130}
   - 135: {fileID: 13571150}
   - 54: {fileID: 5402770}
   m_Layer: 0
@@ -296,19 +297,22 @@ MonoBehaviour:
     randomSpawnPosition: 0
     buffer: .550000012
     bondStrength: 1
-    bornLength: 6
+    lengthOnBorn: 2
   handling:
-    steerMode: 0
+    controlMode: 0
     maxSpeed: .0799999982
     acceleration: .00999999978
     rotationSpeed: 3
     inputSensitivity: 5
   snakeAI:
-    steerType: 4
+    steerMode: 4
     directionAccuracy: 10
     rate: .5
     strength: .5
     fanEffect: .5
+    checkpoints:
+    - {fileID: 0}
+    - {fileID: 0}
     layerMask:
       serializedVersion: 2
       m_Bits: 0
@@ -319,12 +323,19 @@ MonoBehaviour:
   dis: 3
   angle: 20
   num: 1
-  points:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  corners: []
+--- !u!114 &11462130
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 151626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7ca7774dadc74c72aca629fe6182ac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0, g: 0, b: 0, a: 0}
+  body: {fileID: 0}
 --- !u!114 &11481934
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -350,9 +361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a4eff5549494e48b901c172c21599e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  head: {fileID: 0}
-  cellPrefab: {fileID: 426704, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
-  tail: {fileID: 0}
+  cellPrefab: {fileID: 11422526, guid: 4540be354775a445d990ff5fd7442ab2, type: 2}
   zero: 0
 --- !u!124 &12426868
 Behaviour:

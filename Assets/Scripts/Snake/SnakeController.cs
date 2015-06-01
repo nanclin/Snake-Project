@@ -12,7 +12,7 @@ public class SnakeController : Initializer {
 		public bool randomSpawnPosition = false;
 		[Range( 0, 1 )] public float buffer = 0.55f;
 		[Range( 0, 1 )] public float bondStrength = 1f;
-		[Range( 0, 10 )] public int bornLength = 3;
+		[Range( 0, 10 )] public int lengthOnBorn = 3;
 	}
 
 	[System.Serializable]
@@ -70,9 +70,14 @@ public class SnakeController : Initializer {
 		body = GetComponent<SnakeBody>();
 
 		snakeAI.path = new NavMeshPath();
+	}
 
+	void Start()
+	{
 		// Set respawn point
-		respawnPoint = transform;
+		respawnPoint = new GameObject("Spawn Point").transform;
+		respawnPoint.position = transform.position;
+		respawnPoint.rotation = transform.rotation;
 	}
 	
 	// Update is called once per frame
@@ -546,7 +551,7 @@ public class SnakeController : Initializer {
 			respawnPoint.Rotate( Vector3.up * Random.value * 360f );
 		}
 		
-		body.Init( respawnPoint, settings.bornLength );
+		body.Init();
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 
@@ -590,11 +595,9 @@ public class SnakeController : Initializer {
 	[HideInInspector] public float angle = 45;
 	[HideInInspector] public int num = 1;
 
-
-	[HideInInspector] public List<Transform> points = new List<Transform>();
-	[HideInInspector] public Vector3[] corners;
+	private Vector3[] corners;
 	private int currentID = 0;
-	Vector3 currentTarget;
+	private Vector3 currentTarget;
 
 	private void GeneratePath( Vector3 targetLocation, bool random = false )
 	{
@@ -686,10 +689,10 @@ public class SnakeController : Initializer {
 				break;
 
 			case SteerMode.Checkpoint:
-				Vector3 currentTarget = points[ currentID ].position;
+				Vector3 currentTarget = snakeAI.checkpoints[ currentID ].position;
 				float distance = (currentTarget - transform.position).magnitude;
 				if( distance < 3 ){
-					currentID = (currentID + 1) % points.Count;
+					currentID = (currentID + 1) % snakeAI.checkpoints.Count;
 				}
 
 				inputAI = snakeAI.SteerToTarget( transform, currentTarget );
@@ -730,6 +733,8 @@ public class SnakeController : Initializer {
 		rotationInput = SmoothInputHorizontal( inputAI );
 	}
 
+	private int leftInput = 0;
+	private int rightInput = 0;
 
 	private void PCInput ()
 	{
@@ -747,9 +752,6 @@ public class SnakeController : Initializer {
 
 	private bool boostEnabled = true;
 	private float boostTime = 0;
-
-	private int leftInput = 0;
-	private int rightInput = 0;
 
 	private void AndroidInput ()
 	{
@@ -848,8 +850,9 @@ public class SnakeController : Initializer {
 		[Range( 0, 90 )] public float rate = 0.5f;
 		[Range( 0, 5 )] public float strength = 0.5f;
 		[Range( 0, 1 )] public float fanEffect = 0.5f;
+		public List<Transform> checkpoints = new List<Transform>();
 
-		[HideInInspector] public LayerMask layerMask = 5;
+		[HideInInspector] public LayerMask layerMask = 256;
 		public NavMeshPath path;
 
 		public float SteerToTarget( Transform transform, Vector3 target )

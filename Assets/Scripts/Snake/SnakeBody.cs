@@ -3,36 +3,32 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SnakeBody : MonoBehaviour {
-
-	// Debug
-	// public Transform marker;
-
+[RequireComponent(typeof(SnakeController))]
+public class SnakeBody : MonoBehaviour
+{
 	// Components
-	[HideInInspector] public Transform head;
-	public Transform cellPrefab;
-	// public Transform spawnPoint;
+	public SnakeBodyCell cellPrefab;
 
 	// System
-	                  private SnakeController     snakeController;
-	                  public  SnakeSkeleton       skeleton;
-	                  public  Chain               chain;
-	                  private List<SnakeBodyCell> cellList = new List<SnakeBodyCell>();
-	[HideInInspector] public  SnakeBodyCell       tail;
-	// private List<Transform> cells = new List<Transform>();
+	private SnakeSkeleton _skeleton;
+	private Chain _chain;
+	private SnakeBodyCell _head;
+	private SnakeBodyCell _tail;
+	private SnakeController snakeController;
+	private List<SnakeBodyCell> cellList = new List<SnakeBodyCell>();
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 
 	// Use this for initialization
 	void Awake () {
 
+		// Get snake controller reference
 		snakeController = GetComponent<SnakeController>();
 
-		// Init( snakeController.respawnPoint, snakeController.settings.bornLength );
-		
-		head = snakeController.transform;
+		// Get snake head body cell reference
+		_head = snakeController.GetComponent<SnakeBodyCell>();
 	}
-	
+
 	// Update is called once per frame
 	void Update ()
 	{
@@ -53,27 +49,23 @@ public class SnakeBody : MonoBehaviour {
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
-	public void Init( Transform spawnPoint, int size )
+	public void Init()
 	{
-		snakeController = GetComponent<SnakeController>();
-
 		// Remove old cells
-		while( chain != null && chain.head.next != null ){
-			// print( "DestroyCell: " + 111 );
+		while( chain != null && chain.head.next != null )
 			DestroyCell( chain.head.next );
-		}
 
 		// Initialize skeleton and chain
-		skeleton = new SnakeSkeleton();
-		chain = new Chain();
+		_skeleton = new SnakeSkeleton();
+		_chain = new Chain();
 
 		growQueue = 0;
 
 		zero = 0;
 
 		// Reposition
-		transform.position = spawnPoint.position;
-		transform.rotation = spawnPoint.rotation;
+		transform.position = snakeController.respawnPoint.position;
+		transform.rotation = snakeController.respawnPoint.rotation;
 
 		// Create initial skeleton
 		skeleton.AppendJoint( transform.position + transform.forward * 0 );
@@ -83,10 +75,10 @@ public class SnakeBody : MonoBehaviour {
 		chain.AddLast( new ChainNode( 0, snakeController.settings.buffer, this.gameObject, 1 ) );
 
 		// Set Color of head
-		snakeController.GetComponent<Renderer>().material.color = snakeController.settings.color;
+		head.GetComponent<Renderer>().material.color = snakeController.settings.color;
 
 		// GROW INITIAL SNAKE CELLS ///////////////////////////////////////////////////////////////
-		for( int i = 0; i < size; i++ )
+		for( int i = 0; i < snakeController.settings.lengthOnBorn; i++ )
 		{
 			SnakeBodyCell cell = InstantiateCell();
 
@@ -96,12 +88,10 @@ public class SnakeBody : MonoBehaviour {
 			cell.node = node;
 
 			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -(chain.tail.value - snakeController.settings.buffer * 2) );
+			PutOnSkeleton( cell.transform, -(chain.tail.value - snakeController.settings.buffer * 2) - 1f );
 		}
 		//////////////////////////////////////////////////////////// EO GROW INITIAL SNAKE CELLS //
 	}
-
-
 
 // UPDATE BODY ///////////////////////////////////////////////////////////////
 
@@ -133,8 +123,6 @@ public class SnakeBody : MonoBehaviour {
 			PutOnSkeleton( currentNode.prefab.transform, zero - currentNode.value );
 		}
 	}
-
-	// public float temp = 0;
 
 	public void UpdateBody( float moveBy )
 	{
@@ -222,12 +210,12 @@ public class SnakeBody : MonoBehaviour {
 		// print( "node.previous: " + node.previous );
 		// print( "cellScriptPrevious: " + cellScriptPrevious );
 
-		// if( cellScriptPrevious != null && cellScript.isTail != null && cellScriptPrevious.isTail != null ){
-		if( cellScriptPrevious != null ){
-			cellScriptPrevious.isTail = true;
-			cellScriptPrevious.gameObject.GetComponent<Renderer>().material.color = Color.blue;
-		}
-		tail = cellScriptPrevious;
+		// // if( cellScriptPrevious != null && cellScript.isTail != null && cellScriptPrevious.isTail != null ){
+		// if( cellScriptPrevious != null ){
+		// 	cellScriptPrevious.isTail = true;
+		// 	cellScriptPrevious.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+		// }
+		// tail = cellScriptPrevious;
 
 	}
 
@@ -245,7 +233,7 @@ public class SnakeBody : MonoBehaviour {
 	private SnakeBodyCell InstantiateCell()
 	{
 		// Instantiate cell
-		SnakeBodyCell cell = (Instantiate( cellPrefab, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
+		SnakeBodyCell cell = (Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
 
 		// // Set color to new cell
 		cell.SetColor( snakeController.settings.color );
@@ -269,8 +257,8 @@ public class SnakeBody : MonoBehaviour {
 		{
 			// INSTANTIATE SNAKE CELL ///////////////////////////////////////////////////////////////
 			// Instantiate cell
-			// Transform cell = Instantiate( cellPrefab, Vector3.zero, Quaternion.identity) as Transform;
-			SnakeBodyCell cell = (Instantiate( cellPrefab, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
+			// Transform cell = Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity) as Transform;
+			SnakeBodyCell cell = (Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
 
 			// Keep list of all body cells
 			cellList.Add( cell );
@@ -310,4 +298,23 @@ public class SnakeBody : MonoBehaviour {
 		// growTime = Time.time + growDelay;
 	}
 //////////////////////////////////////////////////////////// EO METHODS //
+
+// GETTERS/SETTERS ///////////////////////////////////////////////////////////////
+
+	public SnakeSkeleton skeleton {
+		get{ return _skeleton; }
+	}
+
+	public Chain chain {
+		get{ return _chain; }
+	}
+
+	public SnakeBodyCell head {
+		get{ return _head; }
+	}
+
+	public SnakeBodyCell tail {
+		get{ return _tail; }
+	}
+//////////////////////////////////////////////////////////// EO GETTERS/SETTERS //
 }
