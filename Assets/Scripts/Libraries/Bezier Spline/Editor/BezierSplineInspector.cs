@@ -22,7 +22,7 @@ public class BezierSplineInspector : Editor
 	private bool ShowPositionHandles = false;
 	private bool ShowBaked = true;
 	private bool ShowOutgoingSpline = true;
-	private bool interpolateRotation = true;
+	// private bool interpolateRotation = true;
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
 

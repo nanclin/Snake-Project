@@ -721,9 +721,9 @@ public class SnakeController : MonoBehaviour {
 
 	private void PCInput ()
 	{
-		// Get input by mouse clicking left or right side of the screen
-		int leftInput = Input.GetMouseButton(0) && Input.mousePosition.x <= Screen.width / 2 ? -1 : 0;
-		int rightInput = Input.GetMouseButton(0) && Input.mousePosition.x > Screen.width / 2 ? 1 : 0;
+		// // Get input by mouse clicking left or right side of the screen
+		// int leftInput = Input.GetMouseButton(0) && Input.mousePosition.x <= Screen.width / 2 ? -1 : 0;
+		// int rightInput = Input.GetMouseButton(0) && Input.mousePosition.x > Screen.width / 2 ? 1 : 0;
 
 		// Apply input values
 		// rotationInput = SmoothInputHorizontal( leftInput + rightInput );	        // Mouse click control
