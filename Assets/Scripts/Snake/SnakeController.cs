@@ -14,6 +14,7 @@ public class SnakeController : Initializer {
 	// Handling
 	private float maxSpeed = 0.08f;
 	public Color color = Color.green;
+	public bool randomSpawnPosition;
 	// private float maxSpeed = 0.04f;
 	private float acceleration = 0.01f;
 	private float rotationSpeed = 3;
@@ -524,7 +525,7 @@ public class SnakeController : Initializer {
 	public void SpawnSnake()
 	{
 		// Randomly position AI snakes
-		if( steerMode == SteerMode.AI ){
+		if( randomSpawnPosition ){
 			respawnPoint.position = new Vector3( Random.Range( -50, 50 ), 0, Random.Range( -50, 50 ) );
 			respawnPoint.Rotate( Vector3.up * Random.value * 360f );
 		}
