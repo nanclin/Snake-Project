@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System;
+// using System;
 using System.Collections;
 
 public class RandomColor : MonoBehaviour {
@@ -35,6 +35,11 @@ public class RandomColor : MonoBehaviour {
 		byte g = byte.Parse(hex.Substring(2,2), System.Globalization.NumberStyles.HexNumber);
 		byte b = byte.Parse(hex.Substring(4,2), System.Globalization.NumberStyles.HexNumber);
 		return new Color32(r,g,b, 255);
+	}
+
+	public static Color GetRandomColor()
+	{
+		return new Vector4( Random.value, Random.value, Random.value, 1f );
 	}
 	
 }
