@@ -52,7 +52,7 @@ public class MyDraw
 		}
 	}
 
-	public static void DrawCircle(Vector3 center, float radius, Color color )
+	public static void DrawCircle( Vector3 centerPosition, float radius, Color color )
 	{
 		Vector3 prevPoint = Quaternion.Euler(0, 45, 0) * Vector3.forward;
 		prevPoint = prevPoint.normalized * radius;
@@ -62,7 +62,7 @@ public class MyDraw
 			Vector3 currentPoint = Quaternion.Euler(0, i + 45, 0) * Vector3.forward;
 			currentPoint = currentPoint.normalized * radius;
 			
-			Debug.DrawLine( center + prevPoint, center + currentPoint, color );
+			Debug.DrawLine( centerPosition + prevPoint, centerPosition + currentPoint, color );
 
 			prevPoint = currentPoint;
 		}
