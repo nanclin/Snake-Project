@@ -3,82 +3,81 @@ using System.Collections;
 
 public class SnakeBodyCell : MonoBehaviour {
 
-	public delegate void DestroyCell( ChainNode node );
-    public event DestroyCell OnCellDestroy;
+	private static int TOTAL = 0;
+	private string id;
+	private string[] alphabeth = new string[] {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 
+	// Settings
 	public Color color;
+	public float buffer = 0.55f;
+	public float bondStrength = 1f;
+
+	// System
 	private bool _isTail;
-	[HideInInspector] public SnakeBody body;
-	[HideInInspector] public ChainNode node;
+	private bool _isHead;
+	[HideInInspector] public SnakeBody2 body;
+	[HideInInspector] public float relPos = 0;
 
-	public void Init( bool isTail, SnakeBody body, ChainNode node )
+	public ChainNode node;	// REMOVE????
+
+// INIT ///////////////////////////////////////////////////////////////
+	public void Init( bool isTail, SnakeBody2 body )
 	{
-		this.node = node;
 	}
+//////////////////////////////////////////////////////////// EO INIT //
 
-	// void Update()
-	// {
-	// 	float dis = Vector3.Distance( body.head.position, transform.position );
-	// 	// print( "body.head.position: " + body.head.position );
-	// 	print( "dis: " + dis );
-	// }
-
-	void OnDrawGizmos()
-	{
-		if( isTail ){
-			MyDraw.DrawCircle( transform.position, 0.3f, Color.blue );
-		}
-	}
+// UNITY METHODS ///////////////////////////////////////////////////////////////
 
 	void Awake()
 	{
+		id = alphabeth[ TOTAL++ % alphabeth.Length ];
 	}
+
+	void OnDrawGizmos()
+	{
+		if( isHead ){
+			MyDraw.DrawCircle( transform.position, 0.3f, Color.blue );
+		}
+		if( isTail ){
+			MyDraw.DrawCircle( transform.position, 0.3f, Color.red );
+		}
+	}
+
+	void OnGUI()
+	{
+		Vector3 point = Camera.main.WorldToScreenPoint( transform.position );
+		GUI.Box( new Rect( point.x - 10, Screen.height - point.y - 10, 20, 20 ), id );
+	}
+//////////////////////////////////////////////////////////// EO UNITY METHODS //
+
+// OTHER METHODS ///////////////////////////////////////////////////////////////
 
 	public void Destroy()
 	{
-		// Manage tail reference
-		SnakeBodyCell previousCell = node.previous.prefab.GetComponent<SnakeBodyCell>();
-		if( isTail && previousCell != null )
-		{
-			previousCell.isTail = true;
-			// Color tail
-			previousCell.gameObject.GetComponent<Renderer>().material.color = Color.blue;
-		}
+		// Manage tail/head
 
 		// Destroy
-		OnCellDestroy( node );
 		Destroy( gameObject );
 	}
 
-	// public void SetTail( bool value )
-	// {
-	// 	if( value ){
-			
-	// 	}
-	// 	else{
-	// 		isTail = false;
-	// 	}
-	// }
-	public bool isTail {
-		get{
-			return _isTail;
+	public bool isHead {
+		get{ return _isHead; }
+		set{
+			_isHead = value;
+
+			if( isHead )
+			{
+			}
 		}
+	}
+
+	public bool isTail {
+		get{ return _isTail; }
 		set{
 			_isTail = value;
 
 			if( isTail )
 			{
-				// SnakeBodyCell previousCell = node.previous.GetCellScript();
-				// if( previousCell != null ){
-				// 	previousCell.gameObject.GetComponent<Renderer>().material.color = Color.white;
-				// 	gameObject.GetComponent<Renderer>().material.color = Color.blue;
-				// }
-
-			}
-
-			else if( !isTail )
-			{
-				gameObject.GetComponent<Renderer>().material.color = Color.white;
 			}
 		}
 	}
@@ -86,6 +85,15 @@ public class SnakeBodyCell : MonoBehaviour {
 	{
 		GetComponent<Renderer>().material.color = color;
 	}
+//////////////////////////////////////////////////////////// EO OTHER METHODS //
+
+// DEBUG ///////////////////////////////////////////////////////////////
+
+	override public string ToString()
+	{
+		return id;
+	}
+//////////////////////////////////////////////////////////// EO DEBUG //
 
 	// public SnakeBodyCell GetPrevious(){ return node.previous.prefab.gameObject.GetComponent<SnakeBodyCell>(); }
 	// public SnakeBodyCell GetNext(){ return node.next.prefab.gameObject.GetComponent<SnakeBodyCell>(); }

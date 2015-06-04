@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(SnakeBody))]
+[RequireComponent(typeof(SnakeBody2))]
 public class SnakeController : Initializer {
 
 	[System.Serializable]
@@ -41,7 +41,7 @@ public class SnakeController : Initializer {
 	public SnakeAI snakeAI = new SnakeAI();
 	
 	// Components
-	[HideInInspector] public SnakeBody body;
+	[HideInInspector] public SnakeBody2 body;
 
 	// System
 	[HideInInspector] public Transform respawnPoint;
@@ -67,7 +67,7 @@ public class SnakeController : Initializer {
 	void Awake ()
 	{
 		// Get body reference
-		body = GetComponent<SnakeBody>();
+		body = GetComponent<SnakeBody2>();
 
 		snakeAI.path = new NavMeshPath();
 	}
@@ -151,18 +151,31 @@ public class SnakeController : Initializer {
 			case "Ground":
 			case "Wall":
 			case "Player":
-				bool otherIsNeck = other.gameObject == body.chain.first.next.prefab;
-				bool otherIsTail = other.gameObject == body.chain.last.prefab;
-				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
-				{
-					if( otherIsTail && body.chain.Count > 2 ){
-						body.DestroyCell( body.chain.last );
-						body.Grow();
-					}
-					else if( !otherIsNeck ){
-						currentState = SnakeState.Shrink;
-					}
-				}
+				// if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
+				// {
+				// 	// bool otherIsNeck = other.gameObject == body.chain.first.next.prefab;
+
+				// 	SnakeBodyCell otherCell = other.GetComponent<SnakeBodyCell>();
+				// 	bool otherIsTail = otherCell.isTail;
+
+
+				// 	// print( "otherIsTail: " + otherIsTail );
+				// 	// Debug.Break();
+				// 	if( otherIsTail ){
+				// 		otherCell.body.DestroyCell( otherCell.node );
+				// 		// otherCell.body.DestroyCell( otherCell );
+
+				// 		body.Grow();
+				// 	}
+
+				// 	// if( otherIsTail && body.chain.Count > 2 ){
+				// 	// 	body.DestroyCell( body.chain.last );
+				// 	// 	body.Grow();
+				// 	// }
+				// 	// else if( !otherIsNeck ){
+				// 	// 	currentState = SnakeState.Shrink;
+				// 	// }
+				// }
 				break;
 
 			case "Hole":
@@ -482,27 +495,27 @@ public class SnakeController : Initializer {
 		DebugExecute( "Shrink" );
 
 
-		// Move head along skeleton - from head to tail
-		float dis = Mathf.Abs( targetNode.value - head.value );
-		body.MoveChain( head, -dis/5 );
-		// body.MoveChain( head, -Mathf.Max( 0.02f, dis/10 ) );
-		body.PutOnSkeleton( transform, body.zero - head.value );
+		// // Move head along skeleton - from head to tail
+		// float dis = Mathf.Abs( targetNode.value - head.value );
+		// body.MoveChain( head, -dis/5 );
+		// // body.MoveChain( head, -Mathf.Max( 0.02f, dis/10 ) );
+		// body.PutOnSkeleton( transform, body.zero - head.value );
 
-		// Destroy cells on snakeAI.path
-		if( head.next != null && head.Distance < 0.1f ){
-			body.DestroyCell( head.next );
-		}
+		// // Destroy cells on snakeAI.path
+		// if( head.next != null && head.Distance < 0.1f ){
+		// 	body.DestroyCell( head.next );
+		// }
 
-		// If arrived at target position,
-		// trim skeleton and reset zero value to heads value
-		if( dis < 0.1f )
-		{
-			body.skeleton.ShaveStart( body.zero - head.value );
-			body.zero = head.value;
+		// // If arrived at target position,
+		// // trim skeleton and reset zero value to heads value
+		// if( dis < 0.1f )
+		// {
+		// 	body.skeleton.ShaveStart( body.zero - head.value );
+		// 	body.zero = head.value;
 
-			// Switch state
-			currentState = dying ? SnakeState.Die : SnakeState.Move;
-		}
+		// 	// Switch state
+		// 	currentState = dying ? SnakeState.Die : SnakeState.Move;
+		// }
 	}
 
 	private void ShrinkExitState()
@@ -561,7 +574,8 @@ public class SnakeController : Initializer {
 	public int Size
 	{
 		get{
-			return body.chain.Count;
+			// return body.chain.Count;
+			return body.size;
 		}
 	}
 //////////////////////////////////////////////////////////// EO GETTERS/SETTERS //
@@ -584,10 +598,11 @@ public class SnakeController : Initializer {
 
 	private void DebugInput ()
 	{
-		// speed = 1.5f;
+		speed = 1f;
 
 		// rotationInput = 0;
-		boostInput = 0;
+		// boostInput = 0;
+		// speed = handling.maxSpeed = 0.1f;
 	}
 
 
