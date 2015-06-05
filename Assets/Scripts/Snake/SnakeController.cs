@@ -330,6 +330,9 @@ public class SnakeController : Initializer {
 	{
 		if( handling.controlMode == ControlMode.Android )
 			AndroidInputGUI();
+
+		if( GUI.Button( new Rect(200,0,100,20), "SHRINK" ) )
+			currentState = SnakeState.Shrink;
 	}
 
 	private float speed = 0;
@@ -464,11 +467,10 @@ public class SnakeController : Initializer {
 // SHRINK STATE //
 
 
-	private float shrinkNumberOfCells = 3;
-	private float shrinkCurrentNumberOfCells;
+	private int shrinkNumberOfCells = 2;
+	private int shrinkCurrentNumberOfCells;
 
-	private ChainNode head;
-	private ChainNode targetNode;
+	private SnakeBodyCell targetCell;
 
 	private bool dying;
 
@@ -477,45 +479,43 @@ public class SnakeController : Initializer {
 		DebugEnter( "Shrink" );
 
 		shrinkCurrentNumberOfCells = shrinkNumberOfCells;
-		head = body.chain.first;
 
 		// Get target node (node to which snake is going to be shrinked)
-		targetNode = head;
-		while( shrinkCurrentNumberOfCells-- > 0 && targetNode.next != null ){
-			targetNode = targetNode.next;
-		}
+		// targetCell = body.head;
+		// while( shrinkCurrentNumberOfCells-- > 0 && targetCell.next != null ){
+		// 	targetCell = targetCell.next;
+		// }
+		targetCell = body.cellList[ Mathf.Min( body.cellList.Count - 1, shrinkNumberOfCells ) ];
 
 		// If target node is the last node of the snake,
 		// this is last, dying shrink
-		dying = ( targetNode == body.chain.last );
+		dying = ( shrinkNumberOfCells >= body.cellList.Count );
 	}
 
 	private void ShrinkState()
 	{
 		DebugExecute( "Shrink" );
 
+		// Move head along skeleton (from head to tail)
+		float disToTarget = Mathf.Abs( targetCell.relPos - body.head.relPos );
+		body.UpdateBodyShrink( -( disToTarget / 5f ) );
 
-		// // Move head along skeleton - from head to tail
-		// float dis = Mathf.Abs( targetNode.value - head.value );
-		// body.MoveChain( head, -dis/5 );
-		// // body.MoveChain( head, -Mathf.Max( 0.02f, dis/10 ) );
-		// body.PutOnSkeleton( transform, body.zero - head.value );
+		// Destroy cells along skeleton
+		if( body.head.next != null && body.head.distanceToNext < 0.1f )
+			body.DestroyCell( body.head.next );
 
-		// // Destroy cells on snakeAI.path
-		// if( head.next != null && head.Distance < 0.1f ){
-		// 	body.DestroyCell( head.next );
-		// }
+		// If arrived at target position,
+		if( disToTarget < 0.1f )
+		{
+			// Trim skeleton
+			body.skeleton.ShaveStart( body.correction + targetCell.relPos );
 
-		// // If arrived at target position,
-		// // trim skeleton and reset zero value to heads value
-		// if( dis < 0.1f )
-		// {
-		// 	body.skeleton.ShaveStart( body.zero - head.value );
-		// 	body.zero = head.value;
+			// Reset correction to heads position
+			body.correction = -body.head.relPos;
 
-		// 	// Switch state
-		// 	currentState = dying ? SnakeState.Die : SnakeState.Move;
-		// }
+			// Switch state
+			currentState = dying ? SnakeState.Die : SnakeState.Move;
+		}
 	}
 
 	private void ShrinkExitState()

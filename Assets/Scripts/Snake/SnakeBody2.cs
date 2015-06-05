@@ -16,7 +16,7 @@ public class SnakeBody2 : MonoBehaviour
 	private SnakeSkeleton _skeleton;
 	private SnakeBodyCell _head;
 	private SnakeBodyCell _tail;
-	private List<SnakeBodyCell> cellList = new List<SnakeBodyCell>();
+	private List<SnakeBodyCell> _cellList = new List<SnakeBodyCell>();
 
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
@@ -28,6 +28,7 @@ public class SnakeBody2 : MonoBehaviour
 
 		// Get head cell reference
 		_head = GetComponent<SnakeBodyCell>();
+		_head.body = this;
 	}
 
 	void Update()
@@ -35,9 +36,9 @@ public class SnakeBody2 : MonoBehaviour
 		_skeleton.Draw();
 			
 		// CHAIN DEBUG ///////////////////////////////////////////////////////////////
-		for( int i = 0; i < cellList.Count; i++ )
+		for( int i = 0; i < _cellList.Count; i++ )
 		{
-			SnakeBodyCell cell = cellList[ i ];
+			SnakeBodyCell cell = _cellList[ i ];
 
 			float opacity = Mathf.Max( 1f - i/10f, 0.3f );
 
@@ -53,11 +54,10 @@ public class SnakeBody2 : MonoBehaviour
 
 	void OnGUI()
 	{
-		if( GUI.Button( new Rect(300,0,100,20), "GROW" ) ){
-			Grow();
-		}
+		// if( GUI.Button( new Rect(200,0,100,20), "GROW" ) )
+		// 	Grow();
 
-		GUI.Label( new Rect(0,0,Screen.width, Screen.height), ToString() );
+		// GUI.Label( new Rect(0,0,Screen.width, Screen.height), ToString() );
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
@@ -81,17 +81,14 @@ public class SnakeBody2 : MonoBehaviour
 		// SETUP INIT CELLS ///////////////////////////////////////////////////////////////
 		// 
 		// Add head cell to the list
-		cellList.Add( _head );
+		_cellList.Add( _head );
 
 		// Mark head cell as isHead
 		_head.isHead = true;
 
-		// Add initial cells to the list
+		// Instantiate cells
 		for( int i = 0; i < snakeController.settings.lengthOnBorn; i++ )
-		{
-			// Instantiate cell
-			SnakeBodyCell cell = InstantiateCell( true );
-		}
+			InstantiateCell( true );
 		//////////////////////////////////////////////////////////// EO SETUP INIT CELLS //
 	}
 //////////////////////////////////////////////////////////// EO INIT //
@@ -118,6 +115,8 @@ public class SnakeBody2 : MonoBehaviour
 
 		// Set color to new cell
 		cell.SetColor( snakeController.settings.color );
+
+		// Set body reference
 		cell.body = this;
 
 		// Set tail value
@@ -127,7 +126,7 @@ public class SnakeBody2 : MonoBehaviour
 		_tail = cell;
 
 		// Set value to last cells value, plus combined buffers
-		SnakeBodyCell prev = cellList[ cellList.Count - 1 ];
+		SnakeBodyCell prev = _cellList[ _cellList.Count - 1 ];
 		
 		// Decide where to spawn:
 		// behind the last cell, or under it
@@ -137,7 +136,7 @@ public class SnakeBody2 : MonoBehaviour
 		PutOnSkeleton( cell.transform, cell.relPos + correction );
 
 		// Keep list of all body cells
-		cellList.Add( cell );
+		_cellList.Add( cell );
 
 		// Return newly created cell
 		return cell;
@@ -149,9 +148,9 @@ public class SnakeBody2 : MonoBehaviour
 	public void UpdateBody( float positionChange )
 	{
 		// print("UPDATE");
-		for( int i = 0; i < cellList.Count; i++ )
+		for( int i = 0; i < _cellList.Count; i++ )
 		{
-			SnakeBodyCell cell = cellList[ i ];
+			SnakeBodyCell cell = _cellList[ i ];
 
 			// UPDATE VALUES ///////////////////////////////////////////////////////////////
 			if( cell.isHead )
@@ -165,18 +164,13 @@ public class SnakeBody2 : MonoBehaviour
 			else
 			{
 				// Get previous cell reference
-				SnakeBodyCell prev = cellList[ i - 1 ];
+				SnakeBodyCell prev = _cellList[ i - 1 ];
 				
 				// Distance between centers of cell and previous cell
 				float distance = -(prev.relPos - cell.relPos);
 
 				// Gap between edges of cell and previous cell
 				float gap = distance - cell.buffer - prev.buffer;
-
-				// print( "prev.relPos: " + prev.relPos );
-				// print( "cell.relPos: " + cell.relPos );
-				// print( "gap: " + gap );
-				// print( "zero: " + zero );
 
 				// Move cell forward towards skeleton beginning
 				// for gap distance and consider bond strength (0 to 1)
@@ -185,6 +179,44 @@ public class SnakeBody2 : MonoBehaviour
 				// Put cell on the skeleton to it's relative position with correction
 				PutOnSkeleton( cell.transform, cell.relPos + correction );
 			}
+			//////////////////////////////////////////////////////////// EO UPDATE VALUES //
+		}
+	}
+
+	/**
+	 * UpdateBodyShrink
+	 */
+	public void UpdateBodyShrink( float positionChange )
+	{
+		// print("UPDATE");
+		for( int i = 0; i < _cellList.Count; i++ )
+		{
+			SnakeBodyCell cell = _cellList[ i ];
+
+			// UPDATE VALUES ///////////////////////////////////////////////////////////////
+			if( cell.isHead )
+			{
+				// Move cell value towards skeleton beginning
+				cell.relPos -= positionChange;
+			}
+			else
+			{
+				// Get previous cell reference
+				SnakeBodyCell prev = _cellList[ i - 1 ];
+				
+				// Distance between centers of cell and previous cell
+				float distance = -(prev.relPos - cell.relPos);
+
+				// Gap between edges of cell and previous cell
+				float gap = distance - cell.buffer - prev.buffer;
+
+				// Move cell forward towards skeleton beginning
+				// for gap distance and consider bond strength (0 to 1)
+				cell.relPos -= Mathf.Max( 0, gap ) * cell.bondStrength;
+			}
+				
+			// Put cell on the skeleton to it's relative position with correction
+			PutOnSkeleton( cell.transform, cell.relPos + correction );
 			//////////////////////////////////////////////////////////// EO UPDATE VALUES //
 		}
 	}
@@ -207,7 +239,8 @@ public class SnakeBody2 : MonoBehaviour
 
 	public void DestroyCell( SnakeBodyCell cell )
 	{
-
+		cellList.Remove( cell );
+		Destroy( cell.gameObject );
 	}
 
 	public void SetColor( Color color )
@@ -231,7 +264,11 @@ public class SnakeBody2 : MonoBehaviour
 	}
 
 	public int size {
-		get{ return cellList.Count; }
+		get{ return _cellList.Count; }
+	}
+
+	public List<SnakeBodyCell> cellList {
+		get{ return _cellList; }
 	}
 //////////////////////////////////////////////////////////// EO GETTERS/SETTERS //
 
@@ -240,9 +277,9 @@ public class SnakeBody2 : MonoBehaviour
 	{
 		string trace = "";
 		trace += "correction: " + correction + "\n";
-		for( int i = 0; i < cellList.Count; i++ )
+		for( int i = 0; i < _cellList.Count; i++ )
 		{
-			trace += "cellList[" + i + "].relPos: " + cellList[i].relPos + "\n";
+			trace += "_cellList[" + i + "].relPos: " + _cellList[i].relPos + "\n";
 		}
 		return trace;
 	}

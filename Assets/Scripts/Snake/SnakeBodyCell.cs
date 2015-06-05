@@ -95,6 +95,36 @@ public class SnakeBodyCell : MonoBehaviour {
 	}
 //////////////////////////////////////////////////////////// EO DEBUG //
 
-	// public SnakeBodyCell GetPrevious(){ return node.previous.prefab.gameObject.GetComponent<SnakeBodyCell>(); }
-	// public SnakeBodyCell GetNext(){ return node.next.prefab.gameObject.GetComponent<SnakeBodyCell>(); }
+// GETTERS / SETTERS ///////////////////////////////////////////////////////////////
+
+	public SnakeBodyCell previous
+	{
+		get{
+			int prevId = body.cellList.IndexOf( this ) - 1;
+			return body.cellList[ prevId ];
+		}
+	}
+
+	public SnakeBodyCell next
+	{
+		get{
+			int nextId = body.cellList.IndexOf( this ) + 1;
+			return nextId >= body.cellList.Count ? null : body.cellList[ nextId ];
+		}
+	}
+
+	public float distanceToNext
+	{
+		get{
+			return Mathf.Abs( relPos - next.relPos );
+		}
+	}
+
+	public float gapToNext
+	{
+		get{
+			return Mathf.Abs( distanceToNext - buffer - next.buffer );
+		}
+	}
+//////////////////////////////////////////////////////////// EO GETTERS / SETTERS //
 }
