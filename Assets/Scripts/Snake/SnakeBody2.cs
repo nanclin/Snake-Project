@@ -8,7 +8,6 @@ public class SnakeBody2 : MonoBehaviour
 	// Components
 	public SnakeBodyCell cellPrefab;
 
-	public float correction = 0;
 	public Chain chain;	// REMOVE????
 
 	// System
@@ -17,6 +16,9 @@ public class SnakeBody2 : MonoBehaviour
 	private SnakeBodyCell _head;
 	private SnakeBodyCell _tail;
 	private List<SnakeBodyCell> _cellList = new List<SnakeBodyCell>();
+	[HideInInspector] public float correction = 0;
+	private int growQueue = 0;
+	private float growTime;
 
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
@@ -147,6 +149,9 @@ public class SnakeBody2 : MonoBehaviour
 	 */
 	public void UpdateBody( float positionChange )
 	{
+		// Check if any cell needs to be grown
+		CheckGrowing();
+
 		// print("UPDATE");
 		for( int i = 0; i < _cellList.Count; i++ )
 		{
@@ -238,7 +243,24 @@ public class SnakeBody2 : MonoBehaviour
 
 	public void Grow( int num = 1 )
 	{
-		InstantiateCell();
+		// Update grow queue
+		growQueue += num;
+	}
+
+	private void CheckGrowing()
+	{
+		// Check for grow conditions
+		if( growQueue > 0 && Time.time >= growTime )
+		{
+			// Instantiate cell
+			InstantiateCell();
+
+			// Update grow queue
+			growQueue--;
+
+			// Reset grow delay timer (wait before growing next cell)
+			growTime = Time.time + snakeController.settings.growDelay;
+		}
 	}
 
 	public void DestroyCell( SnakeBodyCell cell )
@@ -267,12 +289,12 @@ public class SnakeBody2 : MonoBehaviour
 		get{ return _tail; }
 	}
 
-	public int size {
-		get{ return _cellList.Count; }
-	}
-
 	public List<SnakeBodyCell> cellList {
 		get{ return _cellList; }
+	}
+
+	public int size {
+		get{ return _cellList.Count; }
 	}
 //////////////////////////////////////////////////////////// EO GETTERS/SETTERS //
 

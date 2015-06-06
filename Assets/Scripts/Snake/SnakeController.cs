@@ -13,6 +13,7 @@ public class SnakeController : Initializer {
 		[Range( 0, 1 )] public float buffer = 0.55f;
 		[Range( 0, 1 )] public float bondStrength = 1f;
 		[Range( 0, 10 )] public int lengthOnBorn = 3;
+		[Range( 0, 5 )] public float growDelay = 0.5f;
 	}
 
 	[System.Serializable]
