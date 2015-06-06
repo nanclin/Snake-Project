@@ -181,6 +181,10 @@ public class SnakeBody2 : MonoBehaviour
 			}
 			//////////////////////////////////////////////////////////// EO UPDATE VALUES //
 		}
+
+		// Trim exces part of the skeleton
+		float realSnakeLength = tail.relPos + correction;
+		skeleton.TrimEnd( Mathf.Max( Mathf.Min( realSnakeLength + 1, _skeleton.length ), 0 ) );
 	}
 
 	/**
