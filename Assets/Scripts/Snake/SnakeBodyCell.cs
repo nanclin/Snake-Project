@@ -39,14 +39,14 @@ public class SnakeBodyCell : MonoBehaviour {
 			MyDraw.DrawCircle( transform.position, 0.3f, Color.blue );
 		}
 		if( isTail ){
-			MyDraw.DrawCircle( transform.position, 0.3f, Color.red );
+			MyDraw.DrawCircle( transform.position, 0.2f, Color.yellow );
 		}
 	}
 
 	void OnGUI()
 	{
-		Vector3 point = Camera.main.WorldToScreenPoint( transform.position );
-		GUI.Box( new Rect( point.x - 10, Screen.height - point.y - 10, 20, 20 ), id );
+		// Vector3 point = Camera.main.WorldToScreenPoint( transform.position + Vector3.right );
+		// GUI.Box( new Rect( point.x - 10, Screen.height - point.y - 10, 20, 20 ), id );
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
@@ -56,10 +56,6 @@ public class SnakeBodyCell : MonoBehaviour {
 		get{ return _isHead; }
 		set{
 			_isHead = value;
-
-			if( isHead )
-			{
-			}
 		}
 	}
 
@@ -67,10 +63,6 @@ public class SnakeBodyCell : MonoBehaviour {
 		get{ return _isTail; }
 		set{
 			_isTail = value;
-
-			if( isTail )
-			{
-			}
 		}
 	}
 	public void SetColor( Color color )

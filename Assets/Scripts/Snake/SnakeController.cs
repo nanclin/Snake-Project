@@ -155,23 +155,22 @@ public class SnakeController : Initializer {
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
 				{
 					SnakeBodyCell otherCell = other.GetComponent<SnakeBodyCell>();
-					bool otherIsNeck = (GetComponent<SnakeBodyCell>() == otherCell.previous);
+					bool otherIsSelfNeck = (GetComponent<SnakeBodyCell>() == otherCell.previous);
 
-					if( otherCell.isTail && !otherIsNeck )
-					{
-						// Destroy hit tail
-						otherCell.body.DestroyCell( otherCell );
+					// Ignore collisions for neck cell
+					if( !otherIsSelfNeck ){
+						
+						// Eat any kind of tail - enemy tail or self tail
+						if( otherCell.isTail )
+						{
+							// Destroy hit tail
+							otherCell.body.DestroyCell( otherCell );
 
-						body.Grow();
+							body.Grow();
+						}
+						else
+							currentState = SnakeState.Shrink;
 					}
-
-					// if( otherIsTail && body.chain.Count > 2 ){
-					// 	body.DestroyCell( body.chain.last );
-					// 	body.Grow();
-					// }
-					// else if( !otherIsNeck ){
-					// 	currentState = SnakeState.Shrink;
-					// }
 				}
 				break;
 
@@ -464,7 +463,7 @@ public class SnakeController : Initializer {
 // SHRINK STATE //
 
 
-	private int shrinkNumberOfCells = 2;
+	private int shrinkNumberOfCells = 3;
 
 	private SnakeBodyCell targetCell;
 
