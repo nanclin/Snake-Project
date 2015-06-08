@@ -52,19 +52,6 @@ public class SnakeBodyCell : MonoBehaviour {
 
 // OTHER METHODS ///////////////////////////////////////////////////////////////
 
-	public bool isHead {
-		get{ return _isHead; }
-		set{
-			_isHead = value;
-		}
-	}
-
-	public bool isTail {
-		get{ return _isTail; }
-		set{
-			_isTail = value;
-		}
-	}
 	public void SetColor( Color color )
 	{
 		GetComponent<Renderer>().material.color = color;
@@ -80,6 +67,16 @@ public class SnakeBodyCell : MonoBehaviour {
 //////////////////////////////////////////////////////////// EO DEBUG //
 
 // GETTERS / SETTERS ///////////////////////////////////////////////////////////////
+
+	public bool isHead {
+		get{ return _isHead; }
+		set{ _isHead = value; }
+	}
+
+	public bool isTail {
+		get{ return _isTail; }
+		set{ _isTail = value; }
+	}
 
 	public SnakeBodyCell previous
 	{
