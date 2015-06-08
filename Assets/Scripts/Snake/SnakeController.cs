@@ -24,6 +24,7 @@ public class SnakeController : Initializer
 		[Range( 0, 0.01f )] public float acceleration = 0.01f;
 		[Range( 0, 90 )] public float rotationSpeed = 3;
 		[Range( 0, 10 )] public float inputSensitivity = 5f;
+		[Range( 0, 5 )] public float boostDuration = 1;
 	}
 
 
@@ -84,6 +85,7 @@ public class SnakeController : Initializer
 	// Update is called once per frame
 	void Update ()
 	{
+		// boostInput = Input.GetAxisRaw("Vertical");
 		// boostInput = Input.GetAxis("Vertical");
 
 		if( currentState != SnakeState.Die )
@@ -96,7 +98,7 @@ public class SnakeController : Initializer
 		}
 
 		// Debug keybidings
-		if( Input.GetKeyDown("space") )
+		if( Input.GetKeyDown("enter") )
 			body.Grow(1);
 
 		if( Input.GetKeyDown("backspace") )
@@ -354,26 +356,40 @@ public class SnakeController : Initializer
 	{
 		DebugExecute( "Move" );
 
+		// BOOST ///////////////////////////////////////////////////////////////
+		
+		boostOn = ( boostTime > Time.time );
+
+		// Fade boost value
+		int boostDir = boostOn ? 1 : 0;
+		smoothBoost = Mathf.Lerp( smoothBoost, boostDir, Time.deltaTime * 5 );
+		boostInput = smoothBoost;
+
 		// Set boost
 		float boost = boostInput * 0.1f;
 		float boostRotation = Mathf.Max( 0, boostInput * 1 );
+		//////////////////////////////////////////////////////////// EO BOOST //
+
 
 		// TRANSLATE SNAKE ///////////////////////////////////////////////////////////////
+		
 		// Calculate position
 		float positionChange = speed;
 		transform.Translate( Vector3.forward * positionChange );
+
 		// Calculate speed
 		speed += handling.acceleration;
 		speed = Mathf.Min( speed, handling.maxSpeed + boost );
 		speed = Mathf.Max( speed, 0 );
+
 		// Store current positon point
 		body.skeleton.PrependJoint( transform.position );
 		//////////////////////////////////////////////////////////// EO TRANSLATE SNAKE //
 
-		// // Rotate and translate snakes head
+		// Rotate and translate snakes head
 		transform.Rotate( Vector3.up * rotationInput * ( handling.rotationSpeed + boostRotation ) );
 
-		//
+		// Update body cells
 		body.UpdateBody( positionChange );
 	}
 
@@ -778,12 +794,21 @@ public class SnakeController : Initializer
 		// rotationInput = SmoothInputHorizontal( leftInput + rightInput );	        // Mouse click control
 		rotationInput = SmoothInputHorizontal( Input.GetAxisRaw( "Horizontal" ) );	// Smooth custom
 		// rotationInput = Input.GetAxis("Horizontal");		                        // Unity smooth
-		
-		// boostInput = Input.GetAxis("Vertical");
+
+		// Turn boost on
+		if( Input.GetKeyDown("space") )
+			TrunBoostOn();
 	}
 
-	private bool boostEnabled = true;
+	private void TrunBoostOn()
+	{
+		if( !boostOn )
+			boostTime = Time.time + handling.boostDuration;
+	}
+
+	private bool boostOn = true;
 	private float boostTime = 0;
+	private float smoothBoost = 0;
 
 	private void AndroidInput ()
 	{
@@ -801,33 +826,15 @@ public class SnakeController : Initializer
 		rightInput = GUI.RepeatButton( new Rect( Screen.width - size - padding, Screen.height - size - padding, size, size), ">" ) ? 1 : 0;
 
 
-		// Boost
-		if( boostEnabled ){
-			// if( GUI.Button( new Rect( Screen.width/2 - size*2/2 + size + padding, Screen.height - size - padding, size*2, size), "BOOST" ) ){
-			if( GUI.Button( new Rect( Screen.width/2 - size*2/2, Screen.height - size - padding, size*2, size), "BOOST" ) ){
-				// Add x seconds to boostTime
-				boostTime = Mathf.Max( Time.time, boostTime ) + 1;
-				boostEnabled = false;
-			}
-		}
-		int boostDir = ( boostTime > Time.time ) ? 1 : 0;
-		if( boostDir > 0 )
-			boostInput = SmoothBoost( boostDir );
-		else
-			boostEnabled = true;
+		// Turn boost on
+		if( GUI.Button( new Rect( Screen.width/2 - size*2/2, Screen.height - size - padding, size*2, size), "BOOST" ) )
+			TrunBoostOn();
+
 
 		// // Grow
 		// if( GUI.Button( new Rect( Screen.width/2 - size*2/2 - size - padding, Screen.height - size - padding, size*2, size), "GROW" ) ){
 		// 	body.Grow();
 		// }
-	}
-
-	private float smoothBoost = 0;
-
-	private float SmoothBoost( float boost )
-	{
-		smoothBoost = Mathf.Lerp( smoothBoost, boost, Time.deltaTime * 5 );
-		return smoothBoost;
 	}
 //////////////////////////////////////////////////////// EO INPUTS //
 
