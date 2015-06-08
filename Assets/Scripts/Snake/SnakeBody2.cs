@@ -88,6 +88,12 @@ public class SnakeBody2 : MonoBehaviour
 		// Mark head cell as isHead
 		_head.isHead = true;
 
+		// Mark head cell as isTail
+		_head.isTail = true;
+
+		// Set tail reference
+		_tail = _head;
+
 		// Instantiate cells
 		for( int i = 0; i < snakeController.settings.lengthOnBorn; i++ )
 			InstantiateCell( true );
