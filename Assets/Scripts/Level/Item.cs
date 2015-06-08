@@ -53,7 +53,7 @@ public class Item : MonoBehaviour {
 	{
 		switch( other.tag )
 		{
-			case "Player":
+			case "Snake":
 				if( spawner )
 					spawner.DestroyItem( this );
 				else

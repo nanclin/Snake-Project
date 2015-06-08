@@ -15,6 +15,7 @@ TagManager:
   - Ground
   - AI
   - Exit
+  - Snake
   layers:
   - Default
   - TransparentFX
