@@ -271,7 +271,14 @@ public class SnakeBody2 : MonoBehaviour
 
 	public void DestroyCell( SnakeBodyCell cell )
 	{
+		// Manage tail
+		if( cell.isTail )
+			cell.previous.isTail = true;
+
+		// Remove from list
 		cellList.Remove( cell );
+
+		// Remove object
 		Destroy( cell.gameObject );
 	}
 

@@ -469,7 +469,6 @@ public class SnakeController : Initializer {
 
 
 	private int shrinkNumberOfCells = 2;
-	private int shrinkCurrentNumberOfCells;
 
 	private SnakeBodyCell targetCell;
 
@@ -479,13 +478,7 @@ public class SnakeController : Initializer {
 	{
 		DebugEnter( "Shrink" );
 
-		shrinkCurrentNumberOfCells = shrinkNumberOfCells;
-
-		// Get target node (node to which snake is going to be shrinked)
-		// targetCell = body.head;
-		// while( shrinkCurrentNumberOfCells-- > 0 && targetCell.next != null ){
-		// 	targetCell = targetCell.next;
-		// }
+		// Set reference to cell to which to srhink
 		targetCell = body.cellList[ Mathf.Min( body.cellList.Count - 1, shrinkNumberOfCells ) ];
 
 		// If target node is the last node of the snake,

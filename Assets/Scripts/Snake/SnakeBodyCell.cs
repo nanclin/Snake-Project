@@ -52,15 +52,6 @@ public class SnakeBodyCell : MonoBehaviour {
 
 // OTHER METHODS ///////////////////////////////////////////////////////////////
 
-	public void Destroy()
-	{
-		// Manage tail/head
-
-		// Destroy
-		// Destroy( gameObject );
-		print("SnakeBodyCell Destroy()");
-	}
-
 	public bool isHead {
 		get{ return _isHead; }
 		set{
