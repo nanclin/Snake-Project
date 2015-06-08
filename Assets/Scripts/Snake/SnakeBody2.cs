@@ -33,26 +33,26 @@ public class SnakeBody2 : MonoBehaviour
 		_head.body = this;
 	}
 
-	void Update()
-	{
-		_skeleton.Draw();
+	// void Update()
+	// {
+	// 	_skeleton.Draw();
 			
-		// CHAIN DEBUG ///////////////////////////////////////////////////////////////
-		for( int i = 0; i < _cellList.Count; i++ )
-		{
-			SnakeBodyCell cell = _cellList[ i ];
+	// 	// CHAIN DEBUG ///////////////////////////////////////////////////////////////
+	// 	for( int i = 0; i < _cellList.Count; i++ )
+	// 	{
+	// 		SnakeBodyCell cell = _cellList[ i ];
 
-			float opacity = Mathf.Max( 1f - i/10f, 0.3f );
+	// 		float opacity = Mathf.Max( 1f - i/10f, 0.3f );
 
-			// Draw non-corrected chain
-			MyDraw.DrawCircle( Vector3.right * cell.relPos, 0.5f, Color.white * opacity );
-			// Draw corrected chain
-			MyDraw.DrawCircle( Vector3.right * (cell.relPos + correction), 0.5f, Color.cyan * opacity );
-			// Draw correction value
-			Debug.DrawLine( Vector3.zero, -Vector3.right * correction, Color.cyan );
-		}
-		//////////////////////////////////////////////////////////// EO CHAIN DEBUG //
-	}
+	// 		// Draw non-corrected chain
+	// 		MyDraw.DrawCircle( Vector3.right * cell.relPos, 0.5f, Color.white * opacity );
+	// 		// Draw corrected chain
+	// 		MyDraw.DrawCircle( Vector3.right * (cell.relPos + correction), 0.5f, Color.cyan * opacity );
+	// 		// Draw correction value
+	// 		Debug.DrawLine( Vector3.zero, -Vector3.right * correction, Color.cyan );
+	// 	}
+	// 	//////////////////////////////////////////////////////////// EO CHAIN DEBUG //
+	// }
 
 	void OnGUI()
 	{
@@ -127,11 +127,13 @@ public class SnakeBody2 : MonoBehaviour
 		// Set body reference
 		cell.body = this;
 
-		// Set tail value
-		cell.isTail = true;
+		// Unset old tail
 		if( _tail != null )
 			_tail.isTail = false;
+
+		// Set new tail
 		_tail = cell;
+		_tail.isTail = true;
 
 		// Set value to last cells value, plus combined buffers
 		SnakeBodyCell prev = _cellList[ _cellList.Count - 1 ];
@@ -148,6 +150,24 @@ public class SnakeBody2 : MonoBehaviour
 
 		// Return newly created cell
 		return cell;
+	}
+
+	/**
+	 * 
+	 */
+	public void DestroyCell( SnakeBodyCell cell )
+	{
+		// Set new tail
+		if( cell.isTail ){
+			cell.previous.isTail = true;
+			_tail = cell.previous;
+		}
+
+		// Remove from list
+		cellList.Remove( cell );
+
+		// Remove object
+		Destroy( cell.gameObject );
 	}
 
 	/**
@@ -267,19 +287,6 @@ public class SnakeBody2 : MonoBehaviour
 			// Reset grow delay timer (wait before growing next cell)
 			growTime = Time.time + snakeController.settings.growDelay;
 		}
-	}
-
-	public void DestroyCell( SnakeBodyCell cell )
-	{
-		// Manage tail
-		if( cell.isTail )
-			cell.previous.isTail = true;
-
-		// Remove from list
-		cellList.Remove( cell );
-
-		// Remove object
-		Destroy( cell.gameObject );
 	}
 
 	public void SetColor( Color color )

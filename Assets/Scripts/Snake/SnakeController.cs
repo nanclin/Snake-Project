@@ -152,31 +152,27 @@ public class SnakeController : Initializer {
 			case "Ground":
 			case "Wall":
 			case "Player":
-				// if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
-				// {
-				// 	// bool otherIsNeck = other.gameObject == body.chain.first.next.prefab;
+				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
+				{
+					SnakeBodyCell otherCell = other.GetComponent<SnakeBodyCell>();
+					bool otherIsNeck = (GetComponent<SnakeBodyCell>() == otherCell.previous);
 
-				// 	SnakeBodyCell otherCell = other.GetComponent<SnakeBodyCell>();
-				// 	bool otherIsTail = otherCell.isTail;
+					if( otherCell.isTail && !otherIsNeck )
+					{
+						// Destroy hit tail
+						otherCell.body.DestroyCell( otherCell );
 
+						body.Grow();
+					}
 
-				// 	// print( "otherIsTail: " + otherIsTail );
-				// 	// Debug.Break();
-				// 	if( otherIsTail ){
-				// 		otherCell.body.DestroyCell( otherCell.node );
-				// 		// otherCell.body.DestroyCell( otherCell );
-
-				// 		body.Grow();
-				// 	}
-
-				// 	// if( otherIsTail && body.chain.Count > 2 ){
-				// 	// 	body.DestroyCell( body.chain.last );
-				// 	// 	body.Grow();
-				// 	// }
-				// 	// else if( !otherIsNeck ){
-				// 	// 	currentState = SnakeState.Shrink;
-				// 	// }
-				// }
+					// if( otherIsTail && body.chain.Count > 2 ){
+					// 	body.DestroyCell( body.chain.last );
+					// 	body.Grow();
+					// }
+					// else if( !otherIsNeck ){
+					// 	currentState = SnakeState.Shrink;
+					// }
+				}
 				break;
 
 			case "Hole":
@@ -617,6 +613,8 @@ public class SnakeController : Initializer {
 
 	private void AIInput ()
 	{
+		boostInput = 0;
+
 		if( Input.GetMouseButtonDown(0) )
 		{
 			// Get mouse position in world
