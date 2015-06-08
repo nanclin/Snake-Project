@@ -15,13 +15,11 @@ public class SnakeBodyCell : MonoBehaviour {
 	// System
 	private bool _isTail;
 	private bool _isHead;
-	[HideInInspector] public SnakeBody2 body;
+	[HideInInspector] public SnakeBody body;
 	[HideInInspector] public float relPos = 0;
 
-	public ChainNode node;	// REMOVE????
-
 // INIT ///////////////////////////////////////////////////////////////
-	public void Init( bool isTail, SnakeBody2 body )
+	public void Init( bool isTail, SnakeBody body )
 	{
 	}
 //////////////////////////////////////////////////////////// EO INIT //

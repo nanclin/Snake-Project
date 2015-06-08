@@ -2,9 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(SnakeBody2))]
-public class SnakeController : Initializer {
-
+[RequireComponent(typeof(SnakeBody))]
+public class SnakeController : Initializer
+{
 	[System.Serializable]
 	public class Settings
 	{
@@ -42,7 +42,7 @@ public class SnakeController : Initializer {
 	public SnakeAI snakeAI = new SnakeAI();
 	
 	// Components
-	[HideInInspector] public SnakeBody2 body;
+	[HideInInspector] public SnakeBody body;
 
 	// System
 	[HideInInspector] public Transform respawnPoint;
@@ -68,7 +68,7 @@ public class SnakeController : Initializer {
 	void Awake ()
 	{
 		// Get body reference
-		body = GetComponent<SnakeBody2>();
+		body = GetComponent<SnakeBody>();
 
 		snakeAI.path = new NavMeshPath();
 	}
@@ -585,7 +585,6 @@ public class SnakeController : Initializer {
 	public int Size
 	{
 		get{
-			// return body.chain.Count;
 			return body.size;
 		}
 	}

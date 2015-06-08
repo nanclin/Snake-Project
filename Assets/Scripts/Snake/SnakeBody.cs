@@ -1,310 +1,297 @@
 using UnityEngine;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(SnakeController))]
 public class SnakeBody : MonoBehaviour
 {
 	// Components
 	public SnakeBodyCell cellPrefab;
 
 	// System
+	private SnakeController snakeController;
 	private SnakeSkeleton _skeleton;
-	private Chain _chain;
 	private SnakeBodyCell _head;
 	private SnakeBodyCell _tail;
-	private SnakeController snakeController;
-	private List<SnakeBodyCell> cellList = new List<SnakeBodyCell>();
+	private List<SnakeBodyCell> _cellList = new List<SnakeBodyCell>();
+	[HideInInspector] public float correction = 0;
+	private int growQueue = 0;
+	private float growTime;
+
 
 // UNITY METHODS ///////////////////////////////////////////////////////////////
-
-	// Use this for initialization
-	void Awake () {
-
+	
+	void Awake()
+	{
 		// Get snake controller reference
 		snakeController = GetComponent<SnakeController>();
 
-		// Get snake head body cell reference
-		_head = snakeController.GetComponent<SnakeBodyCell>();
-		cellList.Add( _head );
+		// Get head cell reference
+		_head = GetComponent<SnakeBodyCell>();
+		_head.body = this;
 	}
 
-	// Update is called once per frame
-	void Update ()
-	{
-		// // Debug
-		// skeleton.Draw();
-		// chain.DrawChain( chain.first );
-	}
+	// void Update()
+	// {
+	// 	_skeleton.Draw();
+			
+	// 	// CHAIN DEBUG ///////////////////////////////////////////////////////////////
+	// 	for( int i = 0; i < _cellList.Count; i++ )
+	// 	{
+	// 		SnakeBodyCell cell = _cellList[ i ];
+
+	// 		float opacity = Mathf.Max( 1f - i/10f, 0.3f );
+
+	// 		// Draw non-corrected chain
+	// 		MyDraw.DrawCircle( Vector3.right * cell.relPos, 0.5f, Color.white * opacity );
+	// 		// Draw corrected chain
+	// 		MyDraw.DrawCircle( Vector3.right * (cell.relPos + correction), 0.5f, Color.cyan * opacity );
+	// 		// Draw correction value
+	// 		Debug.DrawLine( Vector3.zero, -Vector3.right * correction, Color.cyan );
+	// 	}
+	// 	//////////////////////////////////////////////////////////// EO CHAIN DEBUG //
+	// }
 
 	void OnGUI()
 	{
-		// GUI.Label( new Rect( 10, 10, Screen.width, Screen.height ), chain.ToString() );
-		
-		string debugString = "";
-		foreach( SnakeBodyCell cell in cellList ){
-			debugString += cell.isTail + " \n";
-		}
-		// GUI.Label( new Rect( 10, 10, Screen.width, Screen.height ), debugString );
+		// if( GUI.Button( new Rect(200,0,100,20), "GROW" ) )
+		// 	Grow();
+
+		// GUI.Label( new Rect(0,0,Screen.width, Screen.height), ToString() );
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
+// INIT ///////////////////////////////////////////////////////////////
+
 	public void Init()
 	{
-		// Remove old cells
-		while( chain != null && chain.first.next != null )
-			DestroyCell( chain.first.next );
-
-		// Initialize skeleton and chain
-		_skeleton = new SnakeSkeleton();
-		_chain = new Chain();
-
-		growQueue = 0;
-
-		zero = 0;
-
 		// Reposition
 		transform.position = snakeController.respawnPoint.position;
 		transform.rotation = snakeController.respawnPoint.rotation;
 
-		// Create initial skeleton
-		skeleton.AppendJoint( transform.position + transform.forward * 0 );
-		skeleton.AppendJoint( transform.position + transform.forward * -10 );
-
-		// Put head to the chain
-		chain.AddLast( new ChainNode( 0, snakeController.settings.buffer, this.gameObject, 1 ) );
-
 		// Set Color of head
-		head.GetComponent<Renderer>().material.color = snakeController.settings.color;
+		_head.GetComponent<Renderer>().material.color = snakeController.settings.color;
 
-		// GROW INITIAL SNAKE CELLS ///////////////////////////////////////////////////////////////
+		// Create initial skeleton
+		_skeleton = new SnakeSkeleton();
+		skeleton.AppendJoint( transform.position + transform.forward * 0 );
+		// skeleton.AppendJoint( transform.position + transform.forward * -snakeController.settings.lengthOnBorn * 1.1f );
+		skeleton.AppendJoint( transform.position + transform.forward * -15f );
+
+		// SETUP INIT CELLS ///////////////////////////////////////////////////////////////
+		// 
+		// Add head cell to the list
+		_cellList.Add( _head );
+
+		// Mark head cell as isHead
+		_head.isHead = true;
+
+		// Mark head cell as isTail
+		_head.isTail = true;
+
+		// Set tail reference
+		_tail = _head;
+
+		// Instantiate cells
 		for( int i = 0; i < snakeController.settings.lengthOnBorn; i++ )
-		{
-			SnakeBodyCell cell = InstantiateCell();
+			InstantiateCell( true );
+		//////////////////////////////////////////////////////////// EO SETUP INIT CELLS //
+	}
+//////////////////////////////////////////////////////////// EO INIT //
 
-			// Add chain node for current cell
-			ChainNode node = new ChainNode( chain.last.value - snakeController.settings.buffer * 2, snakeController.settings.buffer, cell.gameObject, snakeController.settings.bondStrength );
-			chain.AddLast( node );
-			cell.node = node;
+// OTHER METHODS ///////////////////////////////////////////////////////////////
 
-			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -(chain.last.value - snakeController.settings.buffer * 2) - 1f );
-		}
-		//////////////////////////////////////////////////////////// EO GROW INITIAL SNAKE CELLS //
+	/**
+	 * InstantiateCell
+	 */
+	public SnakeBodyCell InstantiateCell( bool fullyGrown = false )
+	{
+		// print("INSTANTIATE");
+		// Instantiate cell
+		SnakeBodyCell cell = (Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
+
+		// Set color to new cell
+		cell.SetColor( snakeController.settings.color );
+
+		// Set body reference
+		cell.body = this;
+
+		// Unset old tail
+		if( _tail != null )
+			_tail.isTail = false;
+
+		// Set new tail
+		_tail = cell;
+		_tail.isTail = true;
+
+		// Set value to last cells value, plus combined buffers
+		SnakeBodyCell prev = _cellList[ _cellList.Count - 1 ];
+		
+		// Decide where to spawn:
+		// behind the last cell, or under it
+		cell.relPos = fullyGrown ? prev.relPos + ( prev.buffer + cell.buffer ) : prev.relPos;
+
+		// Put cell on the skeleton to it's relative position with correction
+		PutOnSkeleton( cell.transform, cell.relPos + correction );
+
+		// Keep list of all body cells
+		_cellList.Add( cell );
+
+		// Return newly created cell
+		return cell;
 	}
 
-// UPDATE BODY ///////////////////////////////////////////////////////////////
-
-	[HideInInspector]
-	public float zero;
-
-	public void MoveChain( ChainNode currentNode, float moveBy )
+	/**
+	 * 
+	 */
+	public void DestroyCell( SnakeBodyCell cell )
 	{
-		// Update current nodes value
-		currentNode.value += moveBy * currentNode.bondStrength;
-		// Push zero
-		zero = Mathf.Max( zero, currentNode.value );
-		// Debug.DrawLine( Vector3.forward * 1f + Vector3.right * zero, Vector3.forward * -1f + Vector3.right * zero, Color.green );
+		// Set new tail
+		if( cell.isTail ){
+			try {
+				cell.previous.isTail = true;
+				_tail = cell.previous;
+			}
+			catch( System.ArgumentException e ){ print(e); }
+		}
 
-		// Continoue with the next ChainNode
-		if( currentNode.next != null )
+		// Remove from list
+		cellList.Remove( cell );
+
+		// Remove object
+		Destroy( cell.gameObject );
+	}
+
+	/**
+	 * UpdateBody
+	 */
+	public void UpdateBody( float positionChange )
+	{
+		// Check if any cell needs to be grown
+		CheckGrowing();
+
+		// print("UPDATE");
+		for( int i = 0; i < _cellList.Count; i++ )
 		{
+			SnakeBodyCell cell = _cellList[ i ];
 
-			float gap = currentNode.Gap;
-			
-			if( gap > 0 )
-				MoveChain( currentNode.next, gap );
+			// UPDATE VALUES ///////////////////////////////////////////////////////////////
+			if( cell.isHead )
+			{
+				// Move cell value towards skeleton beginning
+				cell.relPos -= positionChange;
+
+				// Update correction
+				correction += positionChange;
+			}
 			else
-				MoveChain( currentNode.next, 0 );
+			{
+				// Get previous cell reference
+				SnakeBodyCell prev = _cellList[ i - 1 ];
+				
+				// Distance between centers of cell and previous cell
+				float distance = -(prev.relPos - cell.relPos);
+
+				// Gap between edges of cell and previous cell
+				float gap = distance - cell.buffer - prev.buffer;
+
+				// Move cell forward towards skeleton beginning
+				// for gap distance and consider bond strength (0 to 1)
+				cell.relPos -= Mathf.Max( 0, gap ) * cell.bondStrength;
+
+				// Put cell on the skeleton to it's relative position with correction
+				PutOnSkeleton( cell.transform, cell.relPos + correction );
+			}
+			//////////////////////////////////////////////////////////// EO UPDATE VALUES //
 		}
 
-		// Put prefabs on skeleton
-		if( currentNode != chain.first ){
-			PutOnSkeleton( currentNode.prefab.transform, zero - currentNode.value );
-		}
+		// Trim exces part of the skeleton
+		float realSnakeLength = tail.relPos + correction;
+		skeleton.TrimEnd( Mathf.Max( Mathf.Min( realSnakeLength + 1, _skeleton.length ), 0 ) );
 	}
 
-	public void UpdateBody( float moveBy )
+	/**
+	 * UpdateBodyShrink
+	 */
+	public void UpdateBodyShrink( float positionChange )
 	{
-		TryGrowing();
+		// print("UPDATE");
+		for( int i = 0; i < _cellList.Count; i++ )
+		{
+			SnakeBodyCell cell = _cellList[ i ];
 
-		MoveChain( chain.first, moveBy );
+			// UPDATE VALUES ///////////////////////////////////////////////////////////////
+			if( cell.isHead )
+			{
+				// Move cell value towards skeleton beginning
+				cell.relPos -= positionChange;
+			}
+			else
+			{
+				// Get previous cell reference
+				SnakeBodyCell prev = _cellList[ i - 1 ];
+				
+				// Distance between centers of cell and previous cell
+				float distance = -(prev.relPos - cell.relPos);
 
-		skeleton.TrimEnd( Mathf.Max( Mathf.Min( -(chain.last.value - chain.first.value) + 1, skeleton.length ), 0 ) );
+				// Gap between edges of cell and previous cell
+				float gap = distance - cell.buffer - prev.buffer;
 
-
-		// // Grow parts in realtime
-		// if( Time.frameCount > 30 && Time.frameCount%30 == 0 && chain.Count < 5 )
-		// 	Grow();
-
-
-			// ChainNode node = chain.first;
-
-			// node.value += moveBy;
-
-			// while( node.next != null )
-			// {
-			// 	print( node.Gap );
-
-			// 	if( node.Gap > 0 )
-			// 		node.
-
-			// 	node = node.next;
-			// 	print( node );
-			// }
-
-
-
-		// string trace = "";
-
-		// int i = 0;
-		// ChainNode currentNode = chain.first.next;
-
-		// while( currentNode != null && i < 100)
-		// {
-		// 	// Get and reposition currentCell
-		// 	Transform currentCell = cells[i];
-		// 	PutOnSkeleton( currentCell.gameObject, -currentNode.value + chain.first.value );
-
-		// 		// trace += currentNode.value + " : " + chain.first.value + "\n";
-
-		// 	// Move to next node
-		// 	currentNode = currentNode.next;
-		// 	i++;
-		// }
-		// 	// print( trace );
-
-		// 	// skeleton.TrimEnd( Mathf.Max( Mathf.Min( -(chain.last.value - chain.first.value) + 1, skeleton.length ), 0 ) );
-		// // print( -(chain.last.value - chain.first.value) );
-
-
+				// Move cell forward towards skeleton beginning
+				// for gap distance and consider bond strength (0 to 1)
+				cell.relPos -= Mathf.Max( 0, gap ) * cell.bondStrength;
+			}
+				
+			// Put cell on the skeleton to it's relative position with correction
+			PutOnSkeleton( cell.transform, cell.relPos + correction );
+			//////////////////////////////////////////////////////////// EO UPDATE VALUES //
+		}
 	}
-//////////////////////////////////////////////////////////// EO UPDATE BODY //
 
-// METHODS ///////////////////////////////////////////////////////////////
+	// Put given cell on on cell along given value
+	public void PutOnSkeleton( Transform prefab, float distance )
+	{
+		// Get data where certain point on skeleton is absolute to world
+		SkeletonPointData point = skeleton.GetPointOnSkeleton( distance );
 
-	// Change color of the snake
+		// Apply data
+		prefab.position = point.position;
+		prefab.rotation = point.rotation;
+	}
+
+	public void Grow( int num = 1 )
+	{
+		// Update grow queue
+		growQueue += num;
+	}
+
+	private void CheckGrowing()
+	{
+		// Check for grow conditions
+		if( growQueue > 0 && Time.time >= growTime )
+		{
+			// Instantiate cell
+			InstantiateCell();
+
+			// Update grow queue
+			growQueue--;
+
+			// Reset grow delay timer (wait before growing next cell)
+			growTime = Time.time + snakeController.settings.growDelay;
+		}
+	}
+
 	public void SetColor( Color color )
 	{
 		// Set color of body cells
 		foreach( SnakeBodyCell cell in cellList )
 			cell.SetColor( color );
 	}
-
-	public void DestroyCell( ChainNode node )
-	{
-		// Remove from list of all body cells
-		cellList.Remove( node.prefab.GetComponent<SnakeBodyCell>() );
-
-		chain.RemoveNode( node );
-
-		// if( node.prefab.gameObject.GetComponent<SnakeBodyCell>().isTail )
-			// tail.gameObject.GetComponent<Renderer>().material.color = snakeController.settings.color;
-
-		// SnakeBodyCell cellScript = node.prefab.gameObject.GetComponent<SnakeBodyCell>();
-		SnakeBodyCell cellScriptPrevious = node.previous.GetCellScript();
-		// print( "cellScript: " + cellScript );
-		// print( "node.previous: " + node.previous );
-		// print( "cellScriptPrevious: " + cellScriptPrevious );
-
-		// // if( cellScriptPrevious != null && cellScript.isTail != null && cellScriptPrevious.isTail != null ){
-		// if( cellScriptPrevious != null ){
-		// 	cellScriptPrevious.isTail = true;
-		// 	cellScriptPrevious.gameObject.GetComponent<Renderer>().material.color = Color.blue;
-		// }
-		// tail = cellScriptPrevious;
-
-	}
-
-	public void PutOnSkeleton( Transform prefab, float position )
-	{
-		SkeletonPointData point = skeleton.GetPointOnSkeleton( position );
-		prefab.position = point.position;
-		prefab.rotation = point.rotation;
-	}
-
-	private int growQueue = 0;
-	private float growTime;
-	private float growDelay = 0.5f;
-
-	private SnakeBodyCell InstantiateCell()
-	{
-		// Instantiate cell
-		SnakeBodyCell cell = (Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
-
-		// // Set color to new cell
-		cell.SetColor( snakeController.settings.color );
-		cell.body = this;
-
-		// // Set tail value
-		// cell.isTail = true;
-		// if( tail != null )
-		// 	tail.GetComponent<SnakeBodyCell>().isTail = false;
-		// tail = cell;
-
-		// // Keep list of all body cells
-		cellList.Add( cell );
-
-		return cell;
-	}
-
-	private void TryGrowing()
-	{
-		if( growQueue > 0 && Time.time >= growTime )
-		{
-			// INSTANTIATE SNAKE CELL ///////////////////////////////////////////////////////////////
-			// Instantiate cell
-			// Transform cell = Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity) as Transform;
-			SnakeBodyCell cell = (Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
-
-			// Keep list of all body cells
-			cellList.Add( cell );
-
-			// Set color to new cell
-			cell.SetColor( snakeController.settings.color );
-			cell.body = this;
-
-			// // Set tail value
-			// cell.isTail = true;
-			// cell.gameObject.GetComponent<Renderer>().material.color = Color.blue;
-			// if( tail != null ){
-			// 	tail.GetComponent<SnakeBodyCell>().isTail = false;
-			// 	tail.gameObject.GetComponent<Renderer>().material.color = snakeController.settings.color;
-			// }
-			// tail = cell;
-
-			// Add chain node for current cell
-			chain.AddLast( new ChainNode( chain.last.value, snakeController.settings.buffer, cell.gameObject, snakeController.settings.bondStrength ) );
-
-			// Put cell on the skeleton
-			PutOnSkeleton( cell.transform, -chain.last.value + zero );
-			//////////////////////////////////////////////////////////// EO INSTANTIATE SNAKE CELL //
-
-			growQueue--;
-
-			// Reset grow delay timer (wait before growing next cell)
-			growTime = Time.time + growDelay;
-		}
-	}
-
-	public void Grow( int num = 1 )
-	{
-		growQueue += num;
-
-		// Wait before start growing
-		// growTime = Time.time + growDelay;
-	}
-//////////////////////////////////////////////////////////// EO METHODS //
+//////////////////////////////////////////////////////////// EO OTHER METHODS //
 
 // GETTERS/SETTERS ///////////////////////////////////////////////////////////////
 
 	public SnakeSkeleton skeleton {
 		get{ return _skeleton; }
-	}
-
-	public Chain chain {
-		get{ return _chain; }
 	}
 
 	public SnakeBodyCell head {
@@ -314,5 +301,26 @@ public class SnakeBody : MonoBehaviour
 	public SnakeBodyCell tail {
 		get{ return _tail; }
 	}
+
+	public List<SnakeBodyCell> cellList {
+		get{ return _cellList; }
+	}
+
+	public int size {
+		get{ return _cellList.Count; }
+	}
 //////////////////////////////////////////////////////////// EO GETTERS/SETTERS //
+
+// DEBUG ///////////////////////////////////////////////////////////////
+	override public string ToString()
+	{
+		string trace = "";
+		trace += "correction: " + correction + "\n";
+		for( int i = 0; i < _cellList.Count; i++ )
+		{
+			trace += "_cellList[" + i + "].relPos: " + _cellList[i].relPos + "\n";
+		}
+		return trace;
+	}
+//////////////////////////////////////////////////////////// EO DEBUG //
 }
