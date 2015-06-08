@@ -21,7 +21,7 @@ public class SnakeController : Initializer
 	{
 		public ControlMode controlMode = SnakeController.ControlMode.Debug;
 		[Range( 0, 1f )] public float maxSpeed = 0.08f;
-		[Range( 0, 0.1f )] public float acceleration = 0.01f;
+		[Range( 0, 0.01f )] public float acceleration = 0.01f;
 		[Range( 0, 90 )] public float rotationSpeed = 3;
 		[Range( 0, 10 )] public float inputSensitivity = 5f;
 	}
@@ -84,7 +84,7 @@ public class SnakeController : Initializer
 	// Update is called once per frame
 	void Update ()
 	{
-		boostInput = Input.GetAxis("Vertical");
+		// boostInput = Input.GetAxis("Vertical");
 
 		if( currentState != SnakeState.Die )
 		switch( handling.controlMode )
@@ -133,8 +133,8 @@ public class SnakeController : Initializer
 					body.Grow();
 					GameManager.SCORE++;
 				}
-				settings.color = RandomColor.GetRandomColor();
-				body.SetColor( settings.color );
+				// settings.color = RandomColor.GetRandomColor();
+				// body.SetColor( settings.color );
 				break;
 
 			case "Coin":
@@ -149,8 +149,6 @@ public class SnakeController : Initializer
 				break;
 
 			case "Snake Cell":
-			case "Ground":
-			case "Wall":
 			case "Snake":
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
 				{
@@ -187,6 +185,11 @@ public class SnakeController : Initializer
 						}
 					}
 				}
+				break;
+
+			case "Ground":
+			case "Wall":
+					currentState = SnakeState.Shrink;
 				break;
 
 			case "Hole":
@@ -488,6 +491,9 @@ public class SnakeController : Initializer
 	{
 		DebugEnter( "Shrink" );
 
+		// Reset speed
+		speed = 0;
+
 		// Set reference to cell to which to srhink
 		targetCell = body.cellList[ Mathf.Min( body.cellList.Count - 1, shrinkNumberOfCells ) ];
 
@@ -773,7 +779,7 @@ public class SnakeController : Initializer
 		rotationInput = SmoothInputHorizontal( Input.GetAxisRaw( "Horizontal" ) );	// Smooth custom
 		// rotationInput = Input.GetAxis("Horizontal");		                        // Unity smooth
 		
-		boostInput = Input.GetAxis("Vertical");
+		// boostInput = Input.GetAxis("Vertical");
 	}
 
 	private bool boostEnabled = true;
