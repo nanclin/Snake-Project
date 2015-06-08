@@ -284,7 +284,9 @@ public class SnakeBody2 : MonoBehaviour
 
 	public void SetColor( Color color )
 	{
-
+		// Set color of body cells
+		foreach( SnakeBodyCell cell in cellList )
+			cell.SetColor( color );
 	}
 //////////////////////////////////////////////////////////// EO OTHER METHODS //
 
