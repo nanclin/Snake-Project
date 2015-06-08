@@ -28,8 +28,8 @@ public class CameraSystem : Initializer
 
 	void Awake()
 	{
-		player = GameObject.FindGameObjectWithTag( "Player" ).transform;
-		snake = GameObject.FindGameObjectWithTag( "Player" ).GetComponent<SnakeController>();
+		player = GameObject.Find( "Player Snake" ).transform;
+		snake = player.GetComponent<SnakeController>();
 		relCameraPos = transform.position - player.position;
 	}
 

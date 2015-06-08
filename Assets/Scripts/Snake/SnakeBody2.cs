@@ -159,8 +159,11 @@ public class SnakeBody2 : MonoBehaviour
 	{
 		// Set new tail
 		if( cell.isTail ){
-			cell.previous.isTail = true;
-			_tail = cell.previous;
+			try {
+				cell.previous.isTail = true;
+				_tail = cell.previous;
+			}
+			catch( System.ArgumentException e ){ print(e); }
 		}
 
 		// Remove from list

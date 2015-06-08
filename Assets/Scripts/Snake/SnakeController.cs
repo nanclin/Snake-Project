@@ -151,25 +151,40 @@ public class SnakeController : Initializer {
 			case "Snake Cell":
 			case "Ground":
 			case "Wall":
-			case "Player":
+			case "Snake":
 				if( currentState != SnakeState.Shrink && currentState != SnakeState.OnRail )
 				{
 					SnakeBodyCell otherCell = other.GetComponent<SnakeBodyCell>();
-					bool otherIsSelfNeck = (GetComponent<SnakeBodyCell>() == otherCell.previous);
+
+					bool otherIsSelfNeck = false;
+					try{ otherIsSelfNeck = (GetComponent<SnakeBodyCell>() == otherCell.previous); }
+					catch( System.ArgumentException e ){ print(e); }
 
 					// Ignore collisions for neck cell
-					if( !otherIsSelfNeck ){
-						
+					if( !otherIsSelfNeck )
+					{
 						// Eat any kind of tail - enemy tail or self tail
 						if( otherCell.isTail )
-						{
-							// Destroy hit tail
-							otherCell.body.DestroyCell( otherCell );
+						{	
+							// Both cells are one size long
+							if( otherCell.isHead && body.size == 1 ){
+								currentState = SnakeState.Shrink;
+							}
+							else{
+								// Destroy hit tail
+								otherCell.body.DestroyCell( otherCell );
 
-							body.Grow();
+								body.Grow();
+							}
+						}
+						else if( otherCell.isHead )
+						{
+							currentState = SnakeState.Shrink;
 						}
 						else
+						{
 							currentState = SnakeState.Shrink;
+						}
 					}
 				}
 				break;
@@ -526,9 +541,16 @@ public class SnakeController : Initializer {
 		// // Switch state
 		// currentState = SnakeState.Move;
 
-		if( handling.controlMode != ControlMode.AI )
-			// GameManager.INSTANCE.GameOver();
+		// If players' snake dies, it's game over
+		if( name == "Player Snake" ){
 			GameManager.INSTANCE.currentState = GameManager.GameState.GameOver;
+			currentState = SnakeState.Idle;
+		}
+		
+		// If any other snake dies, remove it from game
+		else{
+			Destroy( gameObject );
+		}
 	}
 
 	private void DieExitState()
