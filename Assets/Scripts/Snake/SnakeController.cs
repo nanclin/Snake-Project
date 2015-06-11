@@ -97,12 +97,13 @@ public class SnakeController : Initializer
 			case ControlMode.Android: AndroidInput(); break;
 		}
 
-		// Debug keybidings
-		if( Input.GetKeyDown("enter") )
-			body.Grow(1);
+		// DEBUG KEYBIDINGS ///////////////////////////////////////////////////////////////
 
 		if( Input.GetKeyDown("backspace") )
 			currentState = SnakeState.Shrink;
+
+		if( Input.GetKeyDown("1") )
+			body.Grow(1);
 
 		if( Input.GetKeyDown("5") )
 			body.Grow(5);
@@ -115,6 +116,7 @@ public class SnakeController : Initializer
 
 		if( Input.GetKeyDown("i") )
 			handling.controlMode = handling.controlMode == ControlMode.PC ? ControlMode.AI : ControlMode.PC;
+		//////////////////////////////////////////////////////////// EO DEBUG KEYBIDINGS //
 
 
 		// FadeObjectInFrontOfCamera();
@@ -347,8 +349,8 @@ public class SnakeController : Initializer
 		if( handling.controlMode == ControlMode.Android )
 			AndroidInputGUI();
 
-		if( GUI.Button( new Rect(200,0,100,20), "SHRINK" ) )
-			currentState = SnakeState.Shrink;
+		// if( GUI.Button( new Rect(200,0,100,20), "SHRINK" ) )
+		// 	currentState = SnakeState.Shrink;
 	}
 
 	private float speed = 0;
@@ -796,11 +798,16 @@ public class SnakeController : Initializer
 		// rotationInput = Input.GetAxis("Horizontal");		                        // Unity smooth
 
 		// Turn boost on
-		if( Input.GetKeyDown("space") )
-			TrunBoostOn();
+		if( Input.GetKeyDown("space") && !boostOn )
+		{
+			bool item = body.GetItem();
+			if( item != false ){
+				TurnBoostOn();
+			}
+		}
 	}
 
-	private void TrunBoostOn()
+	private void TurnBoostOn()
 	{
 		if( !boostOn )
 			boostTime = Time.time + handling.boostDuration;
@@ -828,7 +835,7 @@ public class SnakeController : Initializer
 
 		// Turn boost on
 		if( GUI.Button( new Rect( Screen.width/2 - size*2/2, Screen.height - size - padding, size*2, size), "BOOST" ) )
-			TrunBoostOn();
+			TurnBoostOn();
 
 
 		// // Grow

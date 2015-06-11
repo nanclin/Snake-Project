@@ -12,6 +12,8 @@ public class SnakeBody : MonoBehaviour
 	private SnakeSkeleton _skeleton;
 	private SnakeBodyCell _head;
 	private SnakeBodyCell _tail;
+	private SnakeBodyCell firstEmptyCell;
+	private SnakeBodyCell currentItemCell;
 	private List<SnakeBodyCell> _cellList = new List<SnakeBodyCell>();
 	[HideInInspector] public float correction = 0;
 	private int growQueue = 0;
@@ -30,33 +32,44 @@ public class SnakeBody : MonoBehaviour
 		_head.body = this;
 	}
 
-	// void Update()
-	// {
-	// 	_skeleton.Draw();
+	void Update()
+	{
+		// _skeleton.Draw();
 			
-	// 	// CHAIN DEBUG ///////////////////////////////////////////////////////////////
-	// 	for( int i = 0; i < _cellList.Count; i++ )
-	// 	{
-	// 		SnakeBodyCell cell = _cellList[ i ];
+		// // CHAIN DEBUG ///////////////////////////////////////////////////////////////
+		// for( int i = 0; i < _cellList.Count; i++ )
+		// {
+		// 	SnakeBodyCell cell = _cellList[ i ];
 
-	// 		float opacity = Mathf.Max( 1f - i/10f, 0.3f );
+		// 	float opacity = Mathf.Max( 1f - i/10f, 0.3f );
 
-	// 		// Draw non-corrected chain
-	// 		MyDraw.DrawCircle( Vector3.right * cell.relPos, 0.5f, Color.white * opacity );
-	// 		// Draw corrected chain
-	// 		MyDraw.DrawCircle( Vector3.right * (cell.relPos + correction), 0.5f, Color.cyan * opacity );
-	// 		// Draw correction value
-	// 		Debug.DrawLine( Vector3.zero, -Vector3.right * correction, Color.cyan );
-	// 	}
-	// 	//////////////////////////////////////////////////////////// EO CHAIN DEBUG //
-	// }
+		// 	// Draw non-corrected chain
+		// 	MyDraw.DrawCircle( Vector3.right * cell.relPos, 0.5f, Color.white * opacity );
+		// 	// Draw corrected chain
+		// 	MyDraw.DrawCircle( Vector3.right * (cell.relPos + correction), 0.5f, Color.cyan * opacity );
+		// 	// Draw correction value
+		// 	Debug.DrawLine( Vector3.zero, -Vector3.right * correction, Color.cyan );
+		// }
+		// //////////////////////////////////////////////////////////// EO CHAIN DEBUG //
+	}
 
-	void OnGUI()
+	void OnDrawGizmos()
 	{
 		// if( GUI.Button( new Rect(200,0,100,20), "GROW" ) )
 		// 	Grow();
 
 		// GUI.Label( new Rect(0,0,Screen.width, Screen.height), ToString() );
+
+		// ITEM SLOTS DEBUG ///////////////////////////////////////////////////////////////
+		foreach( SnakeBodyCell cell in cellList )
+		{
+			if( cell == firstEmptyCell )
+				MyDraw.DrawCircle( cell.transform.position, 0.5f, Color.blue );
+
+			if( cell == currentItemCell )
+				MyDraw.DrawCircle( cell.transform.position, 0.3f, Color.red );
+		}
+		//////////////////////////////////////////////////////////// EO ITEM SLOTS DEBUG //
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
@@ -68,8 +81,8 @@ public class SnakeBody : MonoBehaviour
 		transform.position = snakeController.respawnPoint.position;
 		transform.rotation = snakeController.respawnPoint.rotation;
 
-		// Set Color of head
-		_head.GetComponent<Renderer>().material.color = snakeController.settings.color;
+		// // Set Color of head
+		// _head.GetComponent<Renderer>().material.color = snakeController.settings.color;
 
 		// Create initial skeleton
 		_skeleton = new SnakeSkeleton();
@@ -109,8 +122,8 @@ public class SnakeBody : MonoBehaviour
 		// Instantiate cell
 		SnakeBodyCell cell = (Instantiate( cellPrefab.transform, Vector3.zero, Quaternion.identity ) as Transform).GetComponent<SnakeBodyCell>();
 
-		// Set color to new cell
-		cell.SetColor( snakeController.settings.color );
+		// // Set color to new cell
+		// cell.SetColor( snakeController.settings.color );
 
 		// Set body reference
 		cell.body = this;
@@ -122,6 +135,10 @@ public class SnakeBody : MonoBehaviour
 		// Set new tail
 		_tail = cell;
 		_tail.isTail = true;
+
+		// Set initial empty cell
+		if( firstEmptyCell == null )
+			firstEmptyCell = cell;
 
 		// Set value to last cells value, plus combined buffers
 		SnakeBodyCell prev = _cellList[ _cellList.Count - 1 ];
@@ -260,8 +277,57 @@ public class SnakeBody : MonoBehaviour
 
 	public void Grow( int num = 1 )
 	{
-		// Update grow queue
-		growQueue += num;
+		while( num-- > 0 )
+		{
+			// All cells are filled
+			if( firstEmptyCell == null )
+			{
+				// Update grow queue
+				growQueue ++;
+
+				// Empty all items
+				while( GetItem() ){}
+
+				// Set initial empty cell
+				firstEmptyCell = _head.next;
+			}
+
+			// There is still place for item
+			else
+			{
+				// Mark cell filled
+				firstEmptyCell.isItemOn = true;
+
+				// Get cell reference from where to pull next item
+				currentItemCell = firstEmptyCell;
+
+				// Previously empty cell is filled now, so set next cell to be filled
+				firstEmptyCell = firstEmptyCell.next;
+			}
+		}
+	}
+
+	// Remove item from body and return flag if it even existed
+	public bool GetItem()
+	{	
+		// If any cell has item
+		if( currentItemCell != null )
+		{
+			// Empty item
+			currentItemCell.isItemOn = false;
+
+			// Currently emptied cell is now first empty
+			firstEmptyCell = currentItemCell;
+
+			// Set new current item cell
+			if( currentItemCell.previous.isHead == false )
+				currentItemCell = currentItemCell.previous;
+			else
+				currentItemCell = null;
+
+			return true;
+		}
+		return false;
 	}
 
 	private void CheckGrowing()

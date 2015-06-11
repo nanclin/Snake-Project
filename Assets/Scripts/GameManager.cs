@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 	private float bh = 100;
 
 	// Components
-	public Transform cameraHolder;
+	// public Transform cameraHolder;
 	[HideInInspector] public SnakeController snake;
 	[HideInInspector] public GameObject exit;
 
@@ -51,44 +51,44 @@ public class GameManager : MonoBehaviour {
 		ExecuteState();
 	}
 
-	void OnGUI ()
-	{
-		if( currentState == GameState.NewGame ){
-			GUI.Box( new Rect( 0, 0, sw, sh ), "Snake Project\nMay 2015\nNejc Anclin" );
-			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "Begin Game" ) ){
-				currentState = GameState.Run;
-			}
-		}
-		else if( currentState == GameState.GameOver )
-		{	
-			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nGame Over" );
-			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
-				currentState = GameState.NewGame;
-			}
-		}
+	// void OnGUI ()
+	// {
+	// 	if( currentState == GameState.NewGame ){
+	// 		GUI.Box( new Rect( 0, 0, sw, sh ), "Snake Project\nMay 2015\nNejc Anclin" );
+	// 		if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "Begin Game" ) ){
+	// 			currentState = GameState.Run;
+	// 		}
+	// 	}
+	// 	else if( currentState == GameState.GameOver )
+	// 	{	
+	// 		GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nGame Over" );
+	// 		if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
+	// 			currentState = GameState.NewGame;
+	// 		}
+	// 	}
 
-		if( currentState == GameState.Run ||
-			currentState == GameState.GameOver ){
-			GUI.Box( new Rect( sw/2 - 100/2 - 60, 10, 100, 25 ), "Score: " + SCORE );
-			GUI.Box( new Rect( sw/2 - 100/2 + 60, 10, 100, 25 ), "Stars: " + STARS + " / 3" );
+	// 	if( currentState == GameState.Run ||
+	// 		currentState == GameState.GameOver ){
+	// 		GUI.Box( new Rect( sw/2 - 100/2 - 60, 10, 100, 25 ), "Score: " + SCORE );
+	// 		GUI.Box( new Rect( sw/2 - 100/2 + 60, 10, 100, 25 ), "Stars: " + STARS + " / 3" );
 
-			int m = (int)( TIME / 60f );
-			int s = (int)( TIME % 60f );
-			GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
-		}
+	// 		int m = (int)( TIME / 60f );
+	// 		int s = (int)( TIME % 60f );
+	// 		GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
+	// 	}
 
-		if( currentState == GameState.LevelFinished ){
-			GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nCONGRATULATIONS!\n You finished this level!\nYour score is\n" + SCORE );
+	// 	if( currentState == GameState.LevelFinished ){
+	// 		GUI.Box( new Rect( 0, 0, sw, sh ), "\n\n\n\nCONGRATULATIONS!\n You finished this level!\nYour score is\n" + SCORE );
 
-			int m = (int)( TIME / 60f );
-			int s = (int)( TIME % 60f );
-			GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
+	// 		int m = (int)( TIME / 60f );
+	// 		int s = (int)( TIME % 60f );
+	// 		GUI.Box( new Rect( sw/2 - 100/2 + 180, 10, 100, 25 ), "Time: " + m + ":" + s );
 			
-			if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
-				currentState = GameState.NewGame;
-			}
-		}
-	}
+	// 		if( GUI.Button( new Rect( sw/2-bw/2, sh/2-bh/2, bw, bh ), "New Game " ) ){
+	// 			currentState = GameState.NewGame;
+	// 		}
+	// 	}
+	// }
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
 // FSM MACHINE METHODS ////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@ public class GameManager : MonoBehaviour {
 		// [code...]
 
 		// SET LEVEL REFERENCES ///////////////////////////////////////////////////////////////
-		snake = GameObject.FindWithTag("Player").GetComponent<SnakeController>();
+		snake = GameObject.Find("Player Snake").GetComponent<SnakeController>();
 		exit = GameObject.FindWithTag("Exit");
 		if( exit != null )
 			exit.SetActive( false );

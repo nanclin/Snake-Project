@@ -15,6 +15,7 @@ public class SnakeBodyCell : MonoBehaviour {
 	// System
 	private bool _isTail;
 	private bool _isHead;
+	private bool _isItemOn;
 	[HideInInspector] public SnakeBody body;
 	[HideInInspector] public float relPos = 0;
 
@@ -33,12 +34,12 @@ public class SnakeBodyCell : MonoBehaviour {
 
 	void OnDrawGizmos()
 	{
-		if( isHead ){
-			MyDraw.DrawCircle( transform.position, 0.3f, Color.blue );
-		}
-		if( isTail ){
-			MyDraw.DrawCircle( transform.position, 0.2f, Color.yellow );
-		}
+		// if( isHead ){
+		// 	MyDraw.DrawCircle( transform.position, 0.3f, Color.blue );
+		// }
+		// if( isTail ){
+		// 	MyDraw.DrawCircle( transform.position, 0.2f, Color.yellow );
+		// }
 	}
 
 	void OnGUI()
@@ -74,6 +75,18 @@ public class SnakeBodyCell : MonoBehaviour {
 	public bool isTail {
 		get{ return _isTail; }
 		set{ _isTail = value; }
+	}
+
+	public bool isItemOn {
+		get{ return _isItemOn; }
+		set{
+			_isItemOn = value;
+
+			if( _isItemOn )
+				transform.Find( "Item" ).gameObject.SetActive( true );
+			else if( !_isItemOn )
+				transform.Find( "Item" ).gameObject.SetActive( false );
+		}
 	}
 
 	public SnakeBodyCell previous
