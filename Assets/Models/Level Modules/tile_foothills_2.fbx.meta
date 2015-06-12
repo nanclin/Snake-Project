@@ -6,10 +6,20 @@ ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
     100000: //RootNode
+    100002: collision12
+    100004: mesh19
     400000: //RootNode
+    400002: collision12
+    400004: mesh19
     2300000: //RootNode
+    2300002: collision12
+    2300004: mesh19
     3300000: //RootNode
+    3300002: collision12
+    3300004: mesh19
     4300000: tile_foothills_right
+    4300002: mesh19
+    4300004: collision12
     9500000: //RootNode
   materials:
     importMaterials: 1
