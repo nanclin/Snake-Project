@@ -4,6 +4,7 @@ using System.Collections;
 public class TileGrid : MonoBehaviour
 {
 	private float tileSize = 4f;
+	private float tileHeight = 1f;
 
 	private Transform tile_square;
 	private Transform tile_edge;
@@ -48,6 +49,35 @@ public class TileGrid : MonoBehaviour
 		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129}
 	};
 
+	private int[][] map2 = 
+	{
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,7,8,9,81,82,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,19,20,21,93,94,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,31,32,33,0,89,102,102,102,124,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,40,41,42,0,0,0,0,0,0,0,0,108,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,52,53,54,0,0,0,0,0,0,0,0,0,108,129,129,129,129,129},
+		new int[]{129,129,129,129,121,102,102,64,65,66,0,0,0,0,0,0,0,0,0,0,108,129,129,129,129},
+		new int[]{129,129,129,107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,108,129,129,129},
+		new int[]{129,129,107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,122,129,129},
+		new int[]{129,123,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,114,129,129},
+		new int[]{129,101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,114,129,129},
+		new int[]{129,101,0,0,0,0,0,73,74,78,0,0,0,0,0,0,0,0,0,0,0,0,114,129,129},
+		new int[]{129,133,0,0,0,0,0,85,86,101,0,0,0,0,0,0,0,0,0,0,46,47,48,129,129},
+		new int[]{129,129,119,0,0,46,47,48,129,101,0,0,0,0,0,0,0,0,0,0,58,59,60,129,129},
+		new int[]{129,129,129,119,0,58,59,60,129,95,113,113,113,113,113,113,113,113,113,113,70,71,72,129,129},
+		new int[]{129,129,129,129,135,70,71,72,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
+		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129}
+	};
+
 	void Awake()
 	{
 		// Get prefab refenrence to instantiate from
@@ -65,10 +95,11 @@ public class TileGrid : MonoBehaviour
 		tile_knee_medium = transform.Find("tile_knee_medium");
 		tile_knee_large = transform.Find("tile_knee_large");
 
-		GenerateMap( map );
+		GenerateMap( map, 0 );
+		GenerateMap( map2, 1 );
 	}
 
-	private void GenerateMap( int[][] map )
+	private void GenerateMap( int[][] map, int level = 0 )
 	{	
 		for( int y = 0; y < map.Length; y++ )
 		{
@@ -78,7 +109,7 @@ public class TileGrid : MonoBehaviour
 				int t = map[y][x];
 
 				// Set current tile position vector
-				Vector3 pos = new Vector3( x * tileSize, 0, -y * tileSize );
+				Vector3 pos = new Vector3( x * tileSize, level * tileHeight, -y * tileSize );
 
 				// Tile transform reference
 				Transform tile = null;
@@ -101,15 +132,15 @@ public class TileGrid : MonoBehaviour
 						tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
+					case 114:
+						pos += new Vector3(1,0,-1) * tileSize;
+						tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
+						tile.eulerAngles = Vector3.up * 180;
+						break;
 					case 113:
 						pos += new Vector3(0,0,-1) * tileSize;
 						tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
 						tile.eulerAngles = Vector3.up * 270;
-						break;
-					case 114:
-						// pos += new Vector3(0,0,-1) * tileSize;
-						// tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
-						// tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE EDGE //
 
