@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraSystem : Initializer
 {
-	public static bool DEBUG = false;
+	public static bool DEBUG = true;
 
 	public float smooth = 1.5f;
 	public float lookForwardDis = 5f;
