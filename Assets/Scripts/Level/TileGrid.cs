@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using System.IO;
+using System.Xml;
 
 public class TileGrid : MonoBehaviour
 {
 	private float tileSize = 4f;
-	private float tileHeight = 1f;
+	private float tileHeight = 2f;
 
 	private Transform tile_square;
 	private Transform tile_edge;
@@ -19,51 +23,6 @@ public class TileGrid : MonoBehaviour
 	private Transform tile_knee_small;
 	private Transform tile_knee_medium;
 	private Transform tile_knee_large;
-
-	private int[][] map = 
-	{
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,79,80,81,82,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,91,92,93,94,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,133,0,0,136,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,126,127,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,114,129,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,97,98,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,101,109,110,81,82,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,99,100,0,0,93,94,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,7,8,9,111,112,0,0,0,97,98,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,19,20,21,0,0,0,0,0,109,110,10,11,12,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,31,32,33,0,0,0,0,0,0,0,22,23,24,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,101,0,0,0,0,0,0,0,0,0,34,35,36,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,140,0,0,0,0,0,0,0,0,0,46,47,48,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,123,0,0,0,0,0,0,0,0,0,0,58,59,60,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,103,104,0,0,0,0,0,0,125,113,113,70,71,72,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,115,116,113,113,128,0,0,120,129,129,129,129,129,129,129,129,129,129,129},
-		new int[]{129,129,129,129,129,129,129,129,129,129,129,135,134,129,129,129,129,129,129,129,129,129,129,129,129}
-	};
-
-	private int[][] testMap = 
-	{
-		new int[]{1,2,3,4,5,6,7,8,9,10,11,12},
-		new int[]{13,14,15,16,17,18,19,20,21,22,23,24},
-		new int[]{25,26,27,28,29,30,31,32,33,34,35,36},
-		new int[]{37,38,39,40,41,42,43,44,45,46,47,48},
-		new int[]{49,50,51,52,53,54,55,56,57,58,59,60},
-		new int[]{61,62,63,64,65,66,67,68,69,70,71,72},
-		new int[]{73,74,75,76,77,78,79,80,81,82,83,84},
-		new int[]{85,86,87,88,89,90,91,92,93,94,95,96},
-		new int[]{97,98,99,100,101,102,103,104,105,106,107,108},
-		new int[]{109,110,111,112,113,114,115,116,117,118,119,120},
-		new int[]{121,122,123,124,125,126,127,128,129,130,131,132},
-		new int[]{133,134,135,136,137,138,139,140,141,142,143,144}
-	};
 
 	void Awake()
 	{
@@ -82,12 +41,91 @@ public class TileGrid : MonoBehaviour
 		tile_knee_medium = transform.Find("tile_knee_medium");
 		tile_knee_large = transform.Find("tile_knee_large");
 
-		GenerateMap( testMap, 0 );
-		// GenerateMap( map, 0 );
-		// GenerateMap( map2, 1 );
+
+		// GenerateLevelLayer( level_01_map[0], 0 );
+		// GenerateLevelLayer( level_01_map[1], 1 );
+		// GenerateLevelLayer( map, 0 );
+		// GenerateLevelLayer( map2, 1 );
+
+		// Load level data
+		List<int[][]> level_01_map = LoadLevelMap("Assets/Textures/Level Templates/level 01/level 01.tmx");
+
+		// Instantiate tiles for the level
+		GenerateLevel( level_01_map );
 	}
 
-	private void GenerateMap( int[][] map, int level = 0 )
+	private List<int[][]> LoadLevelMap( string path )
+	{
+		// Load xml document of the level
+		XmlDocument doc = new XmlDocument();
+		doc.Load( path );
+		
+		// Get number of tiles per row and column
+		int width = System.Int32.Parse( doc.DocumentElement.Attributes["width"].Value );
+		int height = System.Int32.Parse( doc.DocumentElement.Attributes["height"].Value );
+
+		// Get layer nodes
+		XmlNodeList layerNodes = doc.SelectNodes("/map/layer");
+
+		// Create list of layer maps
+		List<int[][]> layerMapList = new List<int[][]>();
+
+		// Loop trough layer nodes
+		for( int i = 0; i < layerNodes.Count; i++ )
+		{
+			// TILE VALUES LIST ///////////////////////////////////////////////////////////////
+			
+			// Get layer node
+			XmlNode layer = layerNodes[i];
+			string layerName = layer.Attributes["name"].Value;
+			print( "layerName: " + layerName );
+
+			// Get layer data node
+			XmlNodeList layerTileNodes = layer.ChildNodes[0].ChildNodes;
+
+			// List of all tile values
+			int[] tiles = new int[ layerTileNodes.Count ];
+
+			// Convert and store all tile values to the list
+			for( int j = 0; j < layerTileNodes.Count; j++ )
+			{
+				XmlNode tile = layerTileNodes[j];
+				tiles[j] = System.Int32.Parse( tile.Attributes["gid"].Value );
+			}
+			//////////////////////////////////////////////////////////// EO TILE VALUES LIST //
+
+			// GENERATE MAP ///////////////////////////////////////////////////////////////
+
+			int[][] layerMap = new int[height][];
+			for( int y = 0; y < height; y++ ){
+				layerMap[y] = new int[width];
+				for( int x = 0; x < height; x++ ){
+					layerMap[y][x] = tiles[ x + y * width ];
+				}
+			}
+
+			// Add current layer map to the list of all layer maps of current level
+			layerMapList.Add( layerMap );
+
+			// // Debug
+			// for( int y = 0; y < height; y++ ){
+			// 	for( int x = 0; x < height; x++ ){
+			// 		print("layerMap["+y+"]["+x+"]: " + layerMap[y][x] );
+			// 	}
+			// }
+
+			//////////////////////////////////////////////////////////// EO GENERATE MAP //
+		}
+		return layerMapList;
+	}
+
+	private void GenerateLevel( List<int[][]> layerList )
+	{
+		for( int i = 0; i < layerList.Count; i++ )
+			GenerateLevelLayer( layerList[i], i );
+	}
+
+	private void GenerateLevelLayer( int[][] map, int level = 0 )
 	{	
 		for( int y = 0; y < map.Length; y++ )
 		{

@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="tileset_gray-01" tilewidth="40" tileheight="40">
   <image source="../../../../Files/Level System/tileset_gray-01.png" width="480" height="480"/>
  </tileset>
- <imagelayer name="level 01" opacity="0">
+ <imagelayer name="level 01" visible="0" opacity="0">
   <image source="level_01_structure_07.png"/>
  </imagelayer>
  <layer name="Tile Layer 1" width="25" height="25" opacity="0.43">
@@ -978,7 +978,6 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="73"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -1022,6 +1021,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
+   <tile gid="6"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -1053,7 +1053,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="109"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
