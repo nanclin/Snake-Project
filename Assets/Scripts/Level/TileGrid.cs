@@ -41,14 +41,13 @@ public class TileGrid : MonoBehaviour
 		tile_knee_medium = transform.Find("tile_knee_medium");
 		tile_knee_large = transform.Find("tile_knee_large");
 
+		// Load level data
+		List<int[][]> level_01_map = LoadLevelMap("Assets/Textures/Level Templates/level 01/level 01.tmx");
 
 		// GenerateLevelLayer( level_01_map[0], 0 );
 		// GenerateLevelLayer( level_01_map[1], 1 );
 		// GenerateLevelLayer( map, 0 );
 		// GenerateLevelLayer( map2, 1 );
-
-		// Load level data
-		List<int[][]> level_01_map = LoadLevelMap("Assets/Textures/Level Templates/level 01/level 01.tmx");
 
 		// Instantiate tiles for the level
 		GenerateLevel( level_01_map );
@@ -77,50 +76,57 @@ public class TileGrid : MonoBehaviour
 			
 			// Get layer node
 			XmlNode layer = layerNodes[i];
+
+			// Example of accessing layer attributes
 			string layerName = layer.Attributes["name"].Value;
 			print( "layerName: " + layerName );
 
-			// Get layer data node
-			XmlNodeList layerTileNodes = layer.ChildNodes[0].ChildNodes;
+			// Sample only visible layers
+			if( layer.Attributes["visible"] == null ){
 
-			// List of all tile values
-			int[] tiles = new int[ layerTileNodes.Count ];
+				// Get layer data node
+				XmlNodeList layerTileNodes = layer.ChildNodes[0].ChildNodes;
 
-			// Convert and store all tile values to the list
-			for( int j = 0; j < layerTileNodes.Count; j++ )
-			{
-				XmlNode tile = layerTileNodes[j];
-				tiles[j] = System.Int32.Parse( tile.Attributes["gid"].Value );
-			}
-			//////////////////////////////////////////////////////////// EO TILE VALUES LIST //
+				// List of all tile values
+				int[] tiles = new int[ layerTileNodes.Count ];
 
-			// GENERATE MAP ///////////////////////////////////////////////////////////////
-
-			int[][] layerMap = new int[height][];
-			for( int y = 0; y < height; y++ ){
-				layerMap[y] = new int[width];
-				for( int x = 0; x < height; x++ ){
-					layerMap[y][x] = tiles[ x + y * width ];
+				// Convert and store all tile values to the list
+				for( int j = 0; j < layerTileNodes.Count; j++ )
+				{
+					XmlNode tile = layerTileNodes[j];
+					tiles[j] = System.Int32.Parse( tile.Attributes["gid"].Value );
 				}
+				//////////////////////////////////////////////////////////// EO TILE VALUES LIST //
+
+				// GENERATE MAP ///////////////////////////////////////////////////////////////
+
+				int[][] layerMap = new int[height][];
+				for( int y = 0; y < height; y++ ){
+					layerMap[y] = new int[width];
+					for( int x = 0; x < height; x++ ){
+						layerMap[y][x] = tiles[ x + y * width ];
+					}
+				}
+
+				// Add current layer map to the list of all layer maps of current level
+				layerMapList.Add( layerMap );
+
+				// // Debug
+				// for( int y = 0; y < height; y++ ){
+				// 	for( int x = 0; x < height; x++ ){
+				// 		print("layerMap["+y+"]["+x+"]: " + layerMap[y][x] );
+				// 	}
+				// }
+
+				//////////////////////////////////////////////////////////// EO GENERATE MAP //			
 			}
-
-			// Add current layer map to the list of all layer maps of current level
-			layerMapList.Add( layerMap );
-
-			// // Debug
-			// for( int y = 0; y < height; y++ ){
-			// 	for( int x = 0; x < height; x++ ){
-			// 		print("layerMap["+y+"]["+x+"]: " + layerMap[y][x] );
-			// 	}
-			// }
-
-			//////////////////////////////////////////////////////////// EO GENERATE MAP //
 		}
 		return layerMapList;
 	}
 
 	private void GenerateLevel( List<int[][]> layerList )
 	{
+		print( "layerList.Count: " + layerList.Count );
 		for( int i = 0; i < layerList.Count; i++ )
 			GenerateLevelLayer( layerList[i], i );
 	}
