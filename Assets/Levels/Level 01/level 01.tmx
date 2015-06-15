@@ -2,15 +2,7 @@
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="40" tileheight="40" nextobjectid="16">
  <tileset firstgid="1" name="tileset_gray-01" tilewidth="40" tileheight="40">
   <image source="../../../Files/Level System/tileset_gray-01.png" width="480" height="480"/>
-  <tile id="72">
-   <properties>
-    <property name="moveGroup" value="1"/>
-   </properties>
-  </tile>
  </tileset>
- <imagelayer name="reference image" visible="0" opacity="0.47">
-  <image source="../../Textures/Level Templates/level 01/level_01_structure_07.png"/>
- </imagelayer>
  <layer name="test layer" width="25" height="25" visible="0">
   <data>
    <tile gid="1"/>
@@ -640,10 +632,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="layer 1" width="25" height="25" visible="0" opacity="0.43">
-  <properties>
-   <property name="moveGroup" value="1"/>
-  </properties>
+ <layer name="layer 1" width="25" height="25" opacity="0.43">
   <data>
    <tile gid="129"/>
    <tile gid="129"/>
@@ -672,7 +661,7 @@
    <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>
-   <tile gid="87"/>
+   <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>
@@ -696,7 +685,7 @@
    <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>
-   <tile gid="98"/>
+   <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>
@@ -1274,7 +1263,7 @@
  </layer>
  <layer name="layer 2" width="25" height="25">
   <data>
-   <tile gid="73"/>
+   <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>
    <tile gid="129"/>

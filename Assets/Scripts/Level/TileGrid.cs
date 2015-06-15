@@ -42,7 +42,8 @@ public class TileGrid : MonoBehaviour
 		tile_knee_large = transform.Find("tile_knee_large");
 
 		// Load level data
-		List<int[][]> level_01_map = LoadLevelMap("Assets/Textures/Level Templates/level 01/level 01.tmx");
+		// List<int[][]> level_01_map = LoadLevelMap("Assets/Levels/Level 01/level 01.tmx");
+		List<int[][]> level_01_map = LoadLevelMap("Assets/Levels/Level Pillars/level pillars.tmx");
 
 		// GenerateLevelLayer( level_01_map[0], 0 );
 		// GenerateLevelLayer( level_01_map[1], 1 );
@@ -84,8 +85,21 @@ public class TileGrid : MonoBehaviour
 			// Sample only visible layers
 			if( layer.Attributes["visible"] == null ){
 
+				// READING LAYER PROPERTIES ///////////////////////////////////////////////////////////////
+				if( layer.SelectSingleNode(".//properties") != null )
+				{
+					// Select all property nodes
+					XmlNodeList properties = layer.SelectSingleNode(".//properties").ChildNodes;
+					
+					for( int j = 0; j < properties.Count; j++ )
+					{
+						print( "property " + j + ": " + properties[j].Attributes["name"].Value );
+					}
+				}
+				//////////////////////////////////////////////////////////// EO READING LAYER PROPERTIES //
+
 				// Get layer data node
-				XmlNodeList layerTileNodes = layer.ChildNodes[0].ChildNodes;
+				XmlNodeList layerTileNodes = layer.SelectSingleNode(".//data").ChildNodes;
 
 				// List of all tile values
 				int[] tiles = new int[ layerTileNodes.Count ];
@@ -126,7 +140,6 @@ public class TileGrid : MonoBehaviour
 
 	private void GenerateLevel( List<int[][]> layerList )
 	{
-		print( "layerList.Count: " + layerList.Count );
 		for( int i = 0; i < layerList.Count; i++ )
 			GenerateLevelLayer( layerList[i], i );
 	}
