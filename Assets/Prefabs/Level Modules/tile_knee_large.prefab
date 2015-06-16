@@ -8,9 +8,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 490478}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: tile_knee_large
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25,7 +25,7 @@ GameObject:
   - 4: {fileID: 498172}
   - 33: {fileID: 3357296}
   - 23: {fileID: 2363480}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: mesh9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   - 33: {fileID: 3312922}
   - 23: {fileID: 2375256}
   - 64: {fileID: 6442744}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: collision3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

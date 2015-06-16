@@ -10,7 +10,7 @@ GameObject:
   - 4: {fileID: 431268}
   - 33: {fileID: 3367158}
   - 23: {fileID: 2387460}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,7 +28,7 @@ GameObject:
   - 33: {fileID: 3308070}
   - 23: {fileID: 2324512}
   - 64: {fileID: 6476552}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: collision
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,9 +43,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 489680}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: tile_peak_2
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -10,7 +10,7 @@ GameObject:
   - 4: {fileID: 405898}
   - 33: {fileID: 3356948}
   - 23: {fileID: 2331886}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25,9 +25,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 426920}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: tile_corner_medium
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -43,7 +43,7 @@ GameObject:
   - 33: {fileID: 3369160}
   - 23: {fileID: 2367468}
   - 64: {fileID: 6451950}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: collision
   m_TagString: Untagged
   m_Icon: {fileID: 0}

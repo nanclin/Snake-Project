@@ -10,9 +10,9 @@ GameObject:
   - 4: {fileID: 466960}
   - 33: {fileID: 3322632}
   - 23: {fileID: 2301018}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: tile_square
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

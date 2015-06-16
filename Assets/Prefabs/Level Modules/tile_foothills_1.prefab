@@ -11,7 +11,7 @@ GameObject:
   - 33: {fileID: 3349134}
   - 23: {fileID: 2387016}
   - 64: {fileID: 6483758}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: collision
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,7 +28,7 @@ GameObject:
   - 4: {fileID: 473592}
   - 33: {fileID: 3309690}
   - 23: {fileID: 2339138}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,9 +43,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 445510}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: tile_foothills_1
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
