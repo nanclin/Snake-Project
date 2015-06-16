@@ -9,38 +9,10 @@ public class TileGrid : MonoBehaviour
 {
 	private float tileSize = 4f;
 	private float tileHeight = 2f;
-
-	private Transform tile_square;
-	private Transform tile_edge;
-	private Transform tile_peak_1;
-	private Transform tile_peak_2;
-	private Transform tile_foothills_1;
-	private Transform tile_foothills_2;
-	private Transform tile_diagonal;
-	private Transform tile_corner_small;
-	private Transform tile_corner_medium;
-	private Transform tile_corner_large;
-	private Transform tile_knee_small;
-	private Transform tile_knee_medium;
-	private Transform tile_knee_large;
+	private List<Transform> tiles = new List<Transform>();
 
 	void Awake()
 	{
-		// Get prefab refenrence to instantiate from
-		tile_square = transform.Find("tile_square");
-		tile_edge = transform.Find("tile_edge");
-		tile_peak_1 = transform.Find("tile_peak_1");
-		tile_peak_2 = transform.Find("tile_peak_2");
-		tile_foothills_1 = transform.Find("tile_foothills_1");
-		tile_foothills_2 = transform.Find("tile_foothills_2");
-		tile_diagonal = transform.Find("tile_diagonal");
-		tile_corner_small = transform.Find("tile_corner_small");
-		tile_corner_medium = transform.Find("tile_corner_medium");
-		tile_corner_large = transform.Find("tile_corner_large");
-		tile_knee_small = transform.Find("tile_knee_small");
-		tile_knee_medium = transform.Find("tile_knee_medium");
-		tile_knee_large = transform.Find("tile_knee_large");
-
 		// Load level data
 		// List<int[][]> level_01_map = LoadLevelMap("Assets/Levels/Level 01/level 01.tmx");
 		// List<int[][]> level_map = LoadLevelMap("Assets/Levels/Level Pillars/level pillars.tmx");
@@ -54,26 +26,18 @@ public class TileGrid : MonoBehaviour
 
 	}
 
-	int c = 0;
-	private List<Transform> tiles = new List<Transform>();
+	int p = 0;
+	public string[] paths;
 
 	void Update()
 	{
 		if( Input.GetKeyDown("space") )
 		{
-			Transform go = ObjectPool.instance.GetObjectForType( "tile_square", false ).transform;
-			go.position = Vector3.forward * 4f * c++;
-			tiles.Insert( 0, go );
+			string path = paths[ p++ % paths.Length ];
+			List<int[][]> level_map = LoadLevelMap( path );
+			GenerateLevel( level_map );
 		}
-		if( Input.GetKeyDown("backspace") )
-		{
-			if( tiles.Count > 0 ){
-				Transform go = tiles[0];
-				ObjectPool.instance.PoolObject( go.gameObject );
-				tiles.Remove( go );
-				c--;
-			}
-		}
+
 	}
 
 	private List<int[][]> LoadLevelMap( string path )
@@ -162,6 +126,18 @@ public class TileGrid : MonoBehaviour
 
 	private void GenerateLevel( List<int[][]> layerList )
 	{
+		// RESET PREVIOUS TILE GRID ///////////////////////////////////////////////////////////////
+		
+		// Pool tiles
+		foreach( Transform tile in tiles ){
+			ObjectPool.instance.PoolObject( tile.gameObject );
+		}
+
+		// Empty tiles list
+		tiles = new List<Transform>();
+		//////////////////////////////////////////////////////////// EO RESET PREVIOUS TILE GRID //
+
+		// Generate layers of current map
 		for( int i = 0; i < layerList.Count; i++ )
 			GenerateLevelLayer( layerList[i], i );
 	}
@@ -187,180 +163,228 @@ public class TileGrid : MonoBehaviour
 				{
 				// TILE SQUARE ///////////////////////////////////////////////////////////////
 					case 129:
-						// tile = Instantiate( tile_square, pos, Quaternion.identity ) as Transform;
-				Debug.Break();
 						tile = ObjectPool.instance.GetObjectForType( "tile_square", false ).transform;
 						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE SQUARE //
 						
 				// TILE EDGE ///////////////////////////////////////////////////////////////
 					case 101:
-						tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_edge", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 102:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_edge", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 114:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_edge", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 113:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_edge, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_edge", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE EDGE //
 
 				// TILE PEAK 1 ///////////////////////////////////////////////////////////////
 					case 125:
-						tile = Instantiate( tile_peak_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 126:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_peak_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 138:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_peak_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 137:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_peak_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE PEAK 1 //
 
 				// TILE PEAK 2 ///////////////////////////////////////////////////////////////
 					case 128:
-						tile = Instantiate( tile_peak_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 140:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_peak_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 139:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_peak_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 127:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_peak_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_peak_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE PEAK 2 //
 
 				// TILE FOOTHILS 1 ///////////////////////////////////////////////////////////////
 					case 134:
-						tile = Instantiate( tile_foothills_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 133:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_foothills_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 121:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_foothills_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 122:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_foothills_1, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_1", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE FOOTHILS 1 //
 
 				// TILE FOOTHILS 2 ///////////////////////////////////////////////////////////////
 					case 135:
-						tile = Instantiate( tile_foothills_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 123:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_foothills_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 124:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_foothills_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 136:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_foothills_2, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_foothills_2", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE FOOTHILS 2 //
 
 				// TILE DIAGONAL ///////////////////////////////////////////////////////////////
 					case 107:
-						tile = Instantiate( tile_diagonal, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_diagonal", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 108:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_diagonal, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_diagonal", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 120:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_diagonal, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_diagonal", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 119:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_diagonal, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_diagonal", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE DIAGONAL //
 
 				// TILE CORNER SMALL ///////////////////////////////////////////////////////////////
 					case 83:
-						tile = Instantiate( tile_corner_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 84:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_corner_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 96:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_corner_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 95:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_corner_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE CORNER SMALL //
 
 				// TILE CORNER MEDIUM ///////////////////////////////////////////////////////////////
 					case 79:
-						tile = Instantiate( tile_corner_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
 						x += 1;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 81:
-						pos += new Vector3(2,0,0) * tileSize;
-						tile = Instantiate( tile_corner_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(2,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						x += 1;
 						break;
 					case 105:
-						pos += new Vector3(2,0,-2) * tileSize;
-						tile = Instantiate( tile_corner_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(2,0,-2) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						x += 1;
 						break;
 					case 103:
-						pos += new Vector3(0,0,-2) * tileSize;
-						tile = Instantiate( tile_corner_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-2) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						x += 1;
 						break;
@@ -368,24 +392,30 @@ public class TileGrid : MonoBehaviour
 
 				// TILE CORNER LARGE ///////////////////////////////////////////////////////////////
 					case 7:
-						tile = Instantiate( tile_corner_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
 						x += 2;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 10:
-						pos += new Vector3(3,0,0) * tileSize;
-						tile = Instantiate( tile_corner_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(3,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						x += 2;
 						break;
 					case 46:
-						pos += new Vector3(3,0,-3) * tileSize;
-						tile = Instantiate( tile_corner_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(3,0,-3) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						x += 2;
 						break;
 					case 43:
-						pos += new Vector3(0,0,-3) * tileSize;
-						tile = Instantiate( tile_corner_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_corner_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-3) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						x += 2;
 						break;
@@ -393,45 +423,57 @@ public class TileGrid : MonoBehaviour
 
 				// TILE KNEE SMALL ///////////////////////////////////////////////////////////////
 					case 77:
-						tile = Instantiate( tile_knee_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 78:
-						pos += new Vector3(1,0,0) * tileSize;
-						tile = Instantiate( tile_knee_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						break;
 					case 90:
-						pos += new Vector3(1,0,-1) * tileSize;
-						tile = Instantiate( tile_knee_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(1,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						break;
 					case 89:
-						pos += new Vector3(0,0,-1) * tileSize;
-						tile = Instantiate( tile_knee_small, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_small", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-1) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						break;
 				//////////////////////////////////////////////////////////// EO TILE KNEE SMALL //
 
 				// TILE KNEE MEDIUM ///////////////////////////////////////////////////////////////
 					case 73:
-						tile = Instantiate( tile_knee_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
 						x += 1;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 75:
-						pos += new Vector3(2,0,0) * tileSize;
-						tile = Instantiate( tile_knee_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(2,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						x += 1;
 						break;
 					case 99:
-						pos += new Vector3(2,0,-2) * tileSize;
-						tile = Instantiate( tile_knee_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(2,0,-2) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						x += 1;
 						break;
 					case 97:
-						pos += new Vector3(0,0,-2) * tileSize;
-						tile = Instantiate( tile_knee_medium, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_medium", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-2) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						x += 1;
 						break;
@@ -439,24 +481,30 @@ public class TileGrid : MonoBehaviour
 
 				// TILE KNEE LARGE ///////////////////////////////////////////////////////////////
 					case 1:
-						tile = Instantiate( tile_knee_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos;
 						x += 2;
+						tile.eulerAngles = Vector3.zero;
 						break;
 					case 4:
-						pos += new Vector3(3,0,0) * tileSize;
-						tile = Instantiate( tile_knee_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(3,0,0) * tileSize;
 						tile.eulerAngles = Vector3.up * 90;
 						x += 2;
 						break;
 					case 40:
-						pos += new Vector3(3,0,-3) * tileSize;
-						tile = Instantiate( tile_knee_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(3,0,-3) * tileSize;
 						tile.eulerAngles = Vector3.up * 180;
 						x += 2;
 						break;
 					case 37:
-						pos += new Vector3(0,0,-3) * tileSize;
-						tile = Instantiate( tile_knee_large, pos, Quaternion.identity ) as Transform;
+						tile = ObjectPool.instance.GetObjectForType( "tile_knee_large", false ).transform;
+						tiles.Add( tile );
+						tile.position = pos + new Vector3(0,0,-3) * tileSize;
 						tile.eulerAngles = Vector3.up * 270;
 						x += 2;
 						break;

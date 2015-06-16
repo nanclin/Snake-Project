@@ -176,7 +176,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectPrefabs:
-  - {fileID: 118742, guid: 1320d4ce0804b4fe28ceae2ae37409e9, type: 2}
+  - {fileID: 131880, guid: 2ff5957dd38594f59b8a766b818f8bbb, type: 2}
+  - {fileID: 116872, guid: 1317385811b4c4f69bbc6c3393fdfaef, type: 2}
+  - {fileID: 114338, guid: 8b0c5d81f450742d984855f5c37bd00a, type: 2}
+  - {fileID: 176878, guid: 074616dc06424425ea6f0b11e365b6c8, type: 2}
+  - {fileID: 112624, guid: be0aa585f828b4254896f47df6ff9bba, type: 2}
+  - {fileID: 184756, guid: 1009209db6a484acdaf846f3fba678ce, type: 2}
+  - {fileID: 167328, guid: 2c67918463ffb43618a1e25ad2855012, type: 2}
+  - {fileID: 129248, guid: fec97771ad28b44af820826f27a979a9, type: 2}
+  - {fileID: 109254, guid: 99cb7a1ca79aa4a3799960df5f2c6c03, type: 2}
+  - {fileID: 185692, guid: 37a719425a1e9459abee5df9ad269302, type: 2}
+  - {fileID: 130946, guid: 2065400f76895475d8235a532eaebc16, type: 2}
+  - {fileID: 196476, guid: e5e0c4e3d769c4d84a1d00fae36a1d4b, type: 2}
   - {fileID: 192954, guid: 0eb929ce09b8b4ddcb1bb11364ea49e4, type: 2}
   amountToBuffer: 
   defaultBufferAmount: 0
@@ -212,6 +223,10 @@ Prefab:
     m_Modifications:
     - target: {fileID: 11499216, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
       propertyPath: maps.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11499216, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
+      propertyPath: paths.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 468534, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
@@ -253,6 +268,18 @@ Prefab:
     - target: {fileID: 11499216, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
       propertyPath: maps.Array.data[1]
       value: '"Assets/Levels/test2.tmx"'
+      objectReference: {fileID: 0}
+    - target: {fileID: 11499216, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
+      propertyPath: paths.Array.data[0]
+      value: Assets/Levels/tiles test.tmx
+      objectReference: {fileID: 0}
+    - target: {fileID: 11499216, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
+      propertyPath: paths.Array.data[1]
+      value: Assets/Levels/Level 01/level 01.tmx
+      objectReference: {fileID: 0}
+    - target: {fileID: 11499216, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
+      propertyPath: paths.Array.data[2]
+      value: Assets/Levels/Level 01/level 01.tmx
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3a7f13c41f74244698edaa7cbeb3c40e, type: 2}
