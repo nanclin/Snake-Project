@@ -43,15 +43,37 @@ public class TileGrid : MonoBehaviour
 
 		// Load level data
 		// List<int[][]> level_01_map = LoadLevelMap("Assets/Levels/Level 01/level 01.tmx");
-		List<int[][]> level_01_map = LoadLevelMap("Assets/Levels/Level Pillars/level pillars.tmx");
+		// List<int[][]> level_map = LoadLevelMap("Assets/Levels/Level Pillars/level pillars.tmx");
+		// List<int[][]> level_map = LoadLevelMap("Assets/Levels/test.tmx");
 
-		// GenerateLevelLayer( level_01_map[0], 0 );
-		// GenerateLevelLayer( level_01_map[1], 1 );
-		// GenerateLevelLayer( map, 0 );
-		// GenerateLevelLayer( map2, 1 );
+		// GenerateLevelLayer( level_map[0], 0 );
+		// GenerateLevelLayer( level_map[1], 1 );
 
 		// Instantiate tiles for the level
-		GenerateLevel( level_01_map );
+		// GenerateLevel( level_map );
+
+	}
+
+	int c = 0;
+	private List<Transform> tiles = new List<Transform>();
+
+	void Update()
+	{
+		if( Input.GetKeyDown("space") )
+		{
+			Transform go = ObjectPool.instance.GetObjectForType( "tile_square", false ).transform;
+			go.position = Vector3.forward * 4f * c++;
+			tiles.Insert( 0, go );
+		}
+		if( Input.GetKeyDown("backspace") )
+		{
+			if( tiles.Count > 0 ){
+				Transform go = tiles[0];
+				ObjectPool.instance.PoolObject( go.gameObject );
+				tiles.Remove( go );
+				c--;
+			}
+		}
 	}
 
 	private List<int[][]> LoadLevelMap( string path )
@@ -165,7 +187,10 @@ public class TileGrid : MonoBehaviour
 				{
 				// TILE SQUARE ///////////////////////////////////////////////////////////////
 					case 129:
-						tile = Instantiate( tile_square, pos, Quaternion.identity ) as Transform;
+						// tile = Instantiate( tile_square, pos, Quaternion.identity ) as Transform;
+				Debug.Break();
+						tile = ObjectPool.instance.GetObjectForType( "tile_square", false ).transform;
+						tiles.Add( tile );
 						break;
 				//////////////////////////////////////////////////////////// EO TILE SQUARE //
 						

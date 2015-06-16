@@ -18,17 +18,17 @@ public class PoolSpawnTest : MonoBehaviour {
 	void Update ()
 	{
 
-		if( Input.GetKeyDown("space") )
-		{
-			GameObject go = ObjectPool.instance.GetObjectForType( "prefab_bullet", false );
-			go.transform.position = Vector3.forward * i++;
-			list.Insert( 0, go );
-		}
-		if( Input.GetKeyDown("backspace") )
-		{
-			GameObject go = list[0];
-			ObjectPool.instance.PoolObject( go );
-			list.Remove( go );
-		}
+		// if( Input.GetKeyDown("space") )
+		// {
+		// 	GameObject go = ObjectPool.instance.GetObjectForType( "prefab_bullet", false );
+		// 	go.transform.position = Vector3.forward * i++;
+		// 	list.Insert( 0, go );
+		// }
+		// if( Input.GetKeyDown("backspace") )
+		// {
+		// 	GameObject go = list[0];
+		// 	ObjectPool.instance.PoolObject( go );
+		// 	list.Remove( go );
+		// }
 	}
 }
