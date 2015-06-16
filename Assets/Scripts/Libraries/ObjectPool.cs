@@ -119,7 +119,7 @@ public class ObjectPool : MonoBehaviour
     {
         for ( int i=0; i<objectPrefabs.Length; i++)
         {
-            if(objectPrefabs[i].name == obj.name)
+            if( (objectPrefabs[i].name+"(Clone)" == obj.name ) )
             {
                 obj.SetActiveRecursively(false);
                 obj.transform.parent = containerObject.transform;
