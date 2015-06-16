@@ -10,35 +10,36 @@ public class TileGrid : MonoBehaviour
 	private float tileSize = 4f;
 	private float tileHeight = 2f;
 	private List<Transform> tiles = new List<Transform>();
+	public string levelMapPath;
 
-	void Awake()
+	void Start()
 	{
 		// Load level data
 		// List<int[][]> level_01_map = LoadLevelMap("Assets/Levels/Level 01/level 01.tmx");
 		// List<int[][]> level_map = LoadLevelMap("Assets/Levels/Level Pillars/level pillars.tmx");
-		// List<int[][]> level_map = LoadLevelMap("Assets/Levels/test.tmx");
+		List<int[][]> level_map = LoadLevelMap( levelMapPath );
 
 		// GenerateLevelLayer( level_map[0], 0 );
 		// GenerateLevelLayer( level_map[1], 1 );
 
 		// Instantiate tiles for the level
-		// GenerateLevel( level_map );
+		GenerateLevel( level_map );
 
 	}
 
-	int p = 0;
-	public string[] paths;
+	// int p = 0;
+	// public string[] paths;
 
-	void Update()
-	{
-		if( Input.GetKeyDown("space") )
-		{
-			string path = paths[ p++ % paths.Length ];
-			List<int[][]> level_map = LoadLevelMap( path );
-			GenerateLevel( level_map );
-		}
+	// void Update()
+	// {
+	// 	if( Input.GetKeyDown("space") )
+	// 	{
+	// 		string path = paths[ p++ % paths.Length ];
+	// 		List<int[][]> level_map = LoadLevelMap( path );
+	// 		GenerateLevel( level_map );
+	// 	}
 
-	}
+	// }
 
 	private List<int[][]> LoadLevelMap( string path )
 	{
