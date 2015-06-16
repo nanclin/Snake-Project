@@ -37,7 +37,8 @@ public class ObjectPool : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        containerObject = new GameObject("ObjectPool");
+        // containerObject = new GameObject("ObjectPool");
+        containerObject = gameObject;
        
         //Loop through the object prefabs and make a new list for each one.
         //We do this because the pool can only support prefabs set to it in the editor,
