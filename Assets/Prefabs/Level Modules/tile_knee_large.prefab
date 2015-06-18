@@ -44,8 +44,8 @@ GameObject:
   - 23: {fileID: 2375256}
   - 64: {fileID: 6442744}
   m_Layer: 8
-  m_Name: collision3
-  m_TagString: Untagged
+  m_Name: collision
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
