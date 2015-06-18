@@ -44,8 +44,8 @@ public class SnakeBodyCell : MonoBehaviour {
 
 	void OnGUI()
 	{
-		// Vector3 point = Camera.main.WorldToScreenPoint( transform.position + Vector3.right );
-		// GUI.Box( new Rect( point.x - 10, Screen.height - point.y - 10, 20, 20 ), id );
+		Vector3 point = Camera.main.WorldToScreenPoint( transform.position + Vector3.right );
+		GUI.Box( new Rect( point.x - 10, Screen.height - point.y - 10, 20, 20 ), id );
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
@@ -108,7 +108,7 @@ public class SnakeBodyCell : MonoBehaviour {
 	public float distanceToNext
 	{
 		get{
-			return Mathf.Abs( relPos - next.relPos );
+			return next.relPos - relPos;
 		}
 	}
 

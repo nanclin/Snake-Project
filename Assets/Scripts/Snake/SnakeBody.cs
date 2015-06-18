@@ -14,7 +14,7 @@ public class SnakeBody : MonoBehaviour
 	private SnakeBodyCell _tail;
 	private SnakeBodyCell firstEmptyCell;
 	private SnakeBodyCell currentItemCell;
-	private List<SnakeBodyCell> _cellList = new List<SnakeBodyCell>();
+	private List<SnakeBodyCell> _cellList;
 	[HideInInspector] public float correction = 0;
 	private int growQueue = 0;
 	private float growTime;
@@ -55,11 +55,6 @@ public class SnakeBody : MonoBehaviour
 
 	void OnDrawGizmos()
 	{
-		// if( GUI.Button( new Rect(200,0,100,20), "GROW" ) )
-		// 	Grow();
-
-		// GUI.Label( new Rect(0,0,Screen.width, Screen.height), ToString() );
-
 		// ITEM SLOTS DEBUG ///////////////////////////////////////////////////////////////
 		foreach( SnakeBodyCell cell in cellList )
 		{
@@ -70,6 +65,14 @@ public class SnakeBody : MonoBehaviour
 				MyDraw.DrawCircle( cell.transform.position, 0.3f, Color.red );
 		}
 		//////////////////////////////////////////////////////////// EO ITEM SLOTS DEBUG //
+	}
+
+	void OnGUI()
+	{
+		// GUI.Box( new Rect( 100, 0, 100, Screen.height ), ToString() );
+		
+		// if( GUI.Button( new Rect(200,0,100,20), "GROW" ) )
+		// 	Grow();
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 
@@ -92,6 +95,10 @@ public class SnakeBody : MonoBehaviour
 
 		// SETUP INIT CELLS ///////////////////////////////////////////////////////////////
 		// 
+
+		// Create empty list
+		_cellList = new List<SnakeBodyCell>();
+
 		// Add head cell to the list
 		_cellList.Add( _head );
 
@@ -381,11 +388,16 @@ public class SnakeBody : MonoBehaviour
 	override public string ToString()
 	{
 		string trace = "";
-		trace += "correction: " + correction + "\n";
-		for( int i = 0; i < _cellList.Count; i++ )
-		{
-			trace += "_cellList[" + i + "].relPos: " + _cellList[i].relPos + "\n";
-		}
+
+		// // Trace relative positions of cells
+		// trace += "correction: " + correction + "\n";
+		// for( int i = 0; i < _cellList.Count; i++ )
+		// 	trace += "_cellList[" + i + "].relPos: " + _cellList[i].relPos + "\n";
+
+		// Trace cell list
+		foreach( SnakeBodyCell cell in cellList )
+			trace += cell + "\n";
+
 		return trace;
 	}
 //////////////////////////////////////////////////////////// EO DEBUG //
