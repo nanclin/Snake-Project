@@ -32,6 +32,8 @@ public class ObjectPool : MonoBehaviour
     void Awake ()
     {
         instance = this;
+
+        DontDestroyOnLoad( transform.gameObject );
     }
    
     // Use this for initialization

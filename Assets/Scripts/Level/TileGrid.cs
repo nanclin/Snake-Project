@@ -65,9 +65,9 @@ public class TileGrid : MonoBehaviour
 			// Get layer node
 			XmlNode layer = layerNodes[i];
 
-			// Example of accessing layer attributes
-			string layerName = layer.Attributes["name"].Value;
-			print( "layerName: " + layerName );
+			// // Example of accessing layer attributes
+			// string layerName = layer.Attributes["name"].Value;
+			// print( "layerName: " + layerName );
 
 			// Sample only visible layers
 			if( layer.Attributes["visible"] == null ){
@@ -127,16 +127,8 @@ public class TileGrid : MonoBehaviour
 
 	private void GenerateLevel( List<int[][]> layerList )
 	{
-		// RESET PREVIOUS TILE GRID ///////////////////////////////////////////////////////////////
-		
-		// Pool tiles
-		foreach( Transform tile in tiles ){
-			ObjectPool.instance.PoolObject( tile.gameObject );
-		}
-
-		// Empty tiles list
-		tiles = new List<Transform>();
-		//////////////////////////////////////////////////////////// EO RESET PREVIOUS TILE GRID //
+		// Remove old tiles
+		CleanupTiles();
 
 		// Generate layers of current map
 		for( int i = 0; i < layerList.Count; i++ )
@@ -517,5 +509,16 @@ public class TileGrid : MonoBehaviour
 					tile.gameObject.SetActive( true );
 			}
 		}
+	}
+
+	public void CleanupTiles()
+	{
+		// Pool tiles
+		foreach( Transform tile in tiles ){
+			ObjectPool.instance.PoolObject( tile.gameObject );
+		}
+
+		// Empty tiles list
+		tiles = new List<Transform>();
 	}
 }

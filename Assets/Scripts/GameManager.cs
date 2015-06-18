@@ -325,6 +325,10 @@ public class GameManager : MonoBehaviour {
 	{
 		DebugEnter( "Loading" );
 
+		// Pool tiles
+		try{ GameObject.Find( "Tile Grid" ).GetComponent<TileGrid>().CleanupTiles(); }catch( System.Exception e ){}
+
+		// Start loading level
 		async = Application.LoadLevelAsync( currentLevel );
 	}
 
