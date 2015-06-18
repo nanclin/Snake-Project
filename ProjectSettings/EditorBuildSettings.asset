@@ -13,3 +13,5 @@ EditorBuildSettings:
     path: Assets/Scenes/Levels/Level 01.unity
   - enabled: 1
     path: Assets/Scenes/Levels/Level 02.unity
+  - enabled: 1
+    path: Assets/Scenes/demo_Rail.unity

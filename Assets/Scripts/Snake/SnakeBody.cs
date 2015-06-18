@@ -59,6 +59,7 @@ public class SnakeBody : MonoBehaviour
 	void OnDrawGizmos()
 	{
 		// ITEM SLOTS DEBUG ///////////////////////////////////////////////////////////////
+		if( cellList != null )
 		foreach( SnakeBodyCell cell in cellList )
 		{
 			if( cell == firstEmptyCell )
