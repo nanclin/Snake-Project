@@ -44,8 +44,9 @@ public class SnakeBodyCell : MonoBehaviour {
 
 	void OnGUI()
 	{
-		Vector3 point = Camera.main.WorldToScreenPoint( transform.position + Vector3.right );
-		GUI.Box( new Rect( point.x - 10, Screen.height - point.y - 10, 20, 20 ), id );
+		// // Show id next to the cell
+		// Vector3 point = Camera.main.WorldToScreenPoint( transform.position + Vector3.right );
+		// GUI.Box( new Rect( point.x - 10, Screen.height - point.y - 10, 20, 20 ), id );
 	}
 //////////////////////////////////////////////////////////// EO UNITY METHODS //
 

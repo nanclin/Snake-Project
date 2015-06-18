@@ -81,6 +81,9 @@ public class SnakeController : Initializer
 		respawnPoint = new GameObject("Spawn Point").transform;
 		respawnPoint.position = transform.position;
 		respawnPoint.rotation = transform.rotation;
+
+		// Set start state of the snake (default is SnakeState.Idle)
+		currentState = SnakeState.Move;
 	}
 	
 	// Update is called once per frame

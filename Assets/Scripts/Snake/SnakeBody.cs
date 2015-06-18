@@ -30,6 +30,9 @@ public class SnakeBody : MonoBehaviour
 		// Get head cell reference
 		_head = GetComponent<SnakeBodyCell>();
 		_head.body = this;
+
+		// Initialize body
+		Init();
 	}
 
 	void Update()
@@ -81,8 +84,10 @@ public class SnakeBody : MonoBehaviour
 	public void Init()
 	{
 		// Reposition
-		transform.position = snakeController.respawnPoint.position;
-		transform.rotation = snakeController.respawnPoint.rotation;
+		if( snakeController.respawnPoint != null ){	
+			transform.position = snakeController.respawnPoint.position;
+			transform.rotation = snakeController.respawnPoint.rotation;
+		}
 
 		// // Set Color of head
 		// _head.GetComponent<Renderer>().material.color = snakeController.settings.color;
