@@ -12,7 +12,7 @@ public class SnakeController : Initializer
 		public bool randomSpawnPosition = false;
 		[Range( 0, 1 )] public float buffer = 0.55f;
 		[Range( 0, 1 )] public float bondStrength = 1f;
-		[Range( 0, 10 )] public int lengthOnBorn = 3;
+		[Range( 0, 30 )] public int lengthOnBorn = 3;
 		[Range( 0, 5 )] public float growDelay = 0.5f;
 	}
 
@@ -84,6 +84,15 @@ public class SnakeController : Initializer
 
 		// Set start state of the snake (default is SnakeState.Idle)
 		currentState = SnakeState.Move;
+
+		// Enter game on a path
+		try{
+			spline = GameObject.Find("Start Spline").GetComponent<BezierSpline>();
+			currentState = SnakeState.OnRail;
+		}
+		catch( System.Exception e ){
+			print( "Start spline is missing!" );
+		}
 	}
 	
 	// Update is called once per frame
@@ -479,7 +488,7 @@ public class SnakeController : Initializer
 		// When snake comes to an end of the rail
 		if( traversed >= spline.length )
 		{
-			if( hole.type == HoleType.Hole )
+			if( hole == null || hole.type == HoleType.Hole )
 				currentState = SnakeState.Move;
 			else if( hole.type == HoleType.Exit ){
 				currentState = SnakeState.Idle;

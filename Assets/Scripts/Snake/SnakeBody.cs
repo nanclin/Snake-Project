@@ -97,7 +97,7 @@ public class SnakeBody : MonoBehaviour
 		_skeleton = new SnakeSkeleton();
 		skeleton.AppendJoint( transform.position + transform.forward * 0 );
 		// skeleton.AppendJoint( transform.position + transform.forward * -snakeController.settings.lengthOnBorn * 1.1f );
-		skeleton.AppendJoint( transform.position + transform.forward * -15f );
+		skeleton.AppendJoint( transform.position + transform.forward * -100f );
 
 		// SETUP INIT CELLS ///////////////////////////////////////////////////////////////
 		// 

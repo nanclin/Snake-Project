@@ -501,8 +501,6 @@ public class GameManager : MonoBehaviour {
 	private void LevelFinishedEnterState()
 	{
 		DebugEnter( "LevelFinished" );
-
-		snake.currentState = SnakeController.SnakeState.Idle;
 	}
 
 	private void LevelFinishedState()
