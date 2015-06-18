@@ -33,6 +33,7 @@ public class SnakeController : Initializer
 	private static bool FSM_DEBUG = false;
 
 	// Enums
+	public enum SnakeState { Idle, Move, Shrink, OnRail, Die, Dead }
 	public enum ControlMode{ PC, Android, AI, Debug }
 	public enum SteerMode{ None, Wander, Mouse, Item, Checkpoint, Pathfinding }
 
@@ -197,6 +198,7 @@ public class SnakeController : Initializer
 				break;
 
 			case "Hole":
+			case "Exit":
 				if( currentState != SnakeState.OnRail )
 				{
 					hole = other.GetComponent<Hole>();
@@ -800,10 +802,11 @@ public class SnakeController : Initializer
 		// Turn boost on
 		if( Input.GetKeyDown("space") && !boostOn )
 		{
-			bool item = body.GetItem();
-			if( item != false ){
-				TurnBoostOn();
-			}
+			// bool item = body.GetItem();
+			// if( item != false ){
+			// 	TurnBoostOn();
+			// }
+			TurnBoostOn();
 		}
 	}
 

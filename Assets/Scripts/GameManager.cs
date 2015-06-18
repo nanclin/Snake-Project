@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour {
 	public static float START_TIME;
 
 	// Static
-	public static bool FSM_DEBUG = true;
+	public static bool FSM_DEBUG = false;
 	
 	// System
 	public enum GameState { Idle, Loading, SplashScreen, MapScreen, NewGame, Run, GameOver, OpenExit, LevelFinished }
@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour {
 
 	void OnGUI ()
 	{
-		GUI.Box( new Rect( 0, 0, 100, Screen.width/3 ), currentState.ToString() );
+		// GUI.Box( new Rect( 0, 0, 100, Screen.width/3 ), currentState.ToString() );
 
 		// SPLASH SCREEN GUI ///////////////////////////////////////////////////////////////
 		if( currentState == GameState.SplashScreen )
@@ -290,7 +290,7 @@ public class GameManager : MonoBehaviour {
 		// Reset all snakes states
 		foreach( SnakeController snakeController in SnakeController.POOL ){
 			snakeController.SpawnSnake();
-			snakeController.currentState = SnakeState.Idle;
+			snakeController.currentState = SnakeController.SnakeState.Idle;
 		}
 
 		// Reset camera
@@ -422,7 +422,7 @@ public class GameManager : MonoBehaviour {
 
 		// Change all snakes states to move
 		foreach( SnakeController snakeController in SnakeController.POOL ){
-			snakeController.currentState = SnakeState.Move;
+			snakeController.currentState = SnakeController.SnakeState.Move;
 		}
 	}
 
@@ -465,7 +465,7 @@ public class GameManager : MonoBehaviour {
 		openTime = Time.time;
 
 		// Set snake still
-		snake.currentState = SnakeState.Idle;
+		snake.currentState = SnakeController.SnakeState.Idle;
 
 		// Enable exit
 		if( exit != null )
@@ -493,7 +493,7 @@ public class GameManager : MonoBehaviour {
 	{
 		DebugExit( "OpenExit" );
 
-		snake.currentState = SnakeState.Move;
+		snake.currentState = SnakeController.SnakeState.Move;
 	}
 // EO OPEN EXIT STATE //
 
@@ -502,7 +502,7 @@ public class GameManager : MonoBehaviour {
 	{
 		DebugEnter( "LevelFinished" );
 
-		snake.currentState = SnakeState.Idle;
+		snake.currentState = SnakeController.SnakeState.Idle;
 	}
 
 	private void LevelFinishedState()
