@@ -96,6 +96,12 @@ public class SnakeBody : MonoBehaviour
 		// SETUP INIT CELLS ///////////////////////////////////////////////////////////////
 		// 
 
+		// Remove old body cells from scene
+		if( _cellList != null )
+			foreach( SnakeBodyCell cell in _cellList )
+				if( !cell.isHead )
+					Destroy( cell );
+
 		// Create empty list
 		_cellList = new List<SnakeBodyCell>();
 
